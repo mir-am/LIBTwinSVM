@@ -252,6 +252,18 @@ class LSTSVM:
 if __name__ == '__main__':
     
     
-    pass
-
+    from preprocess import read_data
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score
+    
+    X, y, filename = read_data('../dataset/australian.csv')
+    
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    
+    lstsvm_model = LSTSVM('linear', 0.25, 0.5)
+    
+    lstsvm_model.fit(x_train, y_train)
+    pred = lstsvm_model.predict(x_test)
+    
+    print("Accuracy: %.2f" % (accuracy_score(y_test, pred) * 100))
 
