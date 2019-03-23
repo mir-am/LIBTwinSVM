@@ -8,6 +8,7 @@
 In this module, Standard TwinSVM and Least Squares TwinSVM estimators are defined.
 """
 
+from sklearn.base import BaseEstimator
 import numpy as np
 
 # TwinSVM code
@@ -39,7 +40,7 @@ def rbf_kernel(x, y, u):
     return np.exp(-2 * u) * np.exp(2 * u * np.dot(x, y))
 
 # Least Squares TwinSVM
-class LSTSVM:
+class LSTSVM(BaseEstimator):
 
 	"""
 	Least Squares Twin Support Vector Machine (LSTSVM) for binary classification
@@ -95,6 +96,21 @@ class LSTSVM:
          
          # Two hyperplanes attributes
          self.w1, self.b1, self.w2, self.b2 = None, None, None, None
+         
+	def get_params_names(self):
+
+         """
+         For retrieving the names of hyper-parameters of this classifier.
+        
+         Returns
+         -------
+         parameters : list of str, {['C1', 'C2'], ['C1', 'C2', 'gamma']}
+             Returns the names of the hyperparameters which are same as
+             the class' attributes.
+         """
+        
+         return ['C1', 'C2'] if self.kernel == 'linear' else ['C1', 'C2',
+                'gamma']
         
 	def fit(self, X, y):
 
