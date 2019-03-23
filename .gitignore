@@ -1,0 +1,3 @@
+# Git should ignores unnecessary files and folders
+__pycache__
+*.pyc
