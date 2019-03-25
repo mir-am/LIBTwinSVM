@@ -20,6 +20,9 @@
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -187,7 +190,7 @@
               <item row="0" column="2">
                <widget class="QPushButton" name="pushButton_3">
                 <property name="text">
-                 <string>Read</string>
+                 <string>Load</string>
                 </property>
                </widget>
               </item>
@@ -213,6 +216,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <attribute name="title">
         <string>Classify</string>
        </attribute>
@@ -334,6 +340,36 @@
                 <property name="text">
                  <string>Least Squares TwinSVM</string>
                 </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QGroupBox" name="groupBox_10">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="title">
+                 <string>Multi-class scheme</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_16">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_8">
+                   <item>
+                    <widget class="QRadioButton" name="radioButton_8">
+                     <property name="text">
+                      <string>One-vs-All</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="radioButton_9">
+                     <property name="text">
+                      <string>One-vs-One</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -611,7 +647,7 @@
      <x>0</x>
      <y>0</y>
      <width>768</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
