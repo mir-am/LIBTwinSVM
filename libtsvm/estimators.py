@@ -11,35 +11,192 @@ In this module, Standard TwinSVM and Least Squares TwinSVM estimators are define
 from sklearn.base import BaseEstimator
 import numpy as np
 
-# TwinSVM code
 
 
-
-
-# End of TwinSVM code
-
-def rbf_kernel(x, y, u):
-
+class TSVM(BaseEstimator):
+    
     """
-    It transforms samples into higher dimension using Gaussian (RBF) kernel.
+    Standard Twin Support Vector Machine for binary classification.
     
     Parameters
     ----------
-    x, y : array-like, shape (n_features,)
-        A feature vector or sample.
+    kernel : str, optional (default='linear')
+        Type of the kernel function which is either 'linear' or 'RBF'.
     
-    u : float
-        Parameter of the RBF kernel function.
+    rect_kernel : float, optional (default=1.0)
+        Percentage of training samples for Rectangular kernel.
         
-    Returns
-    -------
-    float
-        Value of kernel matrix for feature vector x and y.
+    C1 : float, optional (default=1.0)
+        Penalty parameter of first optimization problem.
+        
+    C2 : float, optional (default=1.0)
+        Penalty parameter of second optimization problem.
+        
+    gamma : float, optional (default=1.0)
+        Parameter of the RBF kernel function.
+    
+    Attributes
+    ----------
+    mat_C_t : array-like, shape = [n_samples, n_samples]
+        A matrix that contains kernel values.
+        
+    cls_name : str
+        Name of the classifier.
+    
+    w1 : array-like, shape=[n_features]
+        Weight vector of class +1's hyperplane.
+        
+    b1 : float
+        Bias of class +1's hyperplane.
+        
+    w2 : array-like, shape=[n_features]
+        Weight vector of class -1's hyperplane.
+    
+    b2 : float
+        Bias of class -1's hyperplane.
+    
     """
 
-    return np.exp(-2 * u) * np.exp(2 * u * np.dot(x, y))
+    def __init__(self, kernel='linear', rect_kernel=1, C1=2**0, C2=2**0, \
+                 gamma=2**0):
 
-# Least Squares TwinSVM
+        self.C1 = C1
+        self.C2 = C2
+        self.gamma = gamma
+        self.kernel = kernel
+        self.rect_kernel = rect_kernel
+        self.mat_C_t = None
+        self.cls_name = 'TSVM'
+        
+        # Two hyperplanes attributes
+        self.w1, self.b1, self.w2, self.b2 = None, None, None, None
+
+    def get_params_names(self):
+        
+        """
+        For retrieving the names of hyper-parameters of this classifier.
+        
+        Returns
+        -------
+        parameters : list of str, {['C1', 'C2'], ['C1', 'C2', 'gamma']}
+            Returns the names of the hyperparameters which are same as
+            the class' attributes.
+        """
+        
+        return ['C1', 'C2'] if self.kernel == 'linear' else ['C1', 'C2', 'gamma']
+
+    def fit(self, X_train, y_train):
+
+        """
+        It fits the binary TwinSVM model according to the given training data.
+        
+        Parameters
+        ----------
+        X_train : array-like, shape (n_samples, n_features) 
+           Training feature vectors, where n_samples is the number of samples
+           and n_features is the number of features. 
+           
+        y_train : array-like, shape(n_samples,)
+            Target values or class labels.
+           
+        """
+
+        # Matrix A or class 1 samples
+        mat_A = X_train[y_train == 1]
+
+        # Matrix B  or class -1 data 
+        mat_B = X_train[y_train == -1]
+
+        # Vectors of ones
+        mat_e1 = np.ones((mat_A.shape[0], 1))
+        mat_e2 = np.ones((mat_B.shape[0], 1))
+
+        if self.kernel == 'linear':  # Linear kernel
+            
+            mat_H = np.column_stack((mat_A, mat_e1))
+            mat_G = np.column_stack((mat_B, mat_e2))
+
+        elif self.kernel == 'RBF': # Non-linear 
+
+            # class 1 & class -1
+            mat_C = np.row_stack((mat_A, mat_B))
+
+            self.mat_C_t = np.transpose(mat_C)[:, :int(mat_C.shape[0] * self.rect_kernel)]
+
+            mat_H = np.column_stack((rbf_kernel(mat_A, self.mat_C_t, self.gamma), mat_e1))
+
+            mat_G = np.column_stack((rbf_kernel(mat_B, self.mat_C_t, self.gamma), mat_e2))
+
+
+        mat_H_t = np.transpose(mat_H)
+        mat_G_t = np.transpose(mat_G)
+
+        # Compute inverses:
+        # Regulariztion term used for ill-possible condition
+        reg_term = 2 ** float(-7)
+
+        mat_H_H = np.linalg.inv(np.dot(mat_H_t, mat_H) + (reg_term * np.identity(mat_H.shape[1])))
+        mat_G_G = np.linalg.inv(np.dot(mat_G_t, mat_G) + (reg_term * np.identity(mat_G.shape[1])))
+
+        # Wolfe dual problem of class 1
+        mat_dual1 = np.dot(np.dot(mat_G, mat_H_H), mat_G_t)
+        # Wolfe dual problem of class -1
+        mat_dual2 = np.dot(np.dot(mat_H, mat_G_G), mat_H_t)
+
+        # Obtaining Lagrange multipliers using ClipDCD optimizer
+        alpha_d1 = np.array(clipdcd.clippDCD_optimizer(mat_dual1, self.C1)).reshape(mat_dual1.shape[0], 1)
+        alpha_d2 = np.array(clipdcd.clippDCD_optimizer(mat_dual2, self.C2)).reshape(mat_dual2.shape[0], 1)
+
+        # Obtain hyperplanes
+        hyper_p_1 = -1 * np.dot(np.dot(mat_H_H, mat_G_t), alpha_d1)
+
+        # Class 1
+        self.w1 = hyper_p_1[:hyper_p_1.shape[0] - 1, :]
+        self.b1 = hyper_p_1[-1, :]
+
+        hyper_p_2 = np.dot(np.dot(mat_G_G, mat_H_t), alpha_d2)
+
+        # Class -1
+        self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
+        self.b2 = hyper_p_2[-1, :]
+
+
+    def predict(self, X_test):
+
+        """
+        Performs classification on samples in X using the TwinSVM model.
+        
+        Parameters
+        ----------
+        X_test : array-like, shape (n_samples, n_features)
+            Feature vectors of test data.
+                
+        Returns
+        -------
+        output : array, shape (n_samples,)
+            Predicted class lables of test data.
+            
+        """
+
+        # Calculate prependicular distances for new data points 
+        prepen_distance = np.zeros((X_test.shape[0], 2))
+
+        kernel_f = {'linear': lambda i: X_test[i, :] , 'RBF': lambda i: rbf_kernel(X_test[i, :], \
+                    self.mat_C_t, self.gamma)}
+
+        for i in range(X_test.shape[0]):
+
+            # Prependicular distance of data pint i from hyperplanes
+            prepen_distance[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) + self.b1)
+
+            prepen_distance[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) + self.b2)
+
+        # Assign data points to class +1 or -1 based on distance from hyperplanes
+        output = 2 * np.argmin(prepen_distance, axis=1) - 1
+
+        return output
+
+
 class LSTSVM(BaseEstimator):
 
 	"""
@@ -244,6 +401,9 @@ class LSTSVM(BaseEstimator):
              Predicted class lables of test data.
 		 """
         
+         # TODO: prediction can be sped up using NumPy's np.apply?!. It removes
+         # below for loop.
+         
          # Calculate prependicular distances for new data points 
          prepen_distance = np.zeros((X.shape[0], 2))
 
@@ -263,6 +423,28 @@ class LSTSVM(BaseEstimator):
          output = 2 * np.argmin(prepen_distance, axis=1) - 1
 
          return output
+
+
+def rbf_kernel(x, y, u):
+
+    """
+    It transforms samples into higher dimension using Gaussian (RBF) kernel.
+    
+    Parameters
+    ----------
+    x, y : array-like, shape (n_features,)
+        A feature vector or sample.
+    
+    u : float
+        Parameter of the RBF kernel function.
+        
+    Returns
+    -------
+    float
+        Value of kernel matrix for feature vector x and y.
+    """
+
+    return np.exp(-2 * u) * np.exp(2 * u * np.dot(x, y))
 
 
 if __name__ == '__main__':
