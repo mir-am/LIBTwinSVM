@@ -36,14 +36,14 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
     cls_name : str
         Name of the classifier.
     
-    bin_TSVM_models_ : list
+    bin_cls_ : list
         Stores intances of each binary :class:`TSVM` classifier.
     """    
     
     def __init__(self, estimator):
                
         self.estimator = estimator
-        self.cls_name = 'TSVM_OVO'
+        self.cls_name = 'OVO'
         
     def _validate_targets(self, y):
         
@@ -63,7 +63,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         valid
         """
         
-        check_is_fitted(self, ['bin_TSVM_models_'])
+        check_is_fitted(self, ['bin_cls_'])
         X = check_array(X, dtype=np.float64)
         
         n_samples, n_features = X.shape
@@ -98,8 +98,8 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         y = self._validate_targets(y)
         X, y = check_X_y(X, y, dtype=np.float64)
          
-        # Allocate n(n-1)/2 binary TSVM classifiers
-        self.bin_TSVM_models_ = ((self.classes_.size * (self.classes_.size - 1))
+        # Allocate n(n-1)/2 binary classifiers
+        self.bin_cls_ = ((self.classes_.size * (self.classes_.size - 1))
                                // 2 ) * [None]
         
         p = 0
@@ -121,10 +121,10 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
                 sub_prob_y_i_j[sub_prob_y_i_j == j] = -1
                 sub_prob_y_i_j[sub_prob_y_i_j == i] = 1
                 
-                self.bin_TSVM_models_[p] = TSVM(self.kernel, 1, self.C1, self.C2, \
-                               self.gamma)
+                # Assign an estiamtor
+                self.bin_cls_[p] = self.estimator
                 
-                self.bin_TSVM_models_[p].fit(sub_prob_X_i_j, sub_prob_y_i_j)
+                self.bin_cls_[p].fit(sub_prob_X_i_j, sub_prob_y_i_j)
                 
                 p = p + 1
                 
@@ -162,7 +162,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
                 
                 for j in range(i + 1, self.classes_.size):
                     
-                    y_pred = self.bin_TSVM_models_[p].predict(X[k, :].reshape(1, X.shape[1]))
+                    y_pred = self.bin_cls_[p].predict(X[k, :].reshape(1, X.shape[1]))
                     
                     if y_pred == 1:
                         

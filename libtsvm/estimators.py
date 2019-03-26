@@ -367,7 +367,7 @@ class LSTSVM(BaseEstimator):
                 z = (1 / reg_term) * (np.identity(mat_H.shape[1]) - 
                      np.dot(np.dot(mat_H_t, np.linalg.inv(reg_term * \
                      np.identity(mat_H.shape[0]) + np.dot(mat_H, mat_H_t))),
-                     mat_G))
+                     mat_H))
                 
                 hyper_surf1 = np.dot(self.C1 * (z - np.dot(np.dot(np.dot(z, mat_G_t),
                               np.linalg.inv((np.identity(mat_G.shape[0]) / self.C1) \
