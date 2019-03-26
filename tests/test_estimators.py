@@ -9,12 +9,18 @@
 This test module tests the functionalities of estimators.py module
 """
 
-# A temprory workaround to import LightTwinSVM for running tests
+# A temprory workaround to import LIBTwinSVM for running tests
 import sys
 sys.path.append('./')
 
 from libtsvm.estimators import LSTSVM
+from libtsvm.preprocess import read_data
+from sklearn.utils.testing import assert_greater
 import unittest
+import numpy as np
+
+# Load the dataset for testing
+X, y, file_name = read_data('./dataset/hepatitis.csv')
 
 class TestLSTSVM(unittest.TestCase):
     
@@ -57,6 +63,43 @@ class TestLSTSVM(unittest.TestCase):
         
         self.assertEqual(lstsvm_cls.get_params(), expected_output,
                          'set_params and get_params output don\'t match')
+        
+    def test_linear_lstsvm_hepatitis(self):
+        
+        """
+        It tests linear LSTSVM on hepatits dataset
+        """
+        
+        clf = LSTSVM('linear', 1, 0.5, 0.5)
+        clf.fit(X, y)
+        pred = clf.predict(X)
+        
+        assert_greater(np.mean(y == pred), 0.85)
+        
+    def test_rbf_lstsvm_hepatitis(self):
+        
+        """
+        It tests non-linear LSTSVM on hepatitis dataset
+        """
+        
+        clf = LSTSVM('RBF', 1, 0.5, 0.5, 0.1)
+        clf.fit(X, y)
+        pred = clf.predict(X)
+        
+        assert_greater(np.mean(y == pred), 0.95)
+        
+    def test_rectangular_lstsvm_hepatitis(self):
+        
+        """
+        It tests LSTSVM with rectangular on hepatitis dataset
+        """
+        
+        clf = LSTSVM('RBF', 0.75, 0.5, 2, 0.1)
+        clf.fit(X, y)
+        pred = clf.predict(X)
+        
+        assert_greater(np.mean(y == pred), 0.75)
+        
         
 
 if __name__ == '__main__':
