@@ -9,8 +9,8 @@ In this module, Standard TwinSVM and Least Squares TwinSVM estimators are define
 """
 
 from sklearn.base import BaseEstimator
+from optimizer import clipdcd
 import numpy as np
-
 
 
 class TSVM(BaseEstimator):
@@ -144,8 +144,8 @@ class TSVM(BaseEstimator):
         mat_dual2 = np.dot(np.dot(mat_H, mat_G_G), mat_H_t)
 
         # Obtaining Lagrange multipliers using ClipDCD optimizer
-        alpha_d1 = np.array(clipdcd.clippDCD_optimizer(mat_dual1, self.C1)).reshape(mat_dual1.shape[0], 1)
-        alpha_d2 = np.array(clipdcd.clippDCD_optimizer(mat_dual2, self.C2)).reshape(mat_dual2.shape[0], 1)
+        alpha_d1 = np.array(clipdcd.optimize(mat_dual1, self.C1)).reshape(mat_dual1.shape[0], 1)
+        alpha_d2 = np.array(clipdcd.optimize(mat_dual2, self.C2)).reshape(mat_dual2.shape[0], 1)
 
         # Obtain hyperplanes
         hyper_p_1 = -1 * np.dot(np.dot(mat_H_H, mat_G_t), alpha_d1)
@@ -458,10 +458,10 @@ if __name__ == '__main__':
     
     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     
-    lstsvm_model = LSTSVM('linear', 0.25, 0.5)
+    tsvm_model = TSVM('linear', 0.25, 0.5)
     
-    lstsvm_model.fit(x_train, y_train)
-    pred = lstsvm_model.predict(x_test)
+    tsvm_model.fit(x_train, y_train)
+    pred = tsvm_model.predict(x_test)
     
     print("Accuracy: %.2f" % (accuracy_score(y_test, pred) * 100))
 
