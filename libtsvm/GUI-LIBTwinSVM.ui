@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>487</height>
+    <width>819</width>
+    <height>609</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -646,8 +646,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>768</width>
-     <height>21</height>
+     <width>819</width>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -673,8 +673,8 @@
   </widget>
   <action name="actionOpen_Dataset">
    <property name="icon">
-    <iconset>
-     <normaloff>icons/file.png</normaloff>icons/file.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/img/icons/file.png</normaloff>:/img/icons/file.png</iconset>
    </property>
    <property name="text">
     <string>Open Dataset</string>
@@ -682,8 +682,8 @@
   </action>
   <action name="actionExit">
    <property name="icon">
-    <iconset>
-     <normaloff>icons/exit.png</normaloff>icons/exit.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/img/icons/exit.png</normaloff>:/img/icons/exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -694,8 +694,8 @@
   </action>
   <action name="actionSave_Results">
    <property name="icon">
-    <iconset>
-     <normaloff>icons/save.png</normaloff>icons/save.png</iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/img/icons/save.png</normaloff>:/img/icons/save.png</iconset>
    </property>
    <property name="text">
     <string>Save Results</string>
@@ -717,7 +717,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionExit</sender>
