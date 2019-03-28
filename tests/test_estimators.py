@@ -3,7 +3,7 @@
 
 # Developers: Mir, A. and Mahdi Rahbar
 # Version: 0.1 - 2019-03-20
-# License:
+# License: GNU General Public License v3.0
 
 """
 This test module tests the functionalities of estimators.py module
@@ -13,7 +13,7 @@ This test module tests the functionalities of estimators.py module
 import sys
 sys.path.append('./')
 
-from libtsvm.estimators import LSTSVM
+from libtsvm.estimators import TSVM, LSTSVM
 from libtsvm.preprocess import read_data
 from sklearn.utils.testing import assert_greater
 import unittest
@@ -100,7 +100,33 @@ class TestLSTSVM(unittest.TestCase):
         
         assert_greater(np.mean(y == pred), 0.75)
         
+
+class TestTSVM(unittest.TestCase):
+    
+    """
+    It tests the functionalities of the TSVM estimator
+    """
+    
+    def __init__(self, *args, **kwargs):
         
+        super().__init__(*args, **kwargs)
+        
+    def test_linear_tsvm_set_get_params(self):
+        
+        """
+        It checks that set_params and get_params works correctly for linear 
+        TSVM estimator
+        """
+        
+        expected_output = {'gamma': 1, 'C1': 0.5, 'rect_kernel': 1, 'C2': 1,
+                           'kernel': 'linear'}
+        
+        tsvm_clf = TSVM('linear')
+        tsvm_clf.set_params(**{'C1': 0.5, 'C2':1})
+        
+        self.assertEqual(tsvm_clf.get_params(), expected_output,
+                         'set_params and get_params output don\'t match')
+
 
 if __name__ == '__main__':
 

@@ -9,7 +9,7 @@ In this module, Standard TwinSVM and Least Squares TwinSVM estimators are define
 """
 
 from sklearn.base import BaseEstimator
-from optimizer import clipdcd
+from libtsvm.optimizer import clipdcd
 import numpy as np
 
 
