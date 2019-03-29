@@ -13,6 +13,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils import column_or_1d
+from copy import deepcopy
 import numpy as np
 
 
@@ -33,7 +34,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
     Attributes
     ----------
-    cls_name : str
+    clf_name : str
         Name of the classifier.
 
     bin_cls_ : list
@@ -43,7 +44,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, estimator):
 
         self.estimator = estimator
-        self.cls_name = 'OVO'
+        self.clf_name = 'OVO'
 
     def _validate_targets(self, y):
         """
@@ -97,7 +98,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
         # Allocate n(n-1)/2 binary classifiers
         self.bin_cls_ = ((self.classes_.size * (self.classes_.size - 1))
-                         // 2) * [None]
+                         // 2) * [self.estimator]
 
         p = 0
 
@@ -117,9 +118,6 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
                 # i-th class -> +1 and j-th class -> -1
                 sub_prob_y_i_j[sub_prob_y_i_j == j] = -1
                 sub_prob_y_i_j[sub_prob_y_i_j == i] = 1
-
-                # Assign an estiamtor
-                self.bin_cls_[p] = self.estimator
 
                 self.bin_cls_[p].fit(sub_prob_X_i_j, sub_prob_y_i_j)
 
@@ -174,3 +172,127 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         max_votes = np.argmax(votes, axis=1)
 
         return self.classes_.take(np.asarray(max_votes, dtype=np.int))
+    
+
+class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
+    
+    """
+    Multi-class classification using One-vs-One scheme
+    
+    Parameters
+    ----------
+    estimator : estimator object
+        An estimator object implementing `fit` and `predict`.
+        
+    Attributes
+    ----------
+    clf_name : str
+        Name of the classifier.
+    """
+    
+    def __init__(self, estimator):
+        
+        self.estimator = estimator
+        self.clf_name = "OVA"
+        
+    def _validate_targets(self, y):
+        """
+        Validates labels for training and testing classifier
+        """
+        y_ = column_or_1d(y, warn=True)
+        check_classification_targets(y)
+        self.classes_, y = np.unique(y_, return_inverse=True)
+
+        return np.asarray(y, dtype=np.int)
+    
+    def _validate_for_predict(self, X):
+        """
+        Checks that the classifier is already trained and also test samples are
+        valid
+        """
+
+        check_is_fitted(self, ['bin_clf_'])
+        X = check_array(X, dtype=np.float64)
+
+        n_samples, n_features = X.shape
+
+        if n_features != self.shape_fit_[1]:
+
+            raise ValueError("X.shape[1] = %d should be equal to %d,"
+                             "the number of features of training samples" %
+                             (n_features, self.shape_fit_[1]))
+
+        return X
+        
+    def fit(self, X, y):
+        """
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training feature vectors, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+
+        Returns
+        -------
+        self : object
+        """
+        
+        y = self._validate_targets(y)
+        X, y = check_X_y(X, y, dtype=np.float64)
+        
+        # Allocate n binary classifiers
+        self.bin_clf_ = self.classes_.size * [self.estimator]
+        
+        for idx, i in enumerate(self.classes_):
+            
+            print(i)
+            
+            # labels of samples of i-th class and other classes
+            mat_y_i = y[(y == i) | (y != i)]
+            
+            # For binary classification, labels must be {-1, +1}
+            # i-th class -> +1 and other class -> -1
+            mat_y_i[y == i] = 1
+            mat_y_i[y != i] = -1
+            
+            # TODO: BUG!!!!!!!
+            print(X[mat_y_i == 1].shape, X[mat_y_i == -1].shape)
+            
+            self.bin_clf_[idx].fit(X, mat_y_i)
+            
+        self.shape_fit_ = X.shape
+
+        return self
+    
+    def predict(self, X):
+        """
+        Performs classification on samples in X using the OVO-classifier model.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Feature vectors of test data.
+
+        Returns
+        -------
+        y_pred : array, shape (n_samples,)
+            Predicted class lables of test data.
+        """
+        
+        X = self._validate_for_predict(X)
+        
+        pred = np.zeros((X.shape[0], self.classes_.size), dtype=np.int)
+        
+        for i in range(X.shape[0]):
+            
+            for j in range(self.classes_.size):
+                
+                pred[i, j] = self.bin_clf_[j].predict(X[i, :].reshape(1, X.shape[1]))
+    
+        
+        test_lables = np.argmax(pred, axis=1)
+        
+        return self.classes_.take(np.asarray(test_lables, dtype=np.int))
