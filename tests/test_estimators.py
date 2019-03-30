@@ -126,6 +126,58 @@ class TestTSVM(unittest.TestCase):
         
         self.assertEqual(tsvm_clf.get_params(), expected_output,
                          'set_params and get_params output don\'t match')
+        
+    def test_rbf_tsvm_set_get_params(self):
+        
+        """
+        It checks that set_params and get_params works correctly for non-linear
+        TSVM estimator
+        """
+        
+        expected_output = {'C2': 2, 'C1': 4, 'rect_kernel': 1,
+                           'gamma': 0.625, 'kernel': 'RBF'}
+        
+        tsvm_cls = TSVM('RBF')
+        tsvm_cls.set_params(**{'C1': 4, 'C2': 2, 'gamma': 0.625})
+        
+        self.assertEqual(tsvm_cls.get_params(), expected_output,
+                         'set_params and get_params output don\'t match')
+        
+    def test_linear_tsvm_hepatitis(self):
+        
+        """
+        It tests linear TSVM estimator on hepatits dataset
+        """
+        
+        clf = TSVM('linear', 1, 0.5, 0.5)
+        clf.fit(X, y)
+        pred = clf.predict(X)
+        
+        assert_greater(np.mean(y == pred), 0.78)
+        
+    def test_rbf_tsvm_hepatitis(self):
+        
+        """
+        It tests non-linear TSVM estimator on hepatitis dataset
+        """
+        
+        clf = TSVM('RBF', 1, 0.5, 0.5, 0.1)
+        clf.fit(X, y)
+        pred = clf.predict(X)
+        
+        assert_greater(np.mean(y == pred), 0.95)
+
+    def test_rectangular_tsvm_hepatitis(self):
+        
+        """
+        It tests TSVM with rectangular on hepatitis dataset
+        """
+        
+        clf = TSVM('RBF', 0.75, 0.5, 2, 0.1)
+        clf.fit(X, y)
+        pred = clf.predict(X)
+        
+        assert_greater(np.mean(y == pred), 0.95)
 
 
 if __name__ == '__main__':
