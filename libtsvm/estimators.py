@@ -159,7 +159,7 @@ class TSVM(BaseEstimator):
 
     def predict(self, X_test):
         """
-        Performs classification on samples in X using the TwinSVM model.
+        Performs classification on samples in X using the binary TwinSVM model.
 
         Parameters
         ----------
@@ -190,7 +190,35 @@ class TSVM(BaseEstimator):
         output = 2 * np.argmin(prepen_distance, axis=1) - 1
 
         return output
+    
+    def decision_function(self, X):
+        """
+        Computes distance of test samples from both non-parallel hyperplanes
+        
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+        
+        Returns
+        -------
+        : array, shape(n_samples, 2)
+            distance from both hyperplanes.
+        """
+        
+        dist = np.zeros((X.shape[0], 2), dtype=np.float64)
+        
+        kernel_f = {'linear': lambda i: X[i, :],
+                    'RBF': lambda i: rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
+        
+        for i in range(X.shape[0]):
 
+            # Prependicular distance of data pint i from hyperplanes
+            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) + self.b1)
+
+            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) + self.b2)
+            
+        return dist
+        
 
 class LSTSVM(BaseEstimator):
 

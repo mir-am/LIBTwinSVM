@@ -13,6 +13,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils import column_or_1d
+from sklearn.base import clone
 from copy import deepcopy
 import numpy as np
 
@@ -244,15 +245,16 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         X, y = check_X_y(X, y, dtype=np.float64)
         
         # Allocate n binary classifiers
-        self.bin_clf_ = self.classes_.size * [self.estimator]
+        # Note that an estimator should be cloned for training a multi-class method
+        self.bin_clf_ =  [clone(self.estimator) for i in range(self.classes_.size)]
         
-        for idx, i in enumerate(self.classes_):
+        for i in range(self.classes_.size):
             
             print(i)
             
             # labels of samples of i-th class and other classes
             mat_y_i = y[(y == i) | (y != i)]
-            
+                    
             # For binary classification, labels must be {-1, +1}
             # i-th class -> +1 and other class -> -1
             mat_y_i[y == i] = 1
@@ -260,10 +262,14 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
             
             # TODO: BUG!!!!!!!
             print(X[mat_y_i == 1].shape, X[mat_y_i == -1].shape)
+            #print(X[y == 1].shape, X[y == -1].shape)
+            self.bin_clf_[i].fit(X, mat_y_i)
             
-            self.bin_clf_[idx].fit(X, mat_y_i)
+            print(self.bin_clf_[i].w1)
             
         self.shape_fit_ = X.shape
+        self.bin_clf_[2].C1 = 2
+        print(self.bin_clf_)
 
         return self
     
@@ -284,15 +290,22 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         
         X = self._validate_for_predict(X)
         
-        pred = np.zeros((X.shape[0], self.classes_.size), dtype=np.int)
+        pred = np.zeros((X.shape[0], self.classes_.size), dtype=np.float64)
         
         for i in range(X.shape[0]):
             
             for j in range(self.classes_.size):
                 
-                pred[i, j] = self.bin_clf_[j].predict(X[i, :].reshape(1, X.shape[1]))
+                #print(self.bin_clf_[j].decision_function(X[i, :].reshape(1, X.shape[1])))
+                
+                print(self.bin_clf_[j].w1)
+                
+                pred[i, j] = self.bin_clf_[j].decision_function(X[i, :].reshape(1,
+                    X.shape[1]))[0, 1]
     
         
-        test_lables = np.argmax(pred, axis=1)
+        test_lables = np.argmin(pred, axis=1)
+        
+        print(pred)
         
         return self.classes_.take(np.asarray(test_lables, dtype=np.int))
