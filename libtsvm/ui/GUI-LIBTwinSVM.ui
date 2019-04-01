@@ -16,23 +16,23 @@
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="main_win">
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="1" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tabs">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="data_tab">
        <attribute name="title">
         <string>Data</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QFrame" name="frame_2">
+         <widget class="QFrame" name="data_tab_frame">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -54,13 +54,13 @@
             </spacer>
            </item>
            <item row="4" column="0">
-            <widget class="QGroupBox" name="groupBox_8">
+            <widget class="QGroupBox" name="feature_box">
              <property name="title">
               <string>Features</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_13">
               <item row="0" column="0">
-               <widget class="QTableWidget" name="tableWidget">
+               <widget class="QTableWidget" name="feature_table">
                 <column>
                  <property name="text">
                   <string>No</string>
@@ -77,27 +77,27 @@
             </widget>
            </item>
            <item row="0" column="0" colspan="2">
-            <widget class="QGroupBox" name="groupBox_6">
+            <widget class="QGroupBox" name="import_box">
              <property name="title">
               <string>Import</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_11">
               <item row="0" column="3">
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="open_btn">
                 <property name="text">
                  <string>Open</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_11">
+               <widget class="QLabel" name="path_label">
                 <property name="text">
                  <string>Path:</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="header_check">
                 <property name="text">
                  <string>Header</string>
                 </property>
@@ -107,54 +107,54 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QLineEdit" name="lineEdit"/>
+               <widget class="QLineEdit" name="path_box"/>
               </item>
              </layout>
             </widget>
            </item>
            <item row="3" column="0" colspan="2">
-            <widget class="QGroupBox" name="groupBox_7">
+            <widget class="QGroupBox" name="info_box">
              <property name="title">
               <string>Info</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_12">
               <item row="0" column="2">
-               <widget class="QLabel" name="label_14">
+               <widget class="QLabel" name="feature_label">
                 <property name="text">
                  <string>Features:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="3">
-               <widget class="QLabel" name="label_15">
+               <widget class="QLabel" name="no_features">
                 <property name="text">
                  <string>0</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="4">
-               <widget class="QLabel" name="label_16">
+               <widget class="QLabel" name="class_label">
                 <property name="text">
                  <string>Classes:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="5">
-               <widget class="QLabel" name="label_17">
+               <widget class="QLabel" name="no_classes">
                 <property name="text">
                  <string>0</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_12">
+               <widget class="QLabel" name="samples_label">
                 <property name="text">
                  <string>Samples:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLabel" name="label_13">
+               <widget class="QLabel" name="no_samples">
                 <property name="text">
                  <string>0</string>
                 </property>
@@ -164,22 +164,22 @@
             </widget>
            </item>
            <item row="2" column="0" colspan="2">
-            <widget class="QGroupBox" name="groupBox_9">
+            <widget class="QGroupBox" name="read_box">
              <property name="title">
               <string>Read</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_14">
               <item row="0" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <layout class="QHBoxLayout" name="read_hz_lay">
                 <item>
-                 <widget class="QCheckBox" name="checkBox_3">
+                 <widget class="QCheckBox" name="normalize_box">
                   <property name="text">
                    <string>Normalize</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkBox_2">
+                 <widget class="QCheckBox" name="shuffle_box">
                   <property name="text">
                    <string>Shuffle</string>
                   </property>
@@ -188,7 +188,7 @@
                </layout>
               </item>
               <item row="0" column="2">
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="load_btn">
                 <property name="text">
                  <string>Load</string>
                 </property>
@@ -215,7 +215,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="classify_tab">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -224,7 +224,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="0" rowspan="2">
-         <widget class="QFrame" name="frame">
+         <widget class="QFrame" name="classigy_tab_frame">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -233,13 +233,13 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="2">
-            <widget class="QGroupBox" name="groupBox_3">
+            <widget class="QGroupBox" name="eval_box">
              <property name="title">
               <string>Evaluation</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_6">
               <item row="0" column="0">
-               <widget class="QRadioButton" name="radioButton_6">
+               <widget class="QRadioButton" name="cv_rbtn">
                 <property name="text">
                  <string>Cross-validation</string>
                 </property>
@@ -249,23 +249,23 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_7">
+               <widget class="QRadioButton" name="tt_split_rbtn">
                 <property name="text">
                  <string>Train/Test split</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout">
+               <layout class="QHBoxLayout" name="fold_hz_lay">
                 <item>
-                 <widget class="QLabel" name="label">
+                 <widget class="QLabel" name="folds_label">
                   <property name="text">
                    <string>Folds:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox">
+                 <widget class="QSpinBox" name="cv_folds">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -280,16 +280,16 @@
                </layout>
               </item>
               <item row="3" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <layout class="QHBoxLayout" name="tt_percent_hz_lay">
                 <item>
-                 <widget class="QLabel" name="label_2">
+                 <widget class="QLabel" name="tt_percent_label">
                   <property name="text">
                    <string>Percentage:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_2">
+                 <widget class="QSpinBox" name="tt_percentage">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -320,13 +320,13 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="groupBox">
+            <widget class="QGroupBox" name="classifiers_box">
              <property name="title">
               <string>Classifiers</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
               <item row="0" column="0">
-               <widget class="QRadioButton" name="radioButton">
+               <widget class="QRadioButton" name="STSVM_rbtn">
                 <property name="text">
                  <string>Standard TwinSVM</string>
                 </property>
@@ -336,14 +336,14 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_2">
+               <widget class="QRadioButton" name="LSTSVM_rbtn">
                 <property name="text">
                  <string>Least Squares TwinSVM</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QGroupBox" name="groupBox_10">
+               <widget class="QGroupBox" name="mc_box">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -352,16 +352,16 @@
                 </property>
                 <layout class="QGridLayout" name="gridLayout_16">
                  <item row="0" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <layout class="QHBoxLayout" name="mc_hz_lay">
                    <item>
-                    <widget class="QRadioButton" name="radioButton_8">
+                    <widget class="QRadioButton" name="ova_rbtn">
                      <property name="text">
                       <string>One-vs-All</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QRadioButton" name="radioButton_9">
+                    <widget class="QRadioButton" name="ovo_rbtn">
                      <property name="text">
                       <string>One-vs-One</string>
                      </property>
@@ -376,13 +376,13 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QGroupBox" name="groupBox_2">
+            <widget class="QGroupBox" name="kernel_box">
              <property name="title">
               <string>Kernel</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_7">
               <item row="0" column="0">
-               <widget class="QRadioButton" name="radioButton_3">
+               <widget class="QRadioButton" name="lin_kernel_rbtn">
                 <property name="text">
                  <string>Linear</string>
                 </property>
@@ -392,30 +392,30 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_4">
+               <widget class="QRadioButton" name="rbf_kernel_rbtn">
                 <property name="text">
                  <string>RBF</string>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QRadioButton" name="radioButton_5">
+               <widget class="QRadioButton" name="rect_kernel_rbtn">
                 <property name="text">
                  <string>Rectangular</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <layout class="QHBoxLayout" name="rect_hz_lay">
                 <item>
-                 <widget class="QLabel" name="label_10">
+                 <widget class="QLabel" name="percent_label">
                   <property name="text">
                    <string>Percentage:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_9">
+                 <widget class="QSpinBox" name="rect_kernel_percent">
                   <property name="minimum">
                    <number>5</number>
                   </property>
@@ -430,22 +430,22 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="groupBox_4">
+            <widget class="QGroupBox" name="hparam_box">
              <property name="title">
               <string>Hyper-Parameters</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
               <item row="0" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <layout class="QHBoxLayout" name="c1_hz_lay">
                 <item>
-                 <widget class="QLabel" name="label_3">
+                 <widget class="QLabel" name="C1_label">
                   <property name="text">
                    <string>C1:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_3">
+                 <widget class="QSpinBox" name="C1_lbound">
                   <property name="minimum">
                    <number>-10</number>
                   </property>
@@ -458,14 +458,14 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_4">
+                 <widget class="QLabel" name="c1_to_label">
                   <property name="text">
                    <string>to</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_4">
+                 <widget class="QSpinBox" name="C1_ubound">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -480,16 +480,16 @@
                </layout>
               </item>
               <item row="0" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <layout class="QHBoxLayout" name="c2_hz_lay">
                 <item>
-                 <widget class="QLabel" name="label_5">
+                 <widget class="QLabel" name="C2_label">
                   <property name="text">
                    <string>C2:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_5">
+                 <widget class="QSpinBox" name="C2_lbound">
                   <property name="minimum">
                    <number>-10</number>
                   </property>
@@ -502,14 +502,14 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_6">
+                 <widget class="QLabel" name="c2_to_label">
                   <property name="text">
                    <string>to</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_6">
+                 <widget class="QSpinBox" name="C2_ubound">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -524,16 +524,16 @@
                </layout>
               </item>
               <item row="1" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <layout class="QHBoxLayout" name="u_hz_lay">
                 <item>
-                 <widget class="QLabel" name="label_7">
+                 <widget class="QLabel" name="u_label">
                   <property name="text">
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;u:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_7">
+                 <widget class="QSpinBox" name="u_lbound">
                   <property name="minimum">
                    <number>-20</number>
                   </property>
@@ -546,14 +546,14 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_8">
+                 <widget class="QLabel" name="u_to_label">
                   <property name="text">
                    <string>to</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_8">
+                 <widget class="QSpinBox" name="u_ubound">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -571,43 +571,64 @@
             </widget>
            </item>
            <item row="2" column="0" colspan="3">
-            <widget class="QGroupBox" name="groupBox_5">
+            <widget class="QGroupBox" name="gs_box">
              <property name="title">
               <string>Grid Search</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
+              <item row="0" column="6">
+               <widget class="QLabel" name="elapsed_time">
+                <property name="text">
+                 <string>00:00:00</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="acc">
+                <property name="text">
+                 <string>0.0</string>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="0">
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="run_btn">
                 <property name="text">
                  <string>Run!</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_9">
-                <property name="text">
-                 <string>Best Acc:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLabel" name="label_18">
+              <item row="0" column="3">
+               <widget class="QLabel" name="acc_label">
                 <property name="text">
                  <string>Acc:</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="3">
-               <widget class="QLabel" name="label_19">
+              <item row="1" column="0" colspan="6">
+               <widget class="QProgressBar" name="gs_progress_bar">
+                <property name="value">
+                 <number>0</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="best_acc_label">
+                <property name="text">
+                 <string>Best Acc:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5">
+               <widget class="QLabel" name="elapsed_t_label">
                 <property name="text">
                  <string>Elapsed:</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" colspan="4">
-               <widget class="QProgressBar" name="progressBar">
-                <property name="value">
-                 <number>0</number>
+              <item row="0" column="2">
+               <widget class="QLabel" name="best_acc">
+                <property name="text">
+                 <string>0.0</string>
                 </property>
                </widget>
               </item>
@@ -619,13 +640,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="visualize_tab">
        <attribute name="title">
         <string>Visualize</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_15">
         <item row="0" column="0">
-         <widget class="QFrame" name="frame_3">
+         <widget class="QFrame" name="vis_tab_frame">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
