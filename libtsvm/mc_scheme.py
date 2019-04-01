@@ -250,8 +250,6 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         
         for i in range(self.classes_.size):
             
-            print(i)
-            
             # labels of samples of i-th class and other classes
             mat_y_i = y[(y == i) | (y != i)]
                     
@@ -260,17 +258,9 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
             mat_y_i[y == i] = 1
             mat_y_i[y != i] = -1
             
-            # TODO: BUG!!!!!!!
-            print(X[mat_y_i == 1].shape, X[mat_y_i == -1].shape)
-            #print(X[y == 1].shape, X[y == -1].shape)
             self.bin_clf_[i].fit(X, mat_y_i)
             
-            print(self.bin_clf_[i].w1)
-            
         self.shape_fit_ = X.shape
-        self.bin_clf_[2].C1 = 2
-        print(self.bin_clf_)
-
         return self
     
     def predict(self, X):
@@ -284,7 +274,7 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
 
         Returns
         -------
-        y_pred : array, shape (n_samples,)
+        test_labels : array, shape (n_samples,)
             Predicted class lables of test data.
         """
         
@@ -296,16 +286,9 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
             
             for j in range(self.classes_.size):
                 
-                #print(self.bin_clf_[j].decision_function(X[i, :].reshape(1, X.shape[1])))
-                
-                print(self.bin_clf_[j].w1)
-                
                 pred[i, j] = self.bin_clf_[j].decision_function(X[i, :].reshape(1,
                     X.shape[1]))[0, 1]
-    
+                #pred[i, j] = self.bin_clf_[j].predict(X[i, :].reshape(1, X.shape[1]))
         
-        test_lables = np.argmin(pred, axis=1)
-        
-        print(pred)
-        
+        test_lables = np.argmin(pred, axis=1)  
         return self.classes_.take(np.asarray(test_lables, dtype=np.int))
