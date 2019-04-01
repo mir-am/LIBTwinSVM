@@ -13,26 +13,25 @@ from libtsvm.optimizer import clipdcd
 import numpy as np
 
 
-class TSVM(BaseEstimator):
-
+class BaseTSVM(BaseEstimator):
     """
-    Standard Twin Support Vector Machine for binary classification.
-
+    Base class for TSVM-based estimators
+    
     Parameters
     ----------
-    kernel : str, optional (default='linear')
+    kernel : str 
         Type of the kernel function which is either 'linear' or 'RBF'.
 
-    rect_kernel : float, optional (default=1.0)
+    rect_kernel : float
         Percentage of training samples for Rectangular kernel.
 
-    C1 : float, optional (default=1.0)
+    C1 : float
         Penalty parameter of first optimization problem.
 
-    C2 : float, optional (default=1.0)
+    C2 : float
         Penalty parameter of second optimization problem.
 
-    gamma : float, optional (default=1.0)
+    gamma : float
         Parameter of the RBF kernel function.
 
     Attributes
@@ -54,26 +53,24 @@ class TSVM(BaseEstimator):
 
     b2 : float
         Bias of class -1's hyperplane.
-
     """
-
-    def __init__(self, kernel='linear', rect_kernel=1, C1=2**0, C2=2**0,
-                 gamma=2**0):
-
+    
+    def __init__(self, kernel, rect_kernel, C1, C2, gamma):
+        
         self.C1 = C1
         self.C2 = C2
         self.gamma = gamma
         self.kernel = kernel
         self.rect_kernel = rect_kernel
         self.mat_C_t = None
-        self.cls_name = 'TSVM'
-
+        self.clf_name = None
+        
         # Two hyperplanes attributes
         self.w1, self.b1, self.w2, self.b2 = None, None, None, None
-
+        
     def get_params_names(self):
         """
-        For retrieving the names of hyper-parameters of this classifier.
+        For retrieving the names of hyper-parameters of the TSVM-based estimator.
 
         Returns
         -------
@@ -82,7 +79,107 @@ class TSVM(BaseEstimator):
             the class' attributes.
         """
 
-        return ['C1', 'C2'] if self.kernel == 'linear' else ['C1', 'C2', 'gamma']
+        return ['C1', 'C2'] if self.kernel == 'linear' else ['C1', 'C2',
+               'gamma']
+        
+    def fit(self, X, y):
+        """
+        It fits a TSVM-based estimator. 
+        THIS METHOD SHOULD BE IMPLEMENTED IN CHILD CLASS.
+        
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+           Training feature vectors, where n_samples is the number of samples
+           and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+        """
+        
+        pass # Impelement fit method in child class
+        
+    def predict(self, X):
+        """
+        Performs classification on samples in X using the TSVM-based model.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Feature vectors of test data.
+
+        Returns
+        -------
+        array, shape (n_samples,)
+            Predicted class lables of test data.
+        """
+        
+        # Assign data points to class +1 or -1 based on distance from hyperplanes
+        return 2 * np.argmin(self.decision_function(X), axis=1) - 1
+    
+    def decision_function(self, X):
+        """
+        Computes distance of test samples from both non-parallel hyperplanes
+        
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+        
+        Returns
+        -------
+        : array, shape(n_samples, 2)
+            distance from both hyperplanes.
+        """
+        
+        dist = np.zeros((X.shape[0], 2), dtype=np.float64)
+        
+        kernel_f = {'linear': lambda i: X[i, :],
+                    'RBF': lambda i: rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
+        
+        # TODO: prediction can be sped up using NumPy's np.apply?!. It removes
+        # below for loop.
+        for i in range(X.shape[0]):
+
+            # Prependicular distance of data pint i from hyperplanes
+            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) \
+                + self.b1)
+
+            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) \
+                + self.b2)
+            
+        return dist
+    
+
+class TSVM(BaseTSVM):
+
+    """
+    Standard Twin Support Vector Machine for binary classification.
+    It inherits attributes of :class:`BaseTSVM`.
+
+    Parameters
+    ----------
+    kernel : str, optional (default='linear')
+        Type of the kernel function which is either 'linear' or 'RBF'.
+
+    rect_kernel : float, optional (default=1.0)
+        Percentage of training samples for Rectangular kernel.
+
+    C1 : float, optional (default=1.0)
+        Penalty parameter of first optimization problem.
+
+    C2 : float, optional (default=1.0)
+        Penalty parameter of second optimization problem.
+
+    gamma : float, optional (default=1.0)
+        Parameter of the RBF kernel function.
+    """
+
+    def __init__(self, kernel='linear', rect_kernel=1, C1=2**0, C2=2**0,
+                 gamma=2**0):
+
+        super(TSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
+
+        self.cls_name = 'TSVM'
 
     def fit(self, X_train, y_train):
         """
@@ -157,74 +254,13 @@ class TSVM(BaseEstimator):
         self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
         self.b2 = hyper_p_2[-1, :]
 
-    def predict(self, X_test):
-        """
-        Performs classification on samples in X using the binary TwinSVM model.
-
-        Parameters
-        ----------
-        X_test : array-like, shape (n_samples, n_features)
-            Feature vectors of test data.
-
-        Returns
-        -------
-        output : array, shape (n_samples,)
-            Predicted class lables of test data.
-
-        """
-
-        # Calculate prependicular distances for new data points
-        prepen_distance = np.zeros((X_test.shape[0], 2))
-
-        kernel_f = {'linear': lambda i: X_test[i, :], 'RBF': lambda i: rbf_kernel(X_test[i, :],
-                                                                                  self.mat_C_t, self.gamma)}
-
-        for i in range(X_test.shape[0]):
-
-            # Prependicular distance of data pint i from hyperplanes
-            prepen_distance[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) + self.b1)
-
-            prepen_distance[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) + self.b2)
-
-        # Assign data points to class +1 or -1 based on distance from hyperplanes
-        output = 2 * np.argmin(prepen_distance, axis=1) - 1
-
-        return output
-    
-    def decision_function(self, X):
-        """
-        Computes distance of test samples from both non-parallel hyperplanes
         
-        Parameters
-        ----------
-        X : array-like, shape (n_samples, n_features)
-        
-        Returns
-        -------
-        : array, shape(n_samples, 2)
-            distance from both hyperplanes.
-        """
-        
-        dist = np.zeros((X.shape[0], 2), dtype=np.float64)
-        
-        kernel_f = {'linear': lambda i: X[i, :],
-                    'RBF': lambda i: rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
-        
-        for i in range(X.shape[0]):
-
-            # Prependicular distance of data pint i from hyperplanes
-            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) + self.b1)
-
-            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) + self.b2)
-            
-        return dist
-        
-
-class LSTSVM(BaseEstimator):
+class LSTSVM(BaseTSVM):
 
     """
     Least Squares Twin Support Vector Machine (LSTSVM) for binary classification
-
+    It inherits attributes of :class:`BaseTSVM`.
+    
     Parameters
     ----------
     kernel : str, optional (default='linear')
@@ -241,55 +277,14 @@ class LSTSVM(BaseEstimator):
 
     gamma : float, optional (default=1.0)
         Parameter of the RBF kernel function.
-
-    Attributes
-    ----------
-    mat_C_t : array-like, shape = [n_samples, n_samples]
-    A matrix that contains kernel values.
-
-    cls_name : str
-        Name of the classifier.
-
-    w1 : array-like, shape=[n_features]
-        Weight vector of class +1's hyperplane.
-
-    b1 : float
-        Bias of class +1's hyperplane.
-
-    w2 : array-like, shape=[n_features]
-        Weight vector of class -1's hyperplane.
-
-    b2 : float
-        Bias of class -1's hyperplane.
     """
 
     def __init__(self, kernel='linear', rect_kernel=1, C1=2**0, C2=2**0,
                  gamma=2**0):
 
-        self.kernel = kernel
-        self.rect_kernel = rect_kernel
-        self.C1 = C1
-        self.C2 = C2
-        self.gamma = gamma
-        self.mat_C_t = None
+        super(LSTSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
+
         self.cls_name = 'LSTSVM'
-
-        # Two hyperplanes attributes
-        self.w1, self.b1, self.w2, self.b2 = None, None, None, None
-
-    def get_params_names(self):
-        """
-        For retrieving the names of hyper-parameters of this classifier.
-
-        Returns
-        -------
-        parameters : list of str, {['C1', 'C2'], ['C1', 'C2', 'gamma']}
-            Returns the names of the hyperparameters which are same as
-            the class' attributes.
-        """
-
-        return ['C1', 'C2'] if self.kernel == 'linear' else ['C1', 'C2',
-                                                             'gamma']
 
     def fit(self, X, y):
         """
@@ -405,44 +400,6 @@ class LSTSVM(BaseEstimator):
 
                 self.w2 = hyper_surf2[:hyper_surf2.shape[0] - 1, :]
                 self.b2 = hyper_surf2[-1, :]
-
-    def predict(self, X):
-        """
-        Performs classification on samples in X using the TwinSVM model.
-
-        Parameters
-        ----------
-        X : array-like, shape (n_samples, n_features)
-           Feature vectors of test data.
-
-        Returns
-        -------
-        output : array, shape (n_samples,)
-            Predicted class lables of test data.
-                """
-
-        # TODO: prediction can be sped up using NumPy's np.apply?!. It removes
-        # below for loop.
-
-        # Calculate prependicular distances for new data points
-        prepen_distance = np.zeros((X.shape[0], 2))
-
-        kernel_f = {'linear': lambda i: X[i, :], 'RBF': lambda i:
-                    rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
-
-        for i in range(X.shape[0]):
-
-            # Prependicular distance of data pint i from hyperplanes
-            prepen_distance[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i),
-                                                  self.w1) + self.b1)
-
-            prepen_distance[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i),
-                                                  self.w2) + self.b2)
-
-    # Assign data points to class +1 or -1 based on distance from hyperplanes
-        output = 2 * np.argmin(prepen_distance, axis=1) - 1
-
-        return output
 
 
 def rbf_kernel(x, y, u):
