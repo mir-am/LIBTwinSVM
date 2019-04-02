@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>819</width>
-    <height>609</height>
+    <height>615</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -102,7 +102,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit">
+                 <widget class="QLineEdit" name="sep_char_box">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>

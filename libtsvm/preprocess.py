@@ -12,8 +12,65 @@ In this module, functions for reading and processing datasets are defined.
 from os.path import splitext, split
 from sklearn.datasets import load_svmlight_file
 import numpy as np
+import pandas as pd
 import csv
 
+
+def load_data(file_path, sep, header, shuffle, normalize):
+    """
+    It reads a CSV file into pandas DataFrame.
+        
+    Parameters
+    ----------
+    file_path : str
+        Path to the dataset file.
+        
+    sep : str
+        Separator character
+        
+    header : boolean
+        whether the dataset has header names or not.
+        
+    shuffle : boolean
+        whether to shuffle the dataset or not.
+        
+    normalize : boolean
+        whether to normalize the dataset or not.
+    
+    Returns
+    -------
+    data_train : array-like, shape (n_samples, n_features) 
+        Training samples in NumPy array.
+        
+    data_labels : array-like, shape(n_samples,) 
+        Class labels of training samples.
+        
+    file_name : str
+        Dataset's filename.
+    """
+    
+    df = pd.read_csv(file_path, sep=sep)
+
+    # First extract class labels
+    y_true = df.iloc[:, 0].values
+    df.drop(df.columns[0], axis=1)
+        
+    if normalize:
+    
+        df = (df - df.mean()) / df.std()
+    
+        #print(df)
+        
+    if shuffle:
+        
+        df = df.sample(frac=1).reset_index(drop=True)
+        
+        #print(df)
+    
+    X_train = df.iloc[:, 1:].values # Feature values
+
+    return X_train, y_true
+        
 
 def conv_str_fl(data):
     """
@@ -43,10 +100,11 @@ def conv_str_fl(data):
             
     return temp_data
 
-
 def read_data(filename, header=True):
+    
     """
-    It converts a CSV dataset to NumPy arrays for further operations.
+    It converts a CSV dataset to NumPy arrays for further operations
+    like training the TwinSVM classifier.
         
     Parameters
     ----------

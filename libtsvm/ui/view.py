@@ -10,11 +10,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # icons_rc should be imported as follows
 from . import icons_rc
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(819, 609)
+        MainWindow.resize(819, 615)
         MainWindow.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.main_win = QtWidgets.QWidget(MainWindow)
         self.main_win.setObjectName("main_win")
@@ -62,16 +61,16 @@ class Ui_MainWindow(object):
         self.sep_label = QtWidgets.QLabel(self.import_box)
         self.sep_label.setObjectName("sep_label")
         self.header_ha_lay.addWidget(self.sep_label)
-        self.lineEdit = QtWidgets.QLineEdit(self.import_box)
+        self.sep_char_box = QtWidgets.QLineEdit(self.import_box)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEdit.sizePolicy().hasHeightForWidth())
-        self.lineEdit.setSizePolicy(sizePolicy)
-        self.lineEdit.setMaximumSize(QtCore.QSize(32, 16777215))
-        self.lineEdit.setMaxLength(1)
-        self.lineEdit.setObjectName("lineEdit")
-        self.header_ha_lay.addWidget(self.lineEdit)
+        sizePolicy.setHeightForWidth(self.sep_char_box.sizePolicy().hasHeightForWidth())
+        self.sep_char_box.setSizePolicy(sizePolicy)
+        self.sep_char_box.setMaximumSize(QtCore.QSize(32, 16777215))
+        self.sep_char_box.setMaxLength(1)
+        self.sep_char_box.setObjectName("sep_char_box")
+        self.header_ha_lay.addWidget(self.sep_char_box)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.header_ha_lay.addItem(spacerItem1)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -407,7 +406,7 @@ class Ui_MainWindow(object):
         self.import_box.setTitle(_translate("MainWindow", "Import"))
         self.header_check.setText(_translate("MainWindow", "Header"))
         self.sep_label.setText(_translate("MainWindow", "Separator:"))
-        self.lineEdit.setText(_translate("MainWindow", ","))
+        self.sep_char_box.setText(_translate("MainWindow", ","))
         self.path_label.setText(_translate("MainWindow", "Path:"))
         self.open_btn.setText(_translate("MainWindow", "Open"))
         self.info_box.setTitle(_translate("MainWindow", "Info"))

@@ -6,6 +6,7 @@
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from libtsvm.ui import view
+from libtsvm.preprocess import load_data
 import sys
 
 
@@ -23,12 +24,13 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         Initialize the GUI of application
         """
         
-        self.open_btn.clicked.connect(self.import_data)
+        self.open_btn.clicked.connect(self.get_data_path)
+        self.load_btn.clicked.connect(self.load_data)
         
         
-    def import_data(self):
+    def get_data_path(self):
         """
-        Handels dataset import
+        gets the dataset path from a user.
         """
         
         data_filename, _ = QFileDialog.getOpenFileName(self, "Import dataset",
@@ -37,7 +39,20 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         if data_filename:
             
             self.path_box.setText(data_filename)
-
+            
+    def load_data(self):
+        """
+        Loads a dataset
+        """
+        
+        self.X_train, self.y_train = load_data(self.path_box.text(),
+                                    self.sep_char_box.text(),
+                                    True if self.header_check.isChecked() else False,
+                                    True if self.shuffle_box.isChecked() else False,
+                                    True if self.normalize_box.isChecked() else False)
+        
+        print(self.X_train)
+        print(self.y_train)
      
         
 def main():
