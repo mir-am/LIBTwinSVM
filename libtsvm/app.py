@@ -4,7 +4,7 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout
 from libtsvm.ui import view
 from libtsvm.preprocess import load_data
 import sys
@@ -39,7 +39,15 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         if data_filename:
             
             self.path_box.setText(data_filename)
+            self.read_box.setEnabled(True)
             
+            # Enable widgets in Read group box
+            for w in self.read_box.children():
+                
+                if not isinstance(w, QGridLayout):
+                    
+                    w.setEnabled(True)
+         
     def load_data(self):
         """
         Loads a dataset
@@ -53,7 +61,23 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         print(self.X_train)
         print(self.y_train)
-     
+        
+        load_data_dialog(True)
+
+
+def load_data_dialog(status, error_msg=''):
+    """
+    A message box that shows whether dataset is loaded successfully or not.
+    """
+    
+    msg = QMessageBox()
+    msg.setIcon(QMessageBox.Information)
+    
+    msg.setWindowTitle("Data Status")
+    msg.setText("Loaded the dataset successfully!")
+    msg.setStandardButtons(QMessageBox.Ok)
+    msg.exec_()
+  
         
 def main():
     

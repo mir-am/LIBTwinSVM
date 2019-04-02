@@ -228,6 +228,9 @@
            </item>
            <item row="2" column="0" colspan="2">
             <widget class="QGroupBox" name="read_box">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="title">
               <string>Read</string>
              </property>
@@ -236,6 +239,9 @@
                <layout class="QHBoxLayout" name="read_hz_lay">
                 <item>
                  <widget class="QCheckBox" name="normalize_box">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Normalize</string>
                   </property>
@@ -243,6 +249,9 @@
                 </item>
                 <item>
                  <widget class="QCheckBox" name="shuffle_box">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Shuffle</string>
                   </property>
@@ -252,6 +261,9 @@
               </item>
               <item row="0" column="2">
                <widget class="QPushButton" name="load_btn">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Load</string>
                 </property>
