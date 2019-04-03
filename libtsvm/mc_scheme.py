@@ -98,8 +98,8 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         X, y = check_X_y(X, y, dtype=np.float64)
 
         # Allocate n(n-1)/2 binary classifiers
-        self.bin_cls_ = ((self.classes_.size * (self.classes_.size - 1))
-                         // 2) * [self.estimator]
+        self.bin_cls_ = [clone(self.estimator) for i in range(((self.classes_.size * \
+                        (self.classes_.size - 1)) // 2))]
 
         p = 0
 
