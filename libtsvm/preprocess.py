@@ -11,6 +11,7 @@ In this module, functions for reading and processing datasets are defined.
 
 from os.path import splitext, split
 from sklearn.datasets import load_svmlight_file
+from libtsvm.model import DataInfo
 import numpy as np
 import pandas as pd
 import csv
@@ -53,7 +54,7 @@ def load_data(file_path, sep, header, shuffle, normalize):
 
     # First extract class labels
     y_true = df.iloc[:, 0].values
-    df.drop(df.columns[0], axis=1)
+    df.drop(df.columns[0], axis=1, inplace=True)
         
     if normalize:
     
@@ -69,8 +70,38 @@ def load_data(file_path, sep, header, shuffle, normalize):
     
     X_train = df.iloc[:, 1:].values # Feature values
 
-    return X_train, y_true
+    return X_train, y_true, list(df.columns.values) if header else []
+
+
+def get_data_info(X, y, header):
+    """
+    It gets data characteristics from dataset.
+    
+    Parameters
+    ----------
+    X : array-like, shape (n_samples, n_features)
+        Training feature vectors, where n_samples is the number of samples
+        and n_features is the number of features.
         
+    y : array-like, shape(n_samples,)
+        Target values or class labels.
+        
+    header : list
+        Header names
+        
+    Return
+    ------
+    object
+        data characteristics
+    """
+    
+    no_samples = X.shape[0]
+    no_features = X.shape[1]
+    class_labels = np.unique(y)
+    
+    return DataInfo(no_samples, no_features, class_labels.size, class_labels,
+                    header)
+    
 
 def conv_str_fl(data):
     """
