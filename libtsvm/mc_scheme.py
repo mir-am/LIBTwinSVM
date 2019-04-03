@@ -18,6 +18,45 @@ from copy import deepcopy
 import numpy as np
 
 
+class BaseMC(BaseEstimator, ClassifierMixin):
+    """
+    Base class for the multi-class classifiers.
+    
+    Parameters
+    ----------
+    estimator : estimator object
+        An estimator object implementing `fit` and `predict`.
+
+    Attributes
+    ----------
+    clf_name : str
+        Name of the classifier.
+
+    bin_clf_ : list
+        Stores intances of each binary TSVM-based classifier.
+    """
+    
+    def __init__(self, estimator):
+
+        self.estimator = estimator
+        self.clf_name = None
+        self.bin_clf_ = None
+        
+    def set_params(self):
+        """
+        Sets the hyper-parameters of the underlying estimator.
+        """
+        
+        return self.estimator.set_params
+    
+    def get_params(self):
+        """
+        Gets the hyper-parameters of the underlying estimator.
+        """
+        
+        return self.estimator.get_params
+
+
 class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
     """
