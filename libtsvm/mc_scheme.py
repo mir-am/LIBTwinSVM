@@ -14,47 +14,7 @@ from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils import column_or_1d
 from sklearn.base import clone
-from copy import deepcopy
 import numpy as np
-
-
-class BaseMC(BaseEstimator, ClassifierMixin):
-    """
-    Base class for the multi-class classifiers.
-    
-    Parameters
-    ----------
-    estimator : estimator object
-        An estimator object implementing `fit` and `predict`.
-
-    Attributes
-    ----------
-    clf_name : str
-        Name of the classifier.
-
-    bin_clf_ : list
-        Stores intances of each binary TSVM-based classifier.
-    """
-    
-    def __init__(self, estimator):
-
-        self.estimator = estimator
-        self.clf_name = None
-        self.bin_clf_ = None
-        
-    def set_params(self):
-        """
-        Sets the hyper-parameters of the underlying estimator.
-        """
-        
-        return self.estimator.set_params
-    
-    def get_params(self):
-        """
-        Gets the hyper-parameters of the underlying estimator.
-        """
-        
-        return self.estimator.get_params
 
 
 class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
@@ -93,6 +53,12 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         y_ = column_or_1d(y, warn=True)
         check_classification_targets(y)
         self.classes_, y = np.unique(y_, return_inverse=True)
+        
+        if len(self.classes_) < 2:
+            
+            raise ValueError(
+                "The number of classes has to be greater than one; got %d"
+                " class" % len(self.classes_))
 
         return np.asarray(y, dtype=np.int)
 
@@ -133,8 +99,8 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         self : object
         """
 
-        y = self._validate_targets(y)
         X, y = check_X_y(X, y, dtype=np.float64)
+        y = self._validate_targets(y)
 
         # Allocate n(n-1)/2 binary classifiers
         self.bin_cls_ = [clone(self.estimator) for i in range(((self.classes_.size * \
@@ -242,6 +208,12 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         y_ = column_or_1d(y, warn=True)
         check_classification_targets(y)
         self.classes_, y = np.unique(y_, return_inverse=True)
+        
+        if len(self.classes_) < 2:
+            
+            raise ValueError(
+                "The number of classes has to be greater than one; got %d"
+                " class" % len(self.classes_))
 
         return np.asarray(y, dtype=np.int)
     
@@ -280,8 +252,8 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         self : object
         """
         
-        y = self._validate_targets(y)
         X, y = check_X_y(X, y, dtype=np.float64)
+        y = self._validate_targets(y)
         
         # Allocate n binary classifiers
         # Note that an estimator should be cloned for training a multi-class method
