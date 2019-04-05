@@ -364,3 +364,68 @@ class Validator:
             if self.validator[0] == 'CV':
 
                 return self.cv_validator_mc
+
+
+def search_space(kernel_type, search_type, c_l_bound, c_u_bound, rbf_lbound, \
+                 rbf_ubound, step=1):
+
+    """
+    It generates all combination of search elements based on the given range of 
+    hyperparameters.
+    
+    Parameters
+    ----------
+    kernel_type : str, {'linear', 'RBF'}
+        Type of the kernel function which is either 'linear' or 'RBF'.
+        
+    search_type : str, {'full', 'partial'}
+        Type of search space
+    
+    c_l_bound : int
+        Lower bound for C penalty parameter.
+    
+    c_u_bound : int
+        Upper bound for C penalty parameter.
+        
+    rbf_lbound : int
+        Lower bound for gamma parameter which is the hyperparameter of the RBF
+        kernel function.
+          
+    rbf_ubound : int
+        Upper bound for gamma parameter.
+    
+    step : int, optinal (default=1)
+        Step size to increase power of 2. 
+    
+    Returns
+    -------
+    list
+        Search elements.
+        
+    Examples
+    --------
+    """
+
+    c_range = [2**i for i in np.arange(c_l_bound, c_u_bound+1, step,
+                                         dtype=np.float)]
+    
+    gamma_range = [2**i for i in np.arange(rbf_lbound, rbf_ubound+1, step,
+                   dtype=np.float)] if kernel_type == 'RBF' else [1]
+    
+    # In full search, C1 and C2 is not same.
+    if search_type == 'full':
+        
+        param_grid = ParameterGrid({'C1': c_range, 'C2': c_range,
+                                    'gamma': gamma_range})
+
+    elif search_type == 'partial':
+        
+        # TODO: It will be implemeneted later!
+        pass
+
+    return list(param_grid)
+
+
+
+
+

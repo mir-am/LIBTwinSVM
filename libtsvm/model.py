@@ -41,6 +41,58 @@ class DataInfo:
         
         
 class UserInput:
+    """
+    It encapsulates a user's input.
     
-    pass
+    Parameters
+    ----------
+    X_train : array-like, shape (n_samples, n_features)
+              Training feature vectors, where n_samples is the number of samples
+              and n_features is the number of features.
+              
+    y_train : array-like, shape(n_samples,)
+              Target values or class labels.
+              
+    class_type : str, {'binary', 'multiclass'}
+        Type of classification problem.
+        
+    result_path : str
+        Path for saving classification results.
+        
+    kernel_type : str, {'linear', 'RBF'} 
+        Type of the kernel function
+        
+    rect_kernel : float (default=1.0)
+        Percentage of training samples for Rectangular kernel.
+        
+    test_method_tuple : tuple
+        A two-element tuple which contains type of evaluation method and its
+        parameter.
+        
+    lower_b_c : int
+        Lower bound for C penalty parameter.
+        
+    upper_b_c : int
+        Upper bound for C penalty parameter.
+        
+    lower_b_u : int
+        Lower bound for gamma parameter.
+        
+    upper_b_u : int
+        Upper bound for gamma parameter.
+    """
+    
+    def __init__(self):
+
+        self.X_train, self.y_train = None, None
+        self.class_type = None
+        #self.filename = None
+        self.result_path = './result'
+        self.kernel_type = None
+        self.rect_kernel = 1.0
+        self.test_method_tuple = None
+        self.lower_b_c, self.upper_b_c = None, None
+        # Lower and upper bounds of gamma parameter
+        self.lower_b_u, self.upper_b_u = None, None
+    
     
