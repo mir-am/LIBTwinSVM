@@ -135,7 +135,7 @@ class Validator:
     y_train : array-like, shape (n_samples,)
         Target values or class labels.
         
-    problem_type : str, {'bin', 'mc'}
+    problem_type : str, {'binary', 'multiclass'}
         Type of the classification problem. It is either binary (bin) or
         multi-classification (mc)
         
@@ -235,7 +235,7 @@ class Validator:
                       'f1_n_std': np.std(mean_f1_n), 'tp': tp, 'tn': tn, 'fp': fp,
                       'fn': fn}, **dict_param}
 
-    def split_tt_validator(self, dict_param):
+    def tt_validator(self, dict_param):
         
         """
         It evaluates a TSVM-based estimator using the train/test split method.
@@ -300,8 +300,9 @@ class Validator:
         dict
             Evaluation metrics such as Recall, Percision and F1-measure.
         """
-
-        self.estimator.set_params(**dict_param)
+        
+        # Set parameters of the underlying estimator in the multiclass classifier
+        self.estimator.estimator.set_params(**dict_param)
 
         k_fold = KFold(self.validator[1])    
 
@@ -348,7 +349,7 @@ class Validator:
             An evaluation method for assesing a TSVM-based estimator's performance.
         """
 
-        if self.problem_type == 'bin':
+        if self.problem_type == 'binary':
 
             if self.validator[0] == 'CV':
 
@@ -356,9 +357,9 @@ class Validator:
 
             elif self.validator[0] == 't_t_split':
 
-                return self.split_tt_validator
+                return self.tt_validator
 
-        elif self.problem_type == 'mc':
+        elif self.problem_type == 'multiclass':
 
             if self.validator[0] == 'CV':
 
