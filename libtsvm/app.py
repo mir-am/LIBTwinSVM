@@ -4,9 +4,10 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog
 from sklearn.utils.multiclass import type_of_target
 from libtsvm.ui import view
+from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
 import sys
@@ -30,7 +31,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         # Buttons
         self.open_btn.clicked.connect(self.get_data_path)
         self.load_btn.clicked.connect(self.load_data)
-        self.run_btn.clicked.connect(self.run_gridsearch)
+        self.run_btn.clicked.connect(self.gather_usr_input)
         
         # Enable widgets based on the user selection
         self.rect_kernel_rbtn.toggled.connect(self.rect_kernel_percent.setEnabled)
@@ -133,9 +134,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         # Enable gird search buttonsl
         self.run_btn.setEnabled(True)
         
-    def run_gridsearch(self):
+    def gather_usr_input(self):
         """
-        Runs grid search based on user choices.
+        It gathers all the input variables that set by a user.
         """
         
         if self.STSVM_rbtn.isChecked():
@@ -148,13 +149,13 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
         if self.user_in.class_type == 'multiclass':
             
-                if self.ova_rbtn.isChecked():
-                    
-                    self.user_in.mc_scheme = 'ova'
-                    
-                elif self.ovo_rbtn.isChecked():
-                    
-                    self.user_in.mc_scheme = 'ovo'
+            if self.ova_rbtn.isChecked():
+                
+                self.user_in.mc_scheme = 'ova'
+                
+            elif self.ovo_rbtn.isChecked():
+                
+                self.user_in.mc_scheme = 'ovo'
                     
         if self.lin_kernel_rbtn.isChecked():
             
@@ -178,16 +179,24 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             self.user_in.test_method_tuple = ('t_t_split',
                                               self.tt_percentage.value())
         
-        self.user_in.C1_range = range(self.C1_lbound.value(),
-                                      self.C1_ubound.value() + 1)
-        self.user_in.C2_range = range(self.C2_lbound.value(),
-                                      self.C2_ubound.value() + 1)
+        self.user_in.C1_range = (self.C1_lbound.value(), self.C1_ubound.value())
+        self.user_in.C2_range = (self.C2_lbound.value(), self.C2_ubound.value())
         
         if self.rbf_kernel_rbtn.isChecked() or self.rect_kernel_rbtn.isChecked():
         
-            self.user_in.u_range = range(self.u_lbound.value(),
-                                         self.u_ubound.value() + 1)
-            
+            self.user_in.u_range = (self.u_lbound.value(), self.u_ubound.value())
+        
+        # All the input variables are inserted.
+        self.user_in.input_complete = True
+        ConfrimDialog(self.user_in.get_current_selection(), self.run_gridsearch)
+        
+    
+    def run_gridsearch(self):
+        """
+        Runs grid search based on user choices.
+        """
+        
+        print("Let's run grid search!!")
         
         
 
@@ -203,8 +212,52 @@ def load_data_dialog(status, error_msg=''):
     msg.setText("Loaded the dataset successfully!")
     msg.setStandardButtons(QMessageBox.Ok)
     msg.exec_()
-  
+    
+    
+class ConfrimDialog(confirm_diag.Ui_confirm_diag, QDialog):
+    """
+    It shows a message box to confirm the currect user selection for running
+    grid search.
+    
+    Parameters
+    ----------
+    usr_input : str
+        Selected options by a user.
+    """
+    
+    def __init__(self, usr_input, ok_func):
         
+        super(ConfrimDialog, self).__init__()
+        
+        self.setupUi(self)
+        
+        self.extra_info.setText(usr_input)
+        self.confirm_btn.accepted.connect(ok_func)
+        
+        self.show()
+        self.exec_()
+        
+#def confirm_dialog(usr_input):
+#    """
+#    It shows a message box to confirm the currect user selection for running
+#    grid search.
+#    
+#    Parameters
+#    ----------
+#    usr_input : str
+#        Selected options by a user.
+#    """
+#  
+#    msg = QMessageBox()
+#    msg.setIcon(QMessageBox.Question)
+#    
+#    msg.setWindowTitle("Confirmation")
+#    msg.setText("Do you confirm the following settings for running the classifier?")
+#    msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+#    msg.setDetailedText(usr_input)
+#    msg.exec_()
+    
+  
 def main():
     
    app = QApplication(sys.argv)

@@ -78,13 +78,15 @@ class UserInput:
         A two-element tuple which contains type of evaluation method and its
         parameter.
         
-    C1_range : range
+    C1_range : tuple
         Lower and upper bound for C1 penalty parameter.
+        example: (-4, 5), first element is lower bound and second element is
+        upper bound
         
-    C2_range : range
+    C2_range : tuple
         Lower and upper bound for C2 penalty parameter.
         
-    u_range : range
+    u_range : tuple
         Lower and upper bound for gamma parameter.
     """
     
@@ -96,7 +98,7 @@ class UserInput:
         self.class_type = None
         self.mc_scheme = None
         #self.filename = None
-        self.result_path = './result'
+        self.result_path = ''
         self.kernel_type = None
         self.rect_kernel = 1.0
         self.test_method_tuple = None
@@ -105,21 +107,96 @@ class UserInput:
         self.C2_range = None
         self.u_range = None
         # Whether all the input varabiles are inserted or not.
-        self.input_complete = False 
+        self.input_complete = False
         
+    def _get_kernel_selection(self):
+        """
+        It returns the name of the user's selected kernel function.
+        
+        Returns
+        -------
+        str
+            Name of kernel function
+        """
+        
+        if self.kernel_type == 'linear':
+            
+            return 'Linear'
+        
+        elif self.rect_kernel == 1.0:
+            
+            return 'Gaussian (RBF)'
+        
+        else:
+                
+            return 'Rectangular (%s%% of samples)' % (self.rect_kernel * 100)
+        
+    def _get_eval_method(self):
+        """
+        It returns the name of the user's selected evaluation method.
+        
+         Returns
+        -------
+        str
+            Name of evaluation method.
+        """
+        
+        if self.test_method_tuple[0] == 'CV':
+            
+            return "%d-Fold cross-validation" % self.test_method_tuple[1]
+        
+        elif self.test_method_tuple[0] == 't_t_split':
+            
+            return "Train/Test split (%d%%/%d%%)" % (self.test_method_tuple[1],
+                                     100 - self.test_method_tuple[1])
+            
+    def _get_mc_scheme(self):
+        """
+        It returns type of multi-class classifcation
+        
+        Returns
+        -------
+        str
+            Name of mult-class strategy.
+        """
+        
+        if self.class_type == 'binary':
+            
+            return "Binary"
+        
+        elif self.class_type == 'multiclass':
+          
+            if self.mc_scheme == 'ova':
+                
+                return "One-vs-All"
+            
+            elif self.mc_scheme == 'ovo':
+                
+                return "One-vs-One"
+            
     def get_current_selection(self):
         """
         It returns a user's current selection for confirmation
         """
         
-        curr_selection = ''
-        
         if self.input_complete:
             
-            curr_selection = """
-            data
-            """
+            u_param = " | u: 2^%d to 2^%d" % (self.u_range[0], self.u_range[-1]) \
+            if self.kernel_type == 'RBF' else ''
+            clf = "Standard TwinSVM" if self.clf_type == 'tsvm' else "LeastSquares TwinSVM"
             
-        
-    
-    
+            return ("Dataset: %s\nClassifier: %s\nKernel: %s\n"
+            "Multi-class scheme: %s\nEvaluation method: %s\n"
+            "Range of parameters for grid search:\nC1: 2^%d to 2^%d |"
+            "C2: 2^%d to 2^%d%s\n"
+            "Results' path:%s"
+            ) % (self.data_filename, clf, self._get_kernel_selection(),
+                self._get_mc_scheme(), self._get_eval_method(), self.C1_range[0],
+                self.C1_range[1], self.C2_range[0], self.C2_range[1], u_param,
+                self.result_path)
+            
+        else:
+            
+            raise RuntimeError("input_complete has not been set yet! "
+                               "Check out UserInput Class Docs.")
+            
