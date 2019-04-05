@@ -10,6 +10,9 @@ from libtsvm.ui import view
 from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
+from libtsvm.model_selection import initialize
+from datetime import datetime
+import numpy as np
 import sys
 
 
@@ -196,10 +199,51 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         Runs grid search based on user choices.
         """
         
-        print("Let's run grid search!!")
+        func_eval, search_space = initialize(self.user_in)
         
-        
+        result_list = []
+        max_acc, max_acc_std = 0, 0
+    
+        search_total = len(search_space)
+        self.gs_progress_bar.setRange(0, search_total)
 
+        start_time = datetime.now()
+    
+        run = 1   
+    
+        # Ehaustive Grid search for finding optimal parameters
+        for element in search_space:
+    
+            try:
+    
+                acc, acc_std, result = func_eval(element)
+                
+                # For debugging purpose
+                #print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
+    
+                result_list.append(result)
+    
+                # Save best accuracy
+                if acc > max_acc:
+                    
+                    max_acc = acc
+                    max_acc_std = acc_std       
+                
+                elapsed_time = datetime.now() - start_time
+                
+                # Update info on screen
+                self.best_acc.setText("%.2f+-%.2f" % (max_acc, max_acc_std))
+                self.acc.setText("%.2f+-%.2f" % (acc, acc_std))
+                self.gs_progress_bar.setValue(run)
+    
+                run = run + 1
+    
+            # Some parameters cause errors such as Singular matrix        
+            except np.linalg.LinAlgError:
+            
+                run = run + 1
+
+        
 def load_data_dialog(status, error_msg=''):
     """
     A message box that shows whether dataset is loaded successfully or not.

@@ -4,12 +4,12 @@
 # This module is created for testing different components of the library.
 # It may be removed in the near future.
 
-from libtsvm.preprocess import read_data
-from libtsvm.estimators import LSTSVM, TSVM
-from libtsvm.mc_scheme import OneVsOneClassifier
-from libtsvm.model_selection import eval_metrics
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+#from libtsvm.preprocess import read_data
+#from libtsvm.estimators import LSTSVM, TSVM
+#from libtsvm.mc_scheme import OneVsOneClassifier
+#from libtsvm.model_selection import eval_metrics
+#from sklearn.model_selection import train_test_split
+#from sklearn.metrics import accuracy_score
 from libtsvm.app import main
 
 if __name__ == '__main__':

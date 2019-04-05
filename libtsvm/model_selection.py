@@ -8,6 +8,8 @@
 
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
+from libtsvm.estimators import TSVM, LSTSVM
+from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
 import numpy as np
 
 
@@ -366,8 +368,8 @@ class Validator:
                 return self.cv_validator_mc
 
 
-def search_space(kernel_type, search_type, c_l_bound, c_u_bound, rbf_lbound, \
-                 rbf_ubound, step=1):
+def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
+                 step=1):
 
     """
     It generates all combination of search elements based on the given range of 
@@ -381,19 +383,15 @@ def search_space(kernel_type, search_type, c_l_bound, c_u_bound, rbf_lbound, \
     search_type : str, {'full', 'partial'}
         Type of search space
     
-    c_l_bound : int
-        Lower bound for C penalty parameter.
+    C1_range : tuple
+        Lower and upper bound for C1 penalty parameter.
     
-    c_u_bound : int
-        Upper bound for C penalty parameter.
+    C2_range : tuple
+        Lower and upper bound for C2 penalty parameter.
         
-    rbf_lbound : int
-        Lower bound for gamma parameter which is the hyperparameter of the RBF
-        kernel function.
+    u_range : tuple
+        Lower and upper bound for gamma parameter.
           
-    rbf_ubound : int
-        Upper bound for gamma parameter.
-    
     step : int, optinal (default=1)
         Step size to increase power of 2. 
     
@@ -406,16 +404,18 @@ def search_space(kernel_type, search_type, c_l_bound, c_u_bound, rbf_lbound, \
     --------
     """
 
-    c_range = [2**i for i in np.arange(c_l_bound, c_u_bound+1, step,
+    c1_range = [2**i for i in np.arange(C1_range[0], C1_range[1]+1, step,
+                                         dtype=np.float)]
+    c2_range = [2**i for i in np.arange(C2_range[0], C2_range[1]+1, step,
                                          dtype=np.float)]
     
-    gamma_range = [2**i for i in np.arange(rbf_lbound, rbf_ubound+1, step,
+    gamma_range = [2**i for i in np.arange(u_range[0], u_range[1]+1, step,
                    dtype=np.float)] if kernel_type == 'RBF' else [1]
     
     # In full search, C1 and C2 is not same.
     if search_type == 'full':
         
-        param_grid = ParameterGrid({'C1': c_range, 'C2': c_range,
+        param_grid = ParameterGrid({'C1': c1_range, 'C2': c2_range,
                                     'gamma': gamma_range})
 
     elif search_type == 'partial':
@@ -427,5 +427,61 @@ def search_space(kernel_type, search_type, c_l_bound, c_u_bound, rbf_lbound, \
 
 
 
+def initialize(user_input_obj):
+    """
+    It passes a user's input to the functions and classes for solving a
+    classification task. The steps that this function performs can be summarized
+    as follows:
+        
+    #. Specifies a TwinSVM classifier based on the user's input.
+    #. Chooses an evaluation method for assessment of the classifier.
+    #. Computes all the combination of search elements.
+    #. Computes the evaluation metrics for all the search element using grid search.
+    #. Saves the detailed classification results in a spreadsheet file (Excel).
+    
+    Parameters
+    ----------
+    user_input_obj : object 
+        An instance of :class:`UserInput` class which holds the user input.
+        
+    Returns
+    -------
+    object
+        The evalution method.
+    
+    dict
+        Grids of search elements.
+    """
+    
+    clf_obj = None
+    
+    if user_input_obj.clf_type == 'tsvm':
+        
+        clf_obj = TSVM(user_input_obj.kernel_type, user_input_obj.rect_kernel)
+        
+    elif user_input_obj.clf_type == 'lstsvm':
+        
+        clf_obj = LSTSVM(user_input_obj.kernel_type, user_input_obj.rect_kernel)
+        
+    if user_input_obj.class_type == 'multiclass':
+        
+        if user_input_obj.mc_scheme == 'ova':
+            
+            clf_obj = OneVsAllClassifier(clf_obj)
+            
+        elif user_input_obj.mc_scheme == 'ovo':
+            
+            clf_obj = OneVsOneClassifier(clf_obj)
+            
+    eval_method = Validator(user_input_obj.X_train, user_input_obj.y_train,
+                            user_input_obj.class_type, user_input_obj.test_method_tuple,
+                            clf_obj)
 
+    search_elem = search_space(user_input_obj.kernel_type, 'full',
+                               user_input_obj.C1_range, user_input_obj.C2_range,
+                               user_input_obj.u_range)
+    
+    print(clf_obj)
 
+    return eval_method.choose_validator(), search_elem   
+    
