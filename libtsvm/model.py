@@ -44,7 +44,7 @@ class UserInput:
     """
     It encapsulates a user's input.
     
-    Parameters
+    Attributes
     ----------
     X_train : array-like, shape (n_samples, n_features)
               Training feature vectors, where n_samples is the number of samples
@@ -53,8 +53,14 @@ class UserInput:
     y_train : array-like, shape(n_samples,)
               Target values or class labels.
               
+    clf_type : str, {'tsvm', 'lstsvm'}
+        Type of the classifier.
+              
     class_type : str, {'binary', 'multiclass'}
         Type of classification problem.
+        
+    mc_scheme : str, {'ova', 'ovo'}
+        The multi-class strategy
         
     result_path : str
         Path for saving classification results.
@@ -69,30 +75,47 @@ class UserInput:
         A two-element tuple which contains type of evaluation method and its
         parameter.
         
-    lower_b_c : int
-        Lower bound for C penalty parameter.
+    C1_range : range
+        Lower and upper bound for C1 penalty parameter.
         
-    upper_b_c : int
-        Upper bound for C penalty parameter.
+    C2_range : range
+        Lower and upper bound for C2 penalty parameter.
         
-    lower_b_u : int
-        Lower bound for gamma parameter.
-        
-    upper_b_u : int
-        Upper bound for gamma parameter.
+    u_range : range
+        Lower and upper bound for gamma parameter.
     """
     
     def __init__(self):
 
         self.X_train, self.y_train = None, None
+        self.clf_type = None
         self.class_type = None
+        self.mc_scheme = None
         #self.filename = None
         self.result_path = './result'
         self.kernel_type = None
         self.rect_kernel = 1.0
         self.test_method_tuple = None
-        self.lower_b_c, self.upper_b_c = None, None
-        # Lower and upper bounds of gamma parameter
-        self.lower_b_u, self.upper_b_u = None, None
+        # Lower and upper bounds of hyper-parameters
+        self.C1_range = None
+        self.C2_range = None
+        self.u_range = None
+        # Whether all the input varabiles are inserted or not.
+        self.input_complete = False 
+        
+    def get_current_selection(self):
+        """
+        It returns a user's current selection for confirmation
+        """
+        
+        curr_selection = ''
+        
+        if self.input_complete:
+            
+            curr_selection = """
+            data
+            """
+            
+        
     
     

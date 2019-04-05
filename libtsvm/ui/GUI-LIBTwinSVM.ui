@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>819</width>
-    <height>615</height>
+    <height>708</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -301,7 +301,7 @@
       </widget>
       <widget class="QWidget" name="classify_tab">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <attribute name="title">
         <string>Classify</string>
@@ -374,6 +374,9 @@
                 </item>
                 <item>
                  <widget class="QSpinBox" name="tt_percentage">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -429,7 +432,7 @@
               <item row="2" column="0">
                <widget class="QGroupBox" name="mc_box">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="title">
                  <string>Multi-class scheme</string>
@@ -439,13 +442,22 @@
                   <layout class="QHBoxLayout" name="mc_hz_lay">
                    <item>
                     <widget class="QRadioButton" name="ova_rbtn">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
                      <property name="text">
                       <string>One-vs-All</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QRadioButton" name="ovo_rbtn">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
                      <property name="text">
                       <string>One-vs-One</string>
                      </property>
@@ -500,6 +512,9 @@
                 </item>
                 <item>
                  <widget class="QSpinBox" name="rect_kernel_percent">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="minimum">
                    <number>5</number>
                   </property>
@@ -618,6 +633,9 @@
                 </item>
                 <item>
                  <widget class="QSpinBox" name="u_lbound">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="minimum">
                    <number>-20</number>
                   </property>
@@ -638,6 +656,9 @@
                 </item>
                 <item>
                  <widget class="QSpinBox" name="u_ubound">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -676,6 +697,9 @@
               </item>
               <item row="0" column="0">
                <widget class="QPushButton" name="run_btn">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Run!</string>
                 </property>

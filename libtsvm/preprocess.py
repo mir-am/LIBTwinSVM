@@ -46,8 +46,8 @@ def load_data(file_path, sep, header, shuffle, normalize):
     data_labels : array-like, shape(n_samples,) 
         Class labels of training samples.
         
-    file_name : str
-        Dataset's filename.
+    list
+        Header names of datasets.
     """
     
     df = pd.read_csv(file_path, sep=sep)
