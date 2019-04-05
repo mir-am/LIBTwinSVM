@@ -53,6 +53,9 @@ class UserInput:
     y_train : array-like, shape(n_samples,)
               Target values or class labels.
               
+    data_filename : str
+        The filename of a user's dataset.
+              
     clf_type : str, {'tsvm', 'lstsvm'}
         Type of the classifier.
               
@@ -88,6 +91,7 @@ class UserInput:
     def __init__(self):
 
         self.X_train, self.y_train = None, None
+        self.data_filename = ''
         self.clf_type = None
         self.class_type = None
         self.mc_scheme = None

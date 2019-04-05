@@ -17,10 +17,10 @@ import pandas as pd
 import csv
 
 
-def load_data(file_path, sep, header, shuffle, normalize):
+class DataReader():
     """
-    It reads a CSV file into pandas DataFrame.
-        
+    It handels data-related tasks like reading, etc.
+    
     Parameters
     ----------
     file_path : str
@@ -32,75 +32,102 @@ def load_data(file_path, sep, header, shuffle, normalize):
     header : boolean
         whether the dataset has header names or not.
         
-    shuffle : boolean
-        whether to shuffle the dataset or not.
-        
-    normalize : boolean
-        whether to normalize the dataset or not.
-    
-    Returns
-    -------
-    data_train : array-like, shape (n_samples, n_features) 
+    Attributes
+    ----------
+    X_train : array-like, shape (n_samples, n_features) 
         Training samples in NumPy array.
         
-    data_labels : array-like, shape(n_samples,) 
+    y_train :  array-like, shape(n_samples,) 
         Class labels of training samples.
         
-    list
+    hdr_names : list
         Header names of datasets.
+        
+    filename : str
+        dataset's filename
     """
     
-    df = pd.read_csv(file_path, sep=sep)
+    def __init__(self, file_path, sep, header):
+        
+        self.file_path = file_path
+        self.sep = sep
+        self.header = header
+        
 
-    # First extract class labels
-    y_true = df.iloc[:, 0].values
-    df.drop(df.columns[0], axis=1, inplace=True)
+    def load_data(self, shuffle, normalize):
+        """
+        It reads a CSV file into pandas DataFrame.
+            
+        Parameters
+        ----------
+        shuffle : boolean
+            Whether to shuffle the dataset or not.
+            
+        normalize : boolean
+            Whether to normalize the dataset or not.
+        """
         
-    if normalize:
+        df = pd.read_csv(self.file_path, sep=self.sep)
     
-        df = (df - df.mean()) / df.std()
+        # First extract class labels
+        self.y_train = df.iloc[:, 0].values
+        df.drop(df.columns[0], axis=1, inplace=True)
+            
+        if normalize:
+        
+            df = (df - df.mean()) / df.std()
+        
+            #print(df)
+            
+        if shuffle:
+            
+            df = df.sample(frac=1).reset_index(drop=True)
+            
+            #print(df)
+        
+        self.X_train = df.iloc[:, 1:].values # Feature values
+        self.hdr_names = list(df.columns.values) if self.header else []
+        self.filename = splitext(split(self.file_path)[-1])[0]
+        
+    def get_data(self):
+        """
+        It returns processed dataset.
+        
+        Returns
+        -------
+        array-like
+            Training samples in NumPy array.
+            
+        array-like
+            Class labels of training samples.
+            
+        str
+            The dataset's filename
+        """
+        
+        if all([hasattr(self, attr) for attr in ['X_train', 'y_train',
+                'filename']]):
     
-        #print(df)
-        
-    if shuffle:
-        
-        df = df.sample(frac=1).reset_index(drop=True)
-        
-        #print(df)
-    
-    X_train = df.iloc[:, 1:].values # Feature values
+            return self.X_train, self.y_train, self.filename
+            
+        else:
+            
+            raise AttributeError("The dataset has not been loaded yet!"
+                                 "Run load_data() method.")
 
-    return X_train, y_true, list(df.columns.values) if header else []
-
-
-def get_data_info(X, y, header):
-    """
-    It gets data characteristics from dataset.
-    
-    Parameters
-    ----------
-    X : array-like, shape (n_samples, n_features)
-        Training feature vectors, where n_samples is the number of samples
-        and n_features is the number of features.
+    def get_data_info(self):
+        """
+        It returns data characteristics from dataset.
+                    
+        Returns
+        ------
+        object
+            data characteristics
+        """
         
-    y : array-like, shape(n_samples,)
-        Target values or class labels.
-        
-    header : list
-        Header names
-        
-    Return
-    ------
-    object
-        data characteristics
-    """
-    
-    no_samples = X.shape[0]
-    no_features = X.shape[1]
-    class_labels = np.unique(y)
-    
-    return DataInfo(no_samples, no_features, class_labels.size, class_labels,
-                    header)
+        return DataInfo(self.X_train.shape[0], self.X_train.shape[1], 
+                        self.y_train.size ,np.unique(self.y_train).size,
+                        self.hdr_names)
     
 
 def conv_str_fl(data):

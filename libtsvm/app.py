@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox,
 from sklearn.utils.multiclass import type_of_target
 from libtsvm.ui import view
 from libtsvm.model import UserInput
-from libtsvm.preprocess import load_data, get_data_info
+from libtsvm.preprocess import DataReader
 import sys
 
 
@@ -74,11 +74,14 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         Loads a dataset
         """
         
-        self.user_in.X_train, self.user_in.y_train, data_hdr = load_data(self.path_box.text(),
-                                    self.sep_char_box.text(),
-                                    True if self.header_check.isChecked() else False,
-                                    True if self.shuffle_box.isChecked() else False,
-                                    True if self.normalize_box.isChecked() else False)
+        self.data_reader = DataReader(self.path_box.text(), self.sep_char_box.text(),
+                                 True if self.header_check.isChecked() else False)
+        
+        self.data_reader.load_data(True if self.shuffle_box.isChecked() else False,
+                              True if self.normalize_box.isChecked() else False)
+        
+        self.user_in.X_train, self.user_in.y_train, \
+        self.user_in.data_filename = self.data_reader.get_data()
         
         print(self.user_in.X_train)
         print(self.user_in.y_train)
@@ -86,7 +89,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         # in message box
         load_data_dialog(True)
         
-        self.update_data_info(data_hdr)
+        self.update_data_info(self.data_reader.hdr_names)
         self.enable_classify()
         
     def update_data_info(self, hdr_name):
@@ -99,8 +102,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             Header names of dataset.
         """
         
-        data_info = get_data_info(self.user_in.X_train, self.user_in.y_train,
-                                  hdr_name)
+        data_info = self.data_reader.get_data_info()
         
         self.no_samples.setText(str(data_info.no_samples))
         self.no_features.setText(str(data_info.no_features))
