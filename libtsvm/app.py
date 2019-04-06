@@ -4,13 +4,14 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget
+from PyQt5.QtCore import QThread
 from sklearn.utils.multiclass import type_of_target
 from libtsvm.ui import view
 from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
-from libtsvm.model_selection import initialize
+from libtsvm.model_selection import ThreadGS
 from datetime import datetime
 import numpy as np
 import sys
@@ -30,6 +31,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         """
         Initialize the GUI of application
         """
+        
+        # Threads
+        self.__threads = []
         
         # Buttons
         self.open_btn.clicked.connect(self.get_data_path)
@@ -191,59 +195,24 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         # All the input variables are inserted.
         self.user_in.input_complete = True
-        ConfrimDialog(self.user_in.get_current_selection(), self.run_gridsearch)
+        ConfrimDialog(self.user_in.get_current_selection(), self.run_gs_thread)
         
     
-    def run_gridsearch(self):
+    def run_gs_thread(self):
         """
         Runs grid search based on user choices.
         """
         
-        func_eval, search_space = initialize(self.user_in)
+        t = QThread()
+        gs_t = ThreadGS(self.user_in)
+        self.__threads.append((t, gs_t))
         
-        result_list = []
-        max_acc, max_acc_std = 0, 0
-    
-        search_total = len(search_space)
-        self.gs_progress_bar.setRange(0, search_total)
+        gs_t.moveToThread(t)
+        t.started.connect(gs_t.run_gs)
+        t.start()
+                
 
-        start_time = datetime.now()
-    
-        run = 1   
-    
-        # Ehaustive Grid search for finding optimal parameters
-        for element in search_space:
-    
-            try:
-    
-                acc, acc_std, result = func_eval(element)
                 
-                # For debugging purpose
-                #print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
-    
-                result_list.append(result)
-    
-                # Save best accuracy
-                if acc > max_acc:
-                    
-                    max_acc = acc
-                    max_acc_std = acc_std       
-                
-                elapsed_time = datetime.now() - start_time
-                
-                # Update info on screen
-                self.best_acc.setText("%.2f+-%.2f" % (max_acc, max_acc_std))
-                self.acc.setText("%.2f+-%.2f" % (acc, acc_std))
-                self.gs_progress_bar.setValue(run)
-    
-                run = run + 1
-    
-            # Some parameters cause errors such as Singular matrix        
-            except np.linalg.LinAlgError:
-            
-                run = run + 1
-
-        
 def load_data_dialog(status, error_msg=''):
     """
     A message box that shows whether dataset is loaded successfully or not.
@@ -280,6 +249,9 @@ class ConfrimDialog(confirm_diag.Ui_confirm_diag, QDialog):
         
         self.show()
         self.exec_()
+        
+        
+
         
 #def confirm_dialog(usr_input):
 #    """

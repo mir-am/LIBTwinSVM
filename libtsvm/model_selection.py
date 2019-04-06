@@ -5,13 +5,14 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
-
+from PyQt5.QtCore import QObject, pyqtSlot
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from libtsvm.estimators import TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
+from datetime import datetime
 import numpy as np
-
+import time
 
 def eval_metrics(y_true, y_pred):
     """
@@ -426,6 +427,77 @@ def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
     return list(param_grid)
 
 
+class ThreadGS(QObject):
+    """
+    It runs the Grid Search in a separate Thread.
+    
+    Parameters
+    ----------
+    usr_input : object
+        An instance of :class:`UserInput` class which holds the user input.
+    """
+    
+    def __init__(self, usr_input):
+        
+        super(ThreadGS, self).__init__()
+        self.usr_input = usr_input
+        
+#    def __del__(self):
+#        
+#        self.wait()
+    
+    @pyqtSlot()
+    def run_gs(self):
+        """
+        Runs grid search for the selected classifier on specified hyper-parameters.
+        """
+        
+        func_eval, search_space = initialize(self.usr_input)
+        
+        result_list = []
+        max_acc, max_acc_std = 0, 0
+    
+        search_total = len(search_space)
+        #self.gs_progress_bar.setRange(0, search_total)
+
+        start_time = datetime.now()
+    
+        run = 1
+    
+        # Ehaustive Grid search for finding optimal parameters
+        for element in search_space:
+    
+            try:
+    
+                acc, acc_std, result = func_eval(element)
+    
+                # For debugging purpose
+                #print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
+    
+                result_list.append(result)
+    
+                # Save best accuracy
+                if acc > max_acc:
+                    
+                    max_acc = acc
+                    max_acc_std = acc_std       
+                
+                elapsed_time = datetime.now() - start_time
+                
+                # Update info on screen
+                #self.best_acc.setText("%.2f+-%.2f" % (max_acc, max_acc_std))
+                #self.acc.setText("%.2f+-%.2f" % (acc, acc_std))
+                #self.gs_progress_bar.setValue(run)
+    
+                run = run + 1
+    
+            # Some parameters cause errors such as Singular matrix        
+            except np.linalg.LinAlgError:
+            
+                run = run + 1
+        
+        print("Best Acc: %.2f+-%.2f" % (max_acc, max_acc_std))
+
 
 def initialize(user_input_obj):
     """
@@ -481,7 +553,5 @@ def initialize(user_input_obj):
                                user_input_obj.C1_range, user_input_obj.C2_range,
                                user_input_obj.u_range)
     
-    print(clf_obj)
-
     return eval_method.choose_validator(), search_elem   
     
