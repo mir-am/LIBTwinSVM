@@ -5,14 +5,15 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from libtsvm.estimators import TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
+from libtsvm.misc import time_fmt
 from datetime import datetime
 import numpy as np
-import time
+
 
 def eval_metrics(y_true, y_pred):
     """
@@ -437,15 +438,15 @@ class ThreadGS(QObject):
         An instance of :class:`UserInput` class which holds the user input.
     """
     
+    # Signals
+    sig_pbar_set = pyqtSignal(int)
+    sig_gs_info_set = pyqtSignal(int, str, str, str)
+    
     def __init__(self, usr_input):
         
         super(ThreadGS, self).__init__()
         self.usr_input = usr_input
         
-#    def __del__(self):
-#        
-#        self.wait()
-    
     @pyqtSlot()
     def run_gs(self):
         """
@@ -458,7 +459,7 @@ class ThreadGS(QObject):
         max_acc, max_acc_std = 0, 0
     
         search_total = len(search_space)
-        #self.gs_progress_bar.setRange(0, search_total)
+        self.sig_pbar_set.emit(search_total) # Set range of the progress bar
 
         start_time = datetime.now()
     
@@ -485,10 +486,10 @@ class ThreadGS(QObject):
                 elapsed_time = datetime.now() - start_time
                 
                 # Update info on screen
-                #self.best_acc.setText("%.2f+-%.2f" % (max_acc, max_acc_std))
-                #self.acc.setText("%.2f+-%.2f" % (acc, acc_std))
-                #self.gs_progress_bar.setValue(run)
-    
+                self.sig_gs_info_set.emit(run, "%.2f+-%.2f" % (acc, acc_std),
+                                          "%.2f+-%.2f" % (max_acc, max_acc_std),
+                                          time_fmt(elapsed_time.seconds))
+                
                 run = run + 1
     
             # Some parameters cause errors such as Singular matrix        
@@ -496,8 +497,6 @@ class ThreadGS(QObject):
             
                 run = run + 1
         
-        print("Best Acc: %.2f+-%.2f" % (max_acc, max_acc_std))
-
 
 def initialize(user_input_obj):
     """

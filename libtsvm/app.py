@@ -5,7 +5,7 @@
 # License: GNU General Public License v3.0
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSlot
 from sklearn.utils.multiclass import type_of_target
 from libtsvm.ui import view
 from libtsvm.ui import confirm_diag
@@ -209,8 +209,45 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         gs_t.moveToThread(t)
         t.started.connect(gs_t.run_gs)
+        
+        # Connect signals
+        gs_t.sig_pbar_set.connect(self.set_pbar_range)
+        gs_t.sig_gs_info_set.connect(self.update_gs_info)
+        
         t.start()
-                
+     
+    @pyqtSlot(int)
+    def set_pbar_range(self, pbar_rng):
+        """
+        Sets range of the progress bar by the grid search thread.
+        
+        Parameters
+        ----------
+        pbar_rng : int
+            range of the progress bar.
+        """
+        
+        self.gs_progress_bar.setRange(0, pbar_rng)
+    
+    @pyqtSlot(int, str, str, str)    
+    def update_gs_info(self, pbar_val, curr_acc, best_acc, elapsed_t):
+        """
+        Updates current value of the progress bar, current accuracy, and best
+        accuract, elapsed time.
+        
+        Parameters
+        ----------
+        pbar_val : int
+            value of progress bar.
+            
+        curr_acc
+        """
+        
+        self.gs_progress_bar.setValue(pbar_val)
+        self.acc.setText(curr_acc)
+        self.best_acc.setText(best_acc)
+        self.elapsed_time.setText(elapsed_t)
+        
 
                 
 def load_data_dialog(status, error_msg=''):
