@@ -39,6 +39,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.open_btn.clicked.connect(self.get_data_path)
         self.load_btn.clicked.connect(self.load_data)
         self.run_btn.clicked.connect(self.gather_usr_input)
+        self.save_res_btn.clicked.connect(self.get_save_path)
         
         # Enable widgets based on the user selection
         self.rect_kernel_rbtn.toggled.connect(self.rect_kernel_percent.setEnabled)
@@ -58,7 +59,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.cv_rbtn.toggled.connect(self.cv_folds.setEnabled)
         
     def get_data_path(self):
-        """is
+        """
         gets the dataset path from a user.
         """
         
@@ -76,7 +77,18 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
                 if not isinstance(w, QGridLayout):
                     
                     w.setEnabled(True)
+                    
+    def get_save_path(self):
+        """
+        Gets save path for storing classification results.
+        """
+        
+        results_path = QFileDialog.getExistingDirectory(self, "Select results' directory")
          
+        if results_path:
+            
+            self.save_path_box.setText(results_path)
+        
     def load_data(self):
         """
         Loads a dataset
@@ -192,7 +204,12 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         if self.rbf_kernel_rbtn.isChecked() or self.rect_kernel_rbtn.isChecked():
         
             self.user_in.u_range = (self.u_lbound.value(), self.u_ubound.value())
-        
+
+        # TODO: Check whether the path exists or not.    
+        self.user_in.result_path = self.save_path_box.text()
+            
+        self.user_in.log_file = True if self.log_file_chk.isChecked() else False
+                
         # All the input variables are inserted.
         self.user_in.input_complete = True
         ConfrimDialog(self.user_in.get_current_selection(), self.run_gs_thread)

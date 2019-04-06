@@ -68,6 +68,9 @@ class UserInput:
     result_path : str
         Path for saving classification results.
         
+    log_file : boolean
+        Whether to create a log file or not.
+        
     kernel_type : str, {'linear', 'RBF'} 
         Type of the kernel function
         
@@ -99,6 +102,7 @@ class UserInput:
         self.mc_scheme = None
         #self.filename = None
         self.result_path = ''
+        self.log_file = False
         self.kernel_type = None
         self.rect_kernel = 1.0
         self.test_method_tuple = None
@@ -189,11 +193,11 @@ class UserInput:
             "Multi-class scheme: %s\nEvaluation method: %s\n"
             "Range of parameters for grid search:\nC1: 2^%d to 2^%d |"
             "C2: 2^%d to 2^%d%s\n"
-            "Results' path:%s"
+            "Results' path:%s\nLog File: %s"
             ) % (self.data_filename, clf, self._get_kernel_selection(),
                 self._get_mc_scheme(), self._get_eval_method(), self.C1_range[0],
                 self.C1_range[1], self.C2_range[0], self.C2_range[1], u_param,
-                self.result_path)
+                self.result_path, 'Yes' if self.log_file else 'No')
             
         else:
             
