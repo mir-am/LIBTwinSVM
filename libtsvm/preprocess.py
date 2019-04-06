@@ -68,7 +68,7 @@ class DataReader():
         """
         
         df = pd.read_csv(self.file_path, sep=self.sep)
-    
+
         # First extract class labels
         self.y_train = df.iloc[:, 0].values
         df.drop(df.columns[0], axis=1, inplace=True)
@@ -85,7 +85,7 @@ class DataReader():
             
             #print(df)
         
-        self.X_train = df.iloc[:, 1:].values # Feature values
+        self.X_train = df.values # Feature values
         self.hdr_names = list(df.columns.values) if self.header else []
         self.filename = splitext(split(self.file_path)[-1])[0]
         

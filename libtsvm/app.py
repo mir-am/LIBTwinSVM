@@ -87,8 +87,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.user_in.X_train, self.user_in.y_train, \
         self.user_in.data_filename = self.data_reader.get_data()
         
-        print(self.user_in.X_train)
-        print(self.user_in.y_train)
+        print(self.user_in.X_train.shape)
+        print(self.user_in.y_train.shape)
         # TODO: Handle exception when it fails to load dataset and show the error
         # in message box
         load_data_dialog(True)
