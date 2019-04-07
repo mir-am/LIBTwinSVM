@@ -178,8 +178,3 @@ class TestTSVM(unittest.TestCase):
         pred = clf.predict(X)
         
         assert_greater(np.mean(y == pred), 0.95)
-
-
-if __name__ == '__main__':
-
-    unittest.main()
