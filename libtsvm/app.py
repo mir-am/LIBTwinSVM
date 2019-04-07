@@ -225,7 +225,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.__threads.append((t, gs_t))
         
         gs_t.moveToThread(t)
-        t.started.connect(gs_t.run_gs)
+        t.started.connect(gs_t.initialize)
         
         # Connect signals
         gs_t.sig_pbar_set.connect(self.set_pbar_range)

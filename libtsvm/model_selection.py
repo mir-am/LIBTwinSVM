@@ -12,7 +12,9 @@ from libtsvm.estimators import TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
 from libtsvm.misc import time_fmt
 from datetime import datetime
+import os
 import numpy as np
+import pandas as pd
 
 
 def eval_metrics(y_true, y_pred):
@@ -428,6 +430,75 @@ def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
     return list(param_grid)
 
 
+def save_result(file_name, validator_obj, gs_result, output_path):
+
+    """
+    It saves the detailed classification results in a spreadsheet file (Excel).
+
+    Parameters
+    ----------
+    file_name : str
+        Name of the spreadsheet file.
+        
+    validator_obj : object
+        The evaluation method that was used for the assesment of the TwinSVM
+        classifier.
+    
+    gs_result : list 
+        Classification results of the TwinSVM classifier using different set of
+        hyperparameters.
+        
+    output_path : str
+        Path at which the spreadsheet file will be saved.
+
+    Returns
+    -------
+    str
+        Path to the saved spreadsheet (Excel) file.
+    """
+
+    column_names = {'binary': {'CV': ['accuracy', 'acc_std', 'recall_p', 'r_p_std', 'precision_p', 'p_p_std', \
+                           'f1_p', 'f1_p_std', 'recall_n', 'r_n_std', 'precision_n', 'p_n_std', 'f1_n',\
+                           'f1_n_std', 'tp', 'tn', 'fp', 'fn'],
+                    't_t_split': ['accuracy', 'recall_p', 'precision_p', 'f1_p', 'recall_n', 'precision_n', \
+                                  'f1_n', 'tp', 'tn', 'fp', 'fn']},
+                    'multiclass':{'CV': ['accuracy', 'acc_std', 'micro_recall', 'm_rec_std', 'micro_precision', \
+                                         'm_prec_std', 'mirco_f1', 'm_f1_std']}}
+
+    # (Name of validator, validator's attribute) - ('CV', 5-folds)
+    validator_type, validator_attr = validator_obj.validator     
+
+    if validator_obj.problem_type == 'binary':
+        
+        kernel_t = validator_obj.estimator.kernel
+        param_names = validator_obj.estimator.get_params_names
+        
+    elif validator_obj.problem_type == 'multiclass':
+        
+        kernel_t = validator_obj.estimator.estimator.kernel
+        param_names = validator_obj.estimator.estimator.get_params_names
+                                              
+    eval_type = "%d-F-CV" % validator_attr if validator_type == 'CV' else 'Tr%d-Te%d' % \
+                ((1.0 - validator_attr) * 100, validator_attr * 100)
+
+    output_file = os.path.join(output_path, "%s_%s_%s_%s_%s.xlsx") % (validator_obj.estimator.clf_name,
+                              kernel_t, eval_type, file_name,
+                              datetime.now().strftime('%Y-%m-%d %H-%M'))
+
+    excel_file = pd.ExcelWriter(output_file, engine='xlsxwriter')
+    
+    # columns=column_names['binary' if \isinstance(validator_obj.obj_TSVM, TSVM) else 'multiclass'][validator_type]
+    result_frame = pd.DataFrame(gs_result,
+                   columns=column_names[validator_obj.problem_type][validator_type] + \
+                   param_names()) 
+
+    result_frame.to_excel(excel_file, sheet_name='Sheet1', index=False)
+
+    excel_file.save()
+
+    return os.path.abspath(output_file)  
+
+
 class ThreadGS(QObject):
     """
     It runs the Grid Search in a separate Thread.
@@ -447,13 +518,24 @@ class ThreadGS(QObject):
         super(ThreadGS, self).__init__()
         self.usr_input = usr_input
         
-    @pyqtSlot()
-    def run_gs(self):
+    @pyqtSlot(object, list)
+    def run_gs(self, func_eval, search_space):
         """
         Runs grid search for the selected classifier on specified hyper-parameters.
-        """
         
-        func_eval, search_space = initialize(self.usr_input)
+        Parameters
+        ----------
+        func_eval : object
+            An evaluation method for assesing a TSVM-based estimator's performance.
+            
+        search_space : list
+            Search elements.
+            
+        Returns
+        -------
+        list
+            Classification results for every hyper-parameters.
+        """
         
         result_list = []
         max_acc, max_acc_std = 0, 0
@@ -496,61 +578,61 @@ class ThreadGS(QObject):
             except np.linalg.LinAlgError:
             
                 run = run + 1
-        
-
-def initialize(user_input_obj):
-    """
-    It passes a user's input to the functions and classes for solving a
-    classification task. The steps that this function performs can be summarized
-    as follows:
-        
-    #. Specifies a TwinSVM classifier based on the user's input.
-    #. Chooses an evaluation method for assessment of the classifier.
-    #. Computes all the combination of search elements.
-    #. Computes the evaluation metrics for all the search element using grid search.
-    #. Saves the detailed classification results in a spreadsheet file (Excel).
+                
+        return result_list
     
-    Parameters
-    ----------
-    user_input_obj : object 
-        An instance of :class:`UserInput` class which holds the user input.
-        
-    Returns
-    -------
-    object
-        The evalution method.
-    
-    dict
-        Grids of search elements.
-    """
-    
-    clf_obj = None
-    
-    if user_input_obj.clf_type == 'tsvm':
-        
-        clf_obj = TSVM(user_input_obj.kernel_type, user_input_obj.rect_kernel)
-        
-    elif user_input_obj.clf_type == 'lstsvm':
-        
-        clf_obj = LSTSVM(user_input_obj.kernel_type, user_input_obj.rect_kernel)
-        
-    if user_input_obj.class_type == 'multiclass':
-        
-        if user_input_obj.mc_scheme == 'ova':
+    @pyqtSlot()            
+    def initialize(self): 
+        """
+        It passes a user's input to the functions and classes for solving a
+        classification task. The steps that this function performs can be summarized
+        as follows:
             
-            clf_obj = OneVsAllClassifier(clf_obj)
+        #. Specifies a TwinSVM classifier based on the user's input.
+        #. Chooses an evaluation method for assessment of the classifier.
+        #. Computes all the combination of search elements.
+        #. Computes the evaluation metrics for all the search element using grid search.
+        #. Saves the detailed classification results in a spreadsheet file (Excel).
             
-        elif user_input_obj.mc_scheme == 'ovo':
-            
-            clf_obj = OneVsOneClassifier(clf_obj)
-            
-    eval_method = Validator(user_input_obj.X_train, user_input_obj.y_train,
-                            user_input_obj.class_type, user_input_obj.test_method_tuple,
-                            clf_obj)
-
-    search_elem = search_space(user_input_obj.kernel_type, 'full',
-                               user_input_obj.C1_range, user_input_obj.C2_range,
-                               user_input_obj.u_range)
+        Returns
+        -------
+        object
+            The evalution method.
+        
+        dict
+            Grids of search elements.
+        """
+        
+        clf_obj = None
     
-    return eval_method.choose_validator(), search_elem   
+        if self.usr_input.clf_type == 'tsvm':
+            
+            clf_obj = TSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
+            
+        elif self.usr_input.clf_type == 'lstsvm':
+            
+            clf_obj = LSTSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
+            
+        if self.usr_input.class_type == 'multiclass':
+            
+            if self.usr_input.mc_scheme == 'ova':
+                
+                clf_obj = OneVsAllClassifier(clf_obj)
+                
+            elif self.usr_input.mc_scheme == 'ovo':
+                
+                clf_obj = OneVsOneClassifier(clf_obj)
+                
+        eval_method = Validator(self.usr_input.X_train, self.usr_input.y_train,
+                                self.usr_input.class_type, self.usr_input.test_method_tuple,
+                                clf_obj)
+    
+        search_elem = search_space(self.usr_input.kernel_type, 'full',
+                                   self.usr_input.C1_range, self.usr_input.C2_range,
+                                   self.usr_input.u_range)
+        
+        clf_results = self.run_gs(eval_method.choose_validator(), search_elem)
+        
+        save_result(self.usr_input.data_filename, eval_method, clf_results,
+                    self.usr_input.result_path)
     

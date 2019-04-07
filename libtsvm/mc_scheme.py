@@ -44,7 +44,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, estimator):
 
         self.estimator = estimator
-        self.clf_name = 'OVO'
+        self.clf_name = 'OVO-' + estimator.clf_name
 
     def _validate_targets(self, y):
         """
@@ -199,7 +199,7 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, estimator):
         
         self.estimator = estimator
-        self.clf_name = "OVA"
+        self.clf_name = 'OVA-' + estimator.clf_name
         
     def _validate_targets(self, y):
         """

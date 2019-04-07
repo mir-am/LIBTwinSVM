@@ -179,7 +179,7 @@ class TSVM(BaseTSVM):
 
         super(TSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
-        self.cls_name = 'TSVM'
+        self.clf_name = 'TSVM'
 
     def fit(self, X_train, y_train):
         """
@@ -284,7 +284,7 @@ class LSTSVM(BaseTSVM):
 
         super(LSTSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
-        self.cls_name = 'LSTSVM'
+        self.clf_name = 'LSTSVM'
 
     def fit(self, X, y):
         """
