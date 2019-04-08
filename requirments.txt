@@ -1,0 +1,9 @@
+# The following Python pacakges is required for building and running LIBTwinSVM:
+
+Cython
+Numpy
+PyQt5
+sklearn
+pandas
+xlsxwriter
+
