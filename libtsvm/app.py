@@ -41,6 +41,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.run_btn.clicked.connect(self.gather_usr_input)
         self.save_res_btn.clicked.connect(self.get_save_path)
         
+        # Checkbox
+        self.log_file_chk.clicked.connect(self.log_file_info)
+        
         # Enable widgets based on the user selection
         self.rect_kernel_rbtn.toggled.connect(self.rect_kernel_percent.setEnabled)
         self.rect_kernel_rbtn.toggled.connect(lambda checked: not checked and \
@@ -107,7 +110,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         print(self.user_in.y_train.shape)
         # TODO: Handle exception when it fails to load dataset and show the error
         # in message box
-        load_data_dialog(True)
+        show_info_dialog("Data Status", "Loaded the dataset successfully.")
         
         self.update_data_info(self.data_reader.hdr_names)
         self.enable_classify()
@@ -207,14 +210,29 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
 
         # TODO: Check whether the path exists or not.    
         self.user_in.result_path = self.save_path_box.text()
-            
-        self.user_in.log_file = True if self.log_file_chk.isChecked() else False
-                
+                            
         # All the input variables are inserted.
         self.user_in.input_complete = True
         ConfrimDialog(self.user_in.get_current_selection(), self.run_gs_thread)
         
-    
+    def log_file_info(self):
+        """
+        Gets logging file state and also warns user about its usage.
+        """
+        
+        if self.log_file_chk.isChecked():
+            
+            self.user_in.log_file = True
+            
+            show_info_dialog("Logging Results", "Note that logging classification"
+                             " results may reduce the speed of the grid search "
+                             "process due to the I/O operations. However, "
+                             "results will be not lost in case of power failure, etc.")
+            
+        else:
+            
+            self.user_in.log_file = False
+        
     def run_gs_thread(self):
         """
         Runs grid search based on user choices.
@@ -265,18 +283,25 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.best_acc.setText(best_acc)
         self.elapsed_time.setText(elapsed_t)
         
-
-                
-def load_data_dialog(status, error_msg=''):
+        
+def show_info_dialog(title, msg_txt):
     """
-    A message box that shows whether dataset is loaded successfully or not.
+    A message box that shows extra information to users.
+    
+    Parameters
+    ----------
+    title : str
+        Title of the message box.
+        
+    msg_txt : str
+        Message that shows information to users.
     """
     
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Information)
     
-    msg.setWindowTitle("Data Status")
-    msg.setText("Loaded the dataset successfully!")
+    msg.setWindowTitle(title)
+    msg.setText(msg_txt)
     msg.setStandardButtons(QMessageBox.Ok)
     msg.exec_()
     
