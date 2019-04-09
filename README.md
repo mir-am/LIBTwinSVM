@@ -1,6 +1,5 @@
 # LIBTwinSVM
-***
-***
+
 ## Core Features
 LIBTwinSVM is an easy-to-use implementation of Twin Support Vector Machine.  It is licensed under the terms of GNU GPL v3. This application comes with a user interface which makes using the algorithm so handy for Data Scientists, Machine Learning Researchers and whoever else that is interested in Machine Learning.
 <br>
