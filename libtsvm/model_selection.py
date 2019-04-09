@@ -16,6 +16,11 @@ import os
 import numpy as np
 import pandas as pd
 
+#################
+# Logging results
+import logging
+#################
+
 
 def eval_metrics(y_true, y_pred):
     """
@@ -430,7 +435,7 @@ def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
     return list(param_grid)
 
 
-def get_results_filename(file_name, output_path, validator_obj):
+def get_results_filename(file_name, validator_obj):
     """
     It returns the filename of the results based on user's input.
     
@@ -438,9 +443,6 @@ def get_results_filename(file_name, output_path, validator_obj):
     ----------
     file_name : str
         Name of the dataset file.
-        
-    output_path : str
-        Path at which the results file will be saved.
         
     validator_obj : object
         The evaluation method that was used for the assesment of the classifier.
@@ -465,9 +467,9 @@ def get_results_filename(file_name, output_path, validator_obj):
     eval_type = "%d-F-CV" % validator_attr if validator_type == 'CV' else 'Tr%d-Te%d' % \
                 ((1.0 - validator_attr) * 100, validator_attr * 100)
 
-    output_file = os.path.join(output_path, "%s_%s_%s_%s_%s") % \
-    (validator_obj.estimator.clf_name, kernel_t, eval_type, file_name,
-     datetime.now().strftime('%Y-%m-%d %H-%M'))
+    output_file = "%s_%s_%s_%s_%s" % (validator_obj.estimator.clf_name, kernel_t,
+                                      eval_type, file_name,
+                                      datetime.now().strftime('%Y-%m-%d %H-%M'))
     
     return output_file
 
@@ -477,10 +479,7 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     It saves the detailed classification results in a spreadsheet file (Excel).
 
     Parameters
-    ----------
-    estimator : object
-        The classifier.
-    
+    ----------    
     problem_type : str, {'binary', 'multiclass'}
         Type of the classification problem.
         
@@ -493,7 +492,8 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
         hyperparameters.
               
     output_file : str
-        The filename of the classification results.
+        The full path and filename of the classification results.
+        ex. C:\\Users\\Mir\\file.xlsx
 
     Returns
     -------
@@ -509,34 +509,14 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
                     'multiclass':{'CV': ['accuracy', 'acc_std', 'micro_recall', 'm_rec_std', 'micro_precision', \
                                          'm_prec_std', 'mirco_f1', 'm_f1_std']}}
 
-#    # (Name of validator, validator's attribute) - ('CV', 5-folds)
-#    validator_type, validator_attr = validator_obj.validator     
-#
-#    if validator_obj.problem_type == 'binary':
-#        
-#        kernel_t = validator_obj.estimator.kernel
-#        param_names = validator_obj.estimator.get_params_names
-#        
-#    elif validator_obj.problem_type == 'multiclass':
-#        
-#        kernel_t = validator_obj.estimator.estimator.kernel
-#        param_names = validator_obj.estimator.estimator.get_params_names
-#                                              
-#    eval_type = "%d-F-CV" % validator_attr if validator_type == 'CV' else 'Tr%d-Te%d' % \
-#                ((1.0 - validator_attr) * 100, validator_attr * 100)
-#
-#    output_file = os.path.join(output_path, "%s_%s_%s_%s_%s.xlsx") % (validator_obj.estimator.clf_name,
-#                              kernel_t, eval_type, file_name,
-#                              datetime.now().strftime('%Y-%m-%d %H-%M'))
-
     excel_file = pd.ExcelWriter(output_file + ".xlsx", engine='xlsxwriter')
-    print(problem_type)
     
-    # columns=column_names['binary' if \isinstance(validator_obj.obj_TSVM, TSVM) else 'multiclass'][validator_type]
+    param_names = validator_obj.estimator.get_params_names() if problem_type \
+                  == 'binary' else validator_obj.estimator.estimator.get_params_names()
+    
     result_frame = pd.DataFrame(gs_result,
                    columns=column_names[problem_type][validator_obj.validator[0]] + \
-                   validator_obj.estimator.get_params_names() if problem_type == 'binary' \
-                   else validator_obj.estimator.estimator.get_params_names()) 
+                   param_names) 
 
     result_frame.to_excel(excel_file, sheet_name='Sheet1', index=False)
 
@@ -609,7 +589,16 @@ class ThreadGS(QObject):
                 if acc > max_acc:
                     
                     max_acc = acc
-                    max_acc_std = acc_std       
+                    max_acc_std = acc_std  
+                    
+                    #########################################################
+                    # To minmize I/O operations, only best accuray will be
+                    # saved in the log file.
+                    if self.usr_input.log_file:
+                        print("Logging best acc...")
+                        logging.info("Best Acc: %.2f+-%.2f | params: %s" % \
+                                     (max_acc, max_acc_std, str(element)))
+                    #########################################################
                 
                 elapsed_time = datetime.now() - start_time
                 
@@ -677,20 +666,24 @@ class ThreadGS(QObject):
                                    self.usr_input.C1_range, self.usr_input.C2_range,
                                    self.usr_input.u_range)
         
-        results_fn = get_results_filename(self.usr_input.data_filename,
-                                          self.usr_input.result_path, eval_method)
+        results_fn = get_results_filename(self.usr_input.data_filename, eval_method)
         
-        # Logging section
-#        if self.usr_input.log_file:
-#            import logging
-#            log_f_name = 
-            
-        
-        
-        #########
+        # Logging section ####################################################
+        if self.usr_input.log_file:
+            print(self.usr_input.log_file)
+            logging.basicConfig(filename= os.path.join(self.usr_input.result_path,
+                                'log_'+results_fn+'.txt'),  filemode='w+',
+                                format='%(asctime)s | %(message)s',
+                                datefmt='%Y/%m/%d %I:%M:%S %p', level=logging.INFO)
+        ######################################################################
         
         clf_results = self.run_gs(eval_method.choose_validator(), search_elem)
         
         save_result(eval_method, self.usr_input.class_type, clf_results,
-                    results_fn)
+                    os.path.join(self.usr_input.result_path, results_fn+'.xlsx'))
+        
+        # Close logging file #################################################
+        if self.usr_input.log_file:
+            logging.shutdown()
+        ######################################################################
     
