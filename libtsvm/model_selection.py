@@ -16,12 +16,6 @@ import os
 import numpy as np
 import pandas as pd
 
-#################
-# Logging results
-import logging
-#################
-
-
 def eval_metrics(y_true, y_pred):
     """
     It computes common evaluation metrics such as Accuracy, Recall, Precision,
@@ -542,7 +536,11 @@ class ThreadGS(QObject):
     def __init__(self, usr_input):
         
         super(ThreadGS, self).__init__()
+        
         self.usr_input = usr_input
+        # Logging
+        self.log_file = None
+        ######################################################################
         
     @pyqtSlot(object, list)
     def run_gs(self, func_eval, search_space):
@@ -595,9 +593,9 @@ class ThreadGS(QObject):
                     # To minmize I/O operations, only best accuray will be
                     # saved in the log file.
                     if self.usr_input.log_file:
-                        print("Logging best acc...")
-                        logging.info("Best Acc: %.2f+-%.2f | params: %s" % \
-                                     (max_acc, max_acc_std, str(element)))
+                        self.log_file.write("%s | Best Acc: %.2f+-%.2f | params: %s\n" % \
+                                     (datetime.now().strftime('%Y/%m/%d %I:%M:%S %p'), \
+                                      max_acc, max_acc_std, str(element)))
                     #########################################################
                 
                 elapsed_time = datetime.now() - start_time
@@ -670,11 +668,8 @@ class ThreadGS(QObject):
         
         # Logging section ####################################################
         if self.usr_input.log_file:
-            print(self.usr_input.log_file)
-            logging.basicConfig(filename= os.path.join(self.usr_input.result_path,
-                                'log_'+results_fn+'.txt'),  filemode='w+',
-                                format='%(asctime)s | %(message)s',
-                                datefmt='%Y/%m/%d %I:%M:%S %p', level=logging.INFO)
+            self.log_file = open(os.path.join(self.usr_input.result_path,
+                                'log_'+results_fn+'.txt'), 'w', 1)
         ######################################################################
         
         clf_results = self.run_gs(eval_method.choose_validator(), search_elem)
@@ -684,6 +679,6 @@ class ThreadGS(QObject):
         
         # Close logging file #################################################
         if self.usr_input.log_file:
-            logging.shutdown()
+            self.log_file.close()
         ######################################################################
     
