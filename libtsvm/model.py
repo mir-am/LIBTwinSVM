@@ -81,6 +81,9 @@ class UserInput:
         A two-element tuple which contains type of evaluation method and its
         parameter.
         
+    step_size : float
+        Step size for generating search elements.
+        
     C1_range : tuple
         Lower and upper bound for C1 penalty parameter.
         example: (-4, 5), first element is lower bound and second element is
@@ -106,6 +109,7 @@ class UserInput:
         self.kernel_type = None
         self.rect_kernel = 1.0
         self.test_method_tuple = None
+        self.step_size = 1.0
         # Lower and upper bounds of hyper-parameters
         self.C1_range = None
         self.C2_range = None
@@ -191,13 +195,14 @@ class UserInput:
             
             return ("Dataset: %s\nClassifier: %s\nKernel: %s\n"
             "Multi-class scheme: %s\nEvaluation method: %s\n"
-            "Range of parameters for grid search:\nC1: 2^%d to 2^%d |"
+            "Range of parameters for grid search: (step:%.2f)\nC1: 2^%d to 2^%d |"
             "C2: 2^%d to 2^%d%s\n"
             "Results' path:%s\nLog File: %s"
             ) % (self.data_filename, clf, self._get_kernel_selection(),
-                self._get_mc_scheme(), self._get_eval_method(), self.C1_range[0],
-                self.C1_range[1], self.C2_range[0], self.C2_range[1], u_param,
-                self.result_path, 'Yes' if self.log_file else 'No')
+                self._get_mc_scheme(), self._get_eval_method(), self.step_size,
+                self.C1_range[0], self.C1_range[1], self.C2_range[0],
+                self.C2_range[1], u_param, self.result_path, 'Yes' \
+                if self.log_file else 'No')
             
         else:
             

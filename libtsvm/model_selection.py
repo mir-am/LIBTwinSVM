@@ -662,7 +662,7 @@ class ThreadGS(QObject):
     
         search_elem = search_space(self.usr_input.kernel_type, 'full',
                                    self.usr_input.C1_range, self.usr_input.C2_range,
-                                   self.usr_input.u_range)
+                                   self.usr_input.u_range, self.usr_input.step_size)
         
         results_fn = get_results_filename(self.usr_input.data_filename, eval_method)
         

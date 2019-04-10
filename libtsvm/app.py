@@ -207,6 +207,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         if self.rbf_kernel_rbtn.isChecked() or self.rect_kernel_rbtn.isChecked():
         
             self.user_in.u_range = (self.u_lbound.value(), self.u_ubound.value())
+            
+        self.user_in.step_size = self.step_box_val.value()
 
         # TODO: Check whether the path exists or not.    
         self.user_in.result_path = self.save_path_box.text()

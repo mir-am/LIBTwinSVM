@@ -316,6 +316,71 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="classifiers_box">
+             <property name="title">
+              <string>Classifiers</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="STSVM_rbtn">
+                <property name="text">
+                 <string>Standard TwinSVM</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="LSTSVM_rbtn">
+                <property name="text">
+                 <string>Least Squares TwinSVM</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QGroupBox" name="mc_box">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="title">
+                 <string>Multi-class scheme</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_16">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="mc_hz_lay">
+                   <item>
+                    <widget class="QRadioButton" name="ova_rbtn">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>One-vs-All</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="ovo_rbtn">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>One-vs-One</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
            <item row="0" column="2">
             <widget class="QGroupBox" name="eval_box">
              <property name="title">
@@ -406,71 +471,6 @@
              </layout>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QGroupBox" name="classifiers_box">
-             <property name="title">
-              <string>Classifiers</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-               <widget class="QRadioButton" name="STSVM_rbtn">
-                <property name="text">
-                 <string>Standard TwinSVM</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="LSTSVM_rbtn">
-                <property name="text">
-                 <string>Least Squares TwinSVM</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QGroupBox" name="mc_box">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="title">
-                 <string>Multi-class scheme</string>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_16">
-                 <item row="0" column="0">
-                  <layout class="QHBoxLayout" name="mc_hz_lay">
-                   <item>
-                    <widget class="QRadioButton" name="ova_rbtn">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="text">
-                      <string>One-vs-All</string>
-                     </property>
-                     <property name="checked">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QRadioButton" name="ovo_rbtn">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="text">
-                      <string>One-vs-One</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QGroupBox" name="kernel_box">
              <property name="title">
@@ -534,6 +534,63 @@
               <string>Hyper-Parameters</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
+              <item row="0" column="1">
+               <layout class="QHBoxLayout" name="c2_hz_lay">
+                <item>
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="C2_label">
+                  <property name="text">
+                   <string>C2:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="C2_lbound">
+                  <property name="minimum">
+                   <number>-10</number>
+                  </property>
+                  <property name="maximum">
+                   <number>0</number>
+                  </property>
+                  <property name="value">
+                   <number>-5</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="c2_to_label">
+                  <property name="text">
+                   <string>to</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="C2_ubound">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>10</number>
+                  </property>
+                  <property name="value">
+                   <number>5</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
               <item row="0" column="0">
                <layout class="QHBoxLayout" name="c1_hz_lay">
                 <item>
@@ -565,50 +622,6 @@
                 </item>
                 <item>
                  <widget class="QSpinBox" name="C1_ubound">
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>10</number>
-                  </property>
-                  <property name="value">
-                   <number>5</number>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="0" column="1">
-               <layout class="QHBoxLayout" name="c2_hz_lay">
-                <item>
-                 <widget class="QLabel" name="C2_label">
-                  <property name="text">
-                   <string>C2:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="C2_lbound">
-                  <property name="minimum">
-                   <number>-10</number>
-                  </property>
-                  <property name="maximum">
-                   <number>0</number>
-                  </property>
-                  <property name="value">
-                   <number>-5</number>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="c2_to_label">
-                  <property name="text">
-                   <string>to</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="C2_ubound">
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -669,6 +682,59 @@
                    <number>5</number>
                   </property>
                  </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="1">
+               <layout class="QHBoxLayout" name="step_hz_lay">
+                <item>
+                 <spacer name="horizontalSpacer_7">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="step_label">
+                  <property name="text">
+                   <string>Step:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="step_box_val">
+                  <property name="minimum">
+                   <double>0.010000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>10.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.250000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </item>
@@ -826,7 +892,7 @@
      <x>0</x>
      <y>0</y>
      <width>819</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
