@@ -18,7 +18,41 @@ Externel dependencies:
 from distutils.core import setup, Extension
 from Cython.Build import cythonize
 from os.path import join
+from sys import platform, exit
+from ctypes.util import find_library
 import numpy as np
+
+
+def check_libs_exist():
+    """
+    It checks whether required libraries exists on user's system for compiling
+    the C++ extension module.
+    """
+    
+    if not (find_library('lapack') and find_library('blas')):
+        
+        print("Could not find the required libraries. Please use your "
+              "distribution package manager to install LAPACK and BLAS "
+              "libraries. Otherwise, C++ extension cannot be generated.")
+        
+        exit()
+
+# Choose appropriate libraries depeneding on the OS
+if platform == 'win32':
+    
+    
+    
+    libs = ['lapack_win64_MT', 'blas_win64_MT']
+
+elif platform == 'linux':
+    
+    check_libs_exist()
+    
+    libs = ['blas', 'lapack']
+    
+elif platform == 'darwin':
+    # TODO: Add libs for OSX.
+    pass
 
 
 setup(name='clipdcd',
@@ -31,7 +65,7 @@ setup(name='clipdcd',
         "clipdcd",
         sources=[join("src", "clipdcd.pyx"), join("src", "clippdcd_opt.cpp")],
         language="c++",
-        libraries=['lapack_win64_MT', 'blas_win64_MT'],
+        libraries=libs,
         library_dirs=['.\\armadillo-code\\lib_win64'],
         )),
       include_dirs=[np.get_include(), './armadillo-code/include'])
