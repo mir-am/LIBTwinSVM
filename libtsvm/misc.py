@@ -29,3 +29,36 @@ def time_fmt(t_delta):
     minutes, seconds = divmod(remainder, 60)
    
     return '%d:%02d:%02d' % (hours, minutes, seconds)
+
+
+def validate_step_size(kernel, C1_range, C2_range, u_range, step_size):
+    """
+    Checks whether step size for generating search elements are valid or not.
+    
+    Parameters
+    ----------
+    kernel : str, {'linear', 'RBF'}
+        Type of the kernel function which is either 'linear' or 'RBF'.
+    
+    C1_range : tuple
+        Lower and upper bound for C1 penalty parameter.
+    
+    C2_range : tuple
+        Lower and upper bound for C2 penalty parameter.
+        
+    u_range : tuple
+        Lower and upper bound for gamma parameter.
+          
+    step_size : int, optinal (default=1)
+        Step size to increase power of 2. 
+    
+    Returns
+    -------
+    boolean
+        Whether step size is valid or not.
+    """
+    
+    return (step_size < abs(C1_range[1] - C1_range[0]) and step_size < \
+    abs(C2_range[1] - C2_range[0])) and (step_size < abs(u_range[1] - \
+       u_range[0]) if kernel == 'RBF' else True)
+    

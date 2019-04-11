@@ -217,6 +217,13 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.user_in.input_complete = True
         ConfrimDialog(self.user_in.get_current_selection(), self.run_gs_thread)
         
+    def validate_usr_input(self):
+        """
+        Checks whether user's inputs such as save path, etc are valid or not.
+        """
+        
+        pass
+        
     def log_file_info(self):
         """
         Gets logging file state and also warns user about its usage.

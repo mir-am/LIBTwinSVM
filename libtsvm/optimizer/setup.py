@@ -40,8 +40,6 @@ def check_libs_exist():
 # Choose appropriate libraries depeneding on the OS
 if platform == 'win32':
     
-    
-    
     libs = ['lapack_win64_MT', 'blas_win64_MT']
 
 elif platform == 'linux':
