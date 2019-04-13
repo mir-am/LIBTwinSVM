@@ -41,6 +41,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.run_btn.clicked.connect(self.gather_usr_input)
         self.save_res_btn.clicked.connect(self.get_save_path)
         
+        # Quit main window
+        self.actionExit.triggered.connect(self.closeEvent)
+        
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
         
@@ -241,6 +244,27 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         else:
             
             self.user_in.log_file = False
+            
+    def closeEvent(self, event):
+        """
+        Shows a message box to confirm exiting the program.
+        """
+        
+        close_win = QMessageBox()
+        close_win.setIcon(QMessageBox.Warning)
+        
+        close_win.setWindowTitle("Exit")
+        close_win.setText("Are you sure you want to quit the program?")
+        close_win.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        quit_state = close_win.exec_()
+        
+        if quit_state == QMessageBox.Yes:
+            
+            event.accept()
+            
+        else:
+            
+            event.ignore()
         
     def run_gs_thread(self):
         """
