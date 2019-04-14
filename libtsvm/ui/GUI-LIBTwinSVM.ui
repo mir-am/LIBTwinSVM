@@ -18,7 +18,7 @@
   </property>
   <widget class="QWidget" name="main_win">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="1" column="0">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabs">
       <property name="enabled">
        <bool>true</bool>
@@ -877,6 +877,309 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
+          <layout class="QGridLayout" name="gridLayout_18">
+           <item row="0" column="1">
+            <widget class="QGroupBox" name="DB_gbox">
+             <property name="title">
+              <string>Decision Boundary</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_20">
+              <item row="2" column="0">
+               <widget class="QGroupBox" name="vis_options_gbox">
+                <property name="title">
+                 <string>Options</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_22">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <item>
+                    <widget class="QLabel" name="vis_dpi_label">
+                     <property name="text">
+                      <string>DPI:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="vis_dpi_val">
+                     <property name="minimum">
+                      <number>8</number>
+                     </property>
+                     <property name="maximum">
+                      <number>2048</number>
+                     </property>
+                     <property name="value">
+                      <number>128</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_10">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="1" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                   <item>
+                    <widget class="QLabel" name="vis_save_label">
+                     <property name="text">
+                      <string>Save Path:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="vis_save_val"/>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="vis_select_btn">
+                     <property name="text">
+                      <string>Select</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QRadioButton" name="vis_lin_rbtn">
+                  <property name="text">
+                   <string>Linear</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="vis_non_lin_rbtn">
+                  <property name="text">
+                   <string>Non-Linear</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_11">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QGroupBox" name="vis_clf_gbox">
+             <property name="title">
+              <string>Classifier</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_21">
+              <item row="1" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QLabel" name="vis_clf_label">
+                  <property name="text">
+                   <string>Classifier:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="vis_clf_cbox">
+                  <item>
+                   <property name="text">
+                    <string>Standard TwinSVM</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Least Squares TwinSVM</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="3" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QLabel" name="vis_mc_scheme">
+                  <property name="text">
+                   <string>Multi-class scheme:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="vis_mc_cbox">
+                  <item>
+                   <property name="text">
+                    <string>One-vs-All</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>One-vs-One</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="4" column="0">
+               <widget class="QGroupBox" name="h_params_gbox">
+                <property name="title">
+                 <string>Hyper-Parameters</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_19">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_3">
+                   <item>
+                    <widget class="QLabel" name="vis_C1_label">
+                     <property name="text">
+                      <string>C1: </string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="vis_C1_val">
+                     <property name="minimum">
+                      <number>-10</number>
+                     </property>
+                     <property name="maximum">
+                      <number>10</number>
+                     </property>
+                     <property name="value">
+                      <number>1</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="vis_C2_label">
+                     <property name="text">
+                      <string>C2:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="vis_C2_val">
+                     <property name="minimum">
+                      <number>-10</number>
+                     </property>
+                     <property name="maximum">
+                      <number>10</number>
+                     </property>
+                     <property name="value">
+                      <number>1</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="vix_u_label">
+                     <property name="text">
+                      <string>u:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="vis_u_value">
+                     <property name="minimum">
+                      <number>-10</number>
+                     </property>
+                     <property name="maximum">
+                      <number>10</number>
+                     </property>
+                     <property name="value">
+                      <number>1</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="0" rowspan="2" colspan="2">
+            <widget class="QGroupBox" name="vis_fig_gbox">
+             <property name="title">
+              <string>Figure</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_23">
+              <item row="2" column="0">
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="vis_save_btn">
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QPushButton" name="vis_plot_btn">
+                <property name="text">
+                 <string>Plot</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_12">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="1" rowspan="2" colspan="2">
+               <widget class="QFrame" name="vis_plot_frame">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
