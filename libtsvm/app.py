@@ -12,6 +12,7 @@ from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
 from libtsvm.model_selection import ThreadGS
+from libtsvm.misc import validate_step_size, validate_path
 from datetime import datetime
 import numpy as np
 import sys
@@ -113,7 +114,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         print(self.user_in.y_train.shape)
         # TODO: Handle exception when it fails to load dataset and show the error
         # in message box
-        show_info_dialog("Data Status", "Loaded the dataset successfully.")
+        show_dialog("Data Status", "Loaded the dataset successfully.", 
+                         QMessageBox.Information)
         
         self.update_data_info(self.data_reader.hdr_names)
         self.enable_classify()
@@ -218,14 +220,43 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
                             
         # All the input variables are inserted.
         self.user_in.input_complete = True
-        ConfrimDialog(self.user_in.get_current_selection(), self.run_gs_thread)
+        
+        if self.validate_usr_input():
+            
+            ConfrimDialog(self.user_in.get_current_selection(), self.run_gs_thread)
         
     def validate_usr_input(self):
         """
         Checks whether user's inputs such as save path, etc are valid or not.
+        
+        Returns
+        -------
+        boolean
+            The user's input is valid or not.
         """
         
-        pass
+        total_valid = []
+        
+        if validate_step_size(self.user_in.kernel_type, self.user_in.C1_range,
+                              self.user_in.C2_range, self.user_in.u_range,
+                              self.user_in.step_size):
+            total_valid.append(True)
+        else:
+            total_valid.append(False)
+            show_dialog("Invalid Step Size", "Step size exceeds the chosen range"
+                        " for hyper-parameters.", QMessageBox.Warning)
+            
+        if validate_path(self.user_in.result_path):
+            
+            total_valid.append(True)
+        
+        else:
+            
+            total_valid.append(False)
+            show_dialog("Invalid Save Path", "The path for saving classification"
+                        " results does not exist.", QMessageBox.Warning)
+            
+        return all(total_valid)
         
     def log_file_info(self):
         """
@@ -236,10 +267,11 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
             self.user_in.log_file = True
             
-            show_info_dialog("Logging Results", "Note that logging classification"
-                             " results may reduce the speed of the grid search "
-                             "process due to the I/O operations. However, "
-                             "results will be not lost in case of power failure, etc.")
+            show_dialog("Logging Results", "Note that logging classification"
+                        " results may reduce the speed of the grid search "
+                        "process due to the I/O operations. However, "
+                        "results will be not lost in case of power failure, etc.",
+                        QMessageBox.Information)
             
         else:
             
@@ -317,7 +349,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.elapsed_time.setText(elapsed_t)
         
         
-def show_info_dialog(title, msg_txt):
+def show_dialog(title, msg_txt, diag_type):
     """
     A message box that shows extra information to users.
     
@@ -328,17 +360,20 @@ def show_info_dialog(title, msg_txt):
         
     msg_txt : str
         Message that shows information to users.
+    
+    diag_type : object
+        Type of message box, either information or warning.
     """
     
     msg = QMessageBox()
-    msg.setIcon(QMessageBox.Information)
+    msg.setIcon(diag_type)
     
     msg.setWindowTitle(title)
     msg.setText(msg_txt)
     msg.setStandardButtons(QMessageBox.Ok)
     msg.exec_()
     
-    
+      
 class ConfrimDialog(confirm_diag.Ui_confirm_diag, QDialog):
     """
     It shows a message box to confirm the currect user selection for running

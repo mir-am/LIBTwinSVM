@@ -9,6 +9,8 @@ In this module, several miscellaneous functions are defined for using
 in other module, such as date time formatting.
 """
 
+from os.path import isdir
+
 
 def time_fmt(t_delta):
     """
@@ -61,4 +63,19 @@ def validate_step_size(kernel, C1_range, C2_range, u_range, step_size):
     return (step_size < abs(C1_range[1] - C1_range[0]) and step_size < \
     abs(C2_range[1] - C2_range[0])) and (step_size < abs(u_range[1] - \
        u_range[0]) if kernel == 'RBF' else True)
+    
+    
+def validate_path(path):
+    """
+    Checks whether the specified path exists on a system or not.
+    
+    path : str
+        The specified path.
+    """
+    
+    return isdir(path)
+    
+    
+    
+    
     
