@@ -94,6 +94,21 @@ class UserInput:
         
     u_range : tuple
         Lower and upper bound for gamma parameter.
+        
+    C1 : float
+        The penalty parameter.
+        
+    C2 : float
+        The penalty parameter.
+        
+    u : float
+        The parameter of the RBF kernel function.
+        
+    fig_dpi : int
+        DPI of the figure. It determines the quality of the output image.
+        
+    fig_save_path : str
+        The path at which a figure will be saved.
     """
     
     def __init__(self):
@@ -116,6 +131,13 @@ class UserInput:
         self.u_range = None
         # Whether all the input varabiles are inserted or not.
         self.input_complete = False
+        
+        # Visualization
+        self.C1 = 1.0
+        self.C2 = 1.0
+        self.u = 1.0
+        self.fig_dpi = None
+        self.fig_save_path = None
         
     def _get_kernel_selection(self):
         """

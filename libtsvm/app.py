@@ -373,7 +373,37 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         Plots a decision boundary based on users' input.
         """
         
-        pass
+        if self.vis_clf_cbox.currentIndex() == 0:
+            
+            self.user_in.clf_type = 'tsvm'
+        
+        elif self.vis_clf_cbox.currentIndex() == 1:
+            
+            self.user_in.clf_type = 'lstsvm'
+            
+        if self.vis_mc_cbox.currentIndex() == 0:
+            
+            self.user_in.mc_scheme = 'ova'
+            
+        elif self.vis_mc_cbox.currentIndex() == 1:
+            
+            self.user_in.mc_scheme = 'ovo'
+            
+        if self.vis_lin_rbtn.isChecked():
+            
+            self.user_in.kernel_type = 'linear'
+            
+        elif self.vis_non_lin_rbtn.isChecked():
+            
+            self.user_in.kernel_type = 'RBF'
+            
+        self.user_in.C1 = self.vis_C1_val.value()
+        self.user_in.C2 = self.vis_C2_val.value()
+        self.user_in.u = self.vis_u_value.value()
+        
+        self.user_in.fig_dpi =  self.vis_dpi_val.value()
+        self.user_in.fig_save_path = self.vis_save_val.text()
+            
         
         
 def show_dialog(title, msg_txt, diag_type):
