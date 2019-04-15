@@ -25,7 +25,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         super(LIBTwinSVMApp, self).__init__()
         
         self.setupUi(self)
+        
         self.user_in = UserInput() # Stores user's data and input
+        self.data_info = None
         self.init_GUI()
         
     def init_GUI(self):
@@ -41,6 +43,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.load_btn.clicked.connect(self.load_data)
         self.run_btn.clicked.connect(self.gather_usr_input)
         self.save_res_btn.clicked.connect(self.get_save_path)
+        self.vis_plot_btn.clicked.connect(self.plot_figure)
         
         # Quit main window
         self.actionExit.triggered.connect(self.closeEvent)
@@ -110,15 +113,17 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.user_in.X_train, self.user_in.y_train, \
         self.user_in.data_filename = self.data_reader.get_data()
         
-        print(self.user_in.X_train.shape)
-        print(self.user_in.y_train.shape)
         # TODO: Handle exception when it fails to load dataset and show the error
         # in message box
         show_dialog("Data Status", "Loaded the dataset successfully.", 
                          QMessageBox.Information)
         
         self.update_data_info(self.data_reader.hdr_names)
+        
+        self.user_in.class_type = type_of_target(self.user_in.y_train)
+        
         self.enable_classify()
+        self.enable_visualize()
         
     def update_data_info(self, hdr_name):
         """
@@ -130,17 +135,17 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             Header names of dataset.
         """
         
-        data_info = self.data_reader.get_data_info()
+        self.data_info = self.data_reader.get_data_info()
         
-        self.no_samples.setText(str(data_info.no_samples))
-        self.no_features.setText(str(data_info.no_features))
-        self.no_classes.setText(str(data_info.no_class))
+        self.no_samples.setText(str(self.data_info.no_samples))
+        self.no_features.setText(str(self.data_info.no_features))
+        self.no_classes.setText(str(self.data_info.no_class))
         
-        if len(data_info.header_names) != 0:
+        if len(self.data_info.header_names) != 0:
             
-            self.feature_table.setRowCount(data_info.no_features)
+            self.feature_table.setRowCount(self.data_info.no_features)
                 
-            for i, hdr_name in enumerate(data_info.header_names):
+            for i, hdr_name in enumerate(self.data_info.header_names):
 
                 self.feature_table.setItem(i, 0, QTableWidgetItem(hdr_name))
                 
@@ -148,10 +153,6 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         """
         Enables classify tab after a dataset is successfully loaded.
         """
-        
-        self.user_in.class_type = type_of_target(self.user_in.y_train)
-        
-        print(self.user_in.class_type)
         
         enable_mc = True if self.user_in.class_type == 'multiclass' else False
             
@@ -161,6 +162,25 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         # Enable gird search buttonsl
         self.run_btn.setEnabled(True)
         
+    def enable_visualize(self):
+        """
+        Enables visualize tab after a dataset is successfully loaded.
+        """
+        
+        if self.user_in.class_type == 'multiclass':
+            
+            self.vis_mc_cbox.setEnabled(True)
+        
+        if self.data_info.no_features <= 3:
+            
+            self.vis_plot_btn.setEnabled(True)
+            self.vis_status_msg.setText("Ready to plot!")
+            
+        else:
+            
+            self.vis_status_msg.setText("Number of features must be equal or"
+                                        " less than 3.")
+            
     def gather_usr_input(self):
         """
         It gathers all the input variables that set by a user.
@@ -347,6 +367,13 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.acc.setText(curr_acc)
         self.best_acc.setText(best_acc)
         self.elapsed_time.setText(elapsed_t)
+        
+    def plot_figure(self):
+        """
+        Plots a decision boundary based on users' input.
+        """
+        
+        pass
         
         
 def show_dialog(title, msg_txt, diag_type):
