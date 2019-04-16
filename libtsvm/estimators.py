@@ -9,6 +9,7 @@ In this module, Standard TwinSVM and Least Squares TwinSVM estimators are define
 """
 
 from sklearn.base import BaseEstimator
+from libtsvm import get_current_device
 from libtsvm.optimizer import clipdcd
 import numpy as np
 
@@ -256,7 +257,6 @@ class TSVM(BaseTSVM):
 
         
 class LSTSVM(BaseTSVM):
-
     """
     Least Squares Twin Support Vector Machine (LSTSVM) for binary classification
     It inherits attributes of :class:`BaseTSVM`.
@@ -285,11 +285,35 @@ class LSTSVM(BaseTSVM):
         super(LSTSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
         self.clf_name = 'LSTSVM'
-
+        
+        if get_current_device() == 'CPU':
+            
+            self.fit_method = self.__fit_CPU
+            
+        elif get_current_device == 'GPU':
+            
+            self.fit_method = self.__fit_GPU
+            
     def fit(self, X, y):
         """
         It fits the binary Least Squares TwinSVM model according to the given
         training data.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training feature vectors, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+        """
+        
+        return self.fit_method(X, y)
+
+    def __fit_CPU(self, X, y):
+        """
+        It fits the binary Least Squares TwinSVM model using CPU
 
         Parameters
         ----------
@@ -401,6 +425,53 @@ class LSTSVM(BaseTSVM):
                 self.w2 = hyper_surf2[:hyper_surf2.shape[0] - 1, :]
                 self.b2 = hyper_surf2[-1, :]
 
+
+    def __fit_GPU(self, X, y):
+        """
+        It fits the binary Least Squares TwinSVM model using GPU
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training feature vectors, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+        """        
+        
+        X = cp.asarray(X)
+        y = cp.asarray(y)
+        
+        # Matrix A or class 1 data
+        mat_A = X[y == 1]
+        
+        # Matrix B or class -1 data
+        mat_B = X[y == -1]
+        
+        # Vectors of ones
+        mat_e1 = cp.ones((mat_A.shape[0], 1))
+        mat_e2 = cp.ones((mat_B.shape[0], 1))
+        
+        mat_H = cp.column_stack((mat_A, mat_e1))
+        mat_G = cp.column_stack((mat_B, mat_e2))
+
+        mat_H_t = cp.transpose(mat_H)
+        mat_G_t = cp.transpose(mat_G)
+        
+        # Determine parameters of two non-parallel hyperplanes
+        hyper_p_1 = -1 * cp.dot(cp.linalg.inv(cp.dot(mat_G_t, mat_G) + \
+                               (1 / self.C1) * cp.dot(mat_H_t, mat_H)), \
+                                cp.dot(mat_G_t, mat_e2))
+        
+        self.w1 = hyper_p_1[:hyper_p_1.shape[0] - 1, :]
+        self.b1 = hyper_p_1[-1, :]
+        
+        hyper_p_2 = cp.dot(cp.linalg.inv(cp.dot(mat_H_t, mat_H) + (1 / self.C2)
+                                             * cp.dot(mat_G_t, mat_G)), cp.dot(mat_H_t, mat_e1))
+
+        self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
+        self.b2 = hyper_p_2[-1, :]
 
 def rbf_kernel(x, y, u):
     """
