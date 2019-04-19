@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\GUI-LIBTwinSVM.ui'
+# Form implementation generated from reading ui file 'GUI-LIBTwinSVM.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -13,7 +13,7 @@ from . import icons_rc
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(819, 708)
+        MainWindow.resize(881, 708)
         MainWindow.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.main_win = QtWidgets.QWidget(MainWindow)
         self.main_win.setObjectName("main_win")
@@ -550,28 +550,20 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 819, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 881, 22))
         self.menubar.setObjectName("menubar")
         self.menuHelp = QtWidgets.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
-        self.menuFile = QtWidgets.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
+        self.device_menu = QtWidgets.QMenu(self.menubar)
+        self.device_menu.setObjectName("device_menu")
         MainWindow.setMenuBar(self.menubar)
-        self.actionOpen_Dataset = QtWidgets.QAction(MainWindow)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/img/icons/file.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionOpen_Dataset.setIcon(icon)
-        self.actionOpen_Dataset.setObjectName("actionOpen_Dataset")
-        self.actionExit = QtWidgets.QAction(MainWindow)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/img/icons/exit.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionExit.setIcon(icon1)
-        self.actionExit.setObjectName("actionExit")
-        self.actionSave_Results = QtWidgets.QAction(MainWindow)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/img/icons/save.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionSave_Results.setIcon(icon2)
-        self.actionSave_Results.setObjectName("actionSave_Results")
+        self.cpu_chk_dev = QtWidgets.QAction(MainWindow)
+        self.cpu_chk_dev.setCheckable(True)
+        self.cpu_chk_dev.setChecked(True)
+        self.cpu_chk_dev.setObjectName("cpu_chk_dev")
+        self.gpu_chk_dev = QtWidgets.QAction(MainWindow)
+        self.gpu_chk_dev.setCheckable(True)
+        self.gpu_chk_dev.setObjectName("gpu_chk_dev")
         self.actionDocumentation = QtWidgets.QAction(MainWindow)
         self.actionDocumentation.setObjectName("actionDocumentation")
         self.actionView_License = QtWidgets.QAction(MainWindow)
@@ -582,16 +574,13 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionView_License)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
-        self.menuFile.addAction(self.actionOpen_Dataset)
-        self.menuFile.addAction(self.actionSave_Results)
-        self.menuFile.addSeparator()
-        self.menuFile.addAction(self.actionExit)
-        self.menubar.addAction(self.menuFile.menuAction())
+        self.device_menu.addAction(self.cpu_chk_dev)
+        self.device_menu.addAction(self.gpu_chk_dev)
+        self.menubar.addAction(self.device_menu.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         self.tabs.setCurrentIndex(0)
-        self.actionExit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -679,15 +668,12 @@ class Ui_MainWindow(object):
         self.vix_u_label.setText(_translate("MainWindow", "u:"))
         self.tabs.setTabText(self.tabs.indexOf(self.visualize_tab), _translate("MainWindow", "Visualize"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
-        self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.actionOpen_Dataset.setText(_translate("MainWindow", "Open Dataset"))
-        self.actionExit.setText(_translate("MainWindow", "Exit"))
-        self.actionExit.setStatusTip(_translate("MainWindow", "Click to exit the application."))
-        self.actionSave_Results.setText(_translate("MainWindow", "Save Results"))
+        self.device_menu.setTitle(_translate("MainWindow", "Device"))
+        self.cpu_chk_dev.setText(_translate("MainWindow", "CPU"))
+        self.gpu_chk_dev.setText(_translate("MainWindow", "GPU"))
         self.actionDocumentation.setText(_translate("MainWindow", "Documentation"))
         self.actionView_License.setText(_translate("MainWindow", "View License "))
         self.actionAbout.setText(_translate("MainWindow", "About"))
-
 
 if __name__ == "__main__":
     import sys

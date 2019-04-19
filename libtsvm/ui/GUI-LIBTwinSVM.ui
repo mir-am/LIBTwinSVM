@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
+    <width>881</width>
     <height>708</height>
    </rect>
   </property>
@@ -1202,8 +1202,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>819</width>
-     <height>21</height>
+     <width>881</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -1215,46 +1215,33 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="device_menu">
     <property name="title">
-     <string>File</string>
+     <string>Device</string>
     </property>
-    <addaction name="actionOpen_Dataset"/>
-    <addaction name="actionSave_Results"/>
-    <addaction name="separator"/>
-    <addaction name="actionExit"/>
+    <addaction name="cpu_chk_dev"/>
+    <addaction name="gpu_chk_dev"/>
    </widget>
-   <addaction name="menuFile"/>
+   <addaction name="device_menu"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionOpen_Dataset">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/img/icons/file.png</normaloff>:/img/icons/file.png</iconset>
+  <action name="cpu_chk_dev">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Open Dataset</string>
+    <string>CPU</string>
    </property>
   </action>
-  <action name="actionExit">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/img/icons/exit.png</normaloff>:/img/icons/exit.png</iconset>
+  <action name="gpu_chk_dev">
+   <property name="checkable">
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Exit</string>
-   </property>
-   <property name="statusTip">
-    <string>Click to exit the application.</string>
-   </property>
-  </action>
-  <action name="actionSave_Results">
-   <property name="icon">
-    <iconset resource="icons.qrc">
-     <normaloff>:/img/icons/save.png</normaloff>:/img/icons/save.png</iconset>
-   </property>
-   <property name="text">
-    <string>Save Results</string>
+    <string>GPU</string>
    </property>
   </action>
   <action name="actionDocumentation">
@@ -1276,22 +1263,5 @@
  <resources>
   <include location="icons.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>383</x>
-     <y>243</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

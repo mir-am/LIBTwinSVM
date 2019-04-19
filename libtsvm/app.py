@@ -4,7 +4,7 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget, QActionGroup
 from PyQt5.QtCore import QThread, pyqtSlot
 from sklearn.utils.multiclass import type_of_target
 from libtsvm.ui import view
@@ -45,9 +45,6 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.save_res_btn.clicked.connect(self.get_save_path)
         self.vis_plot_btn.clicked.connect(self.plot_figure)
         
-        # Quit main window
-        self.actionExit.triggered.connect(self.closeEvent)
-        
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
         
@@ -67,6 +64,12 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
                                 self.tt_percentage.setEnabled(False))
         
         self.cv_rbtn.toggled.connect(self.cv_folds.setEnabled)
+        
+        # Device menu
+        self.ag = QActionGroup(self.device_menu, exclusive=True)
+        self.ag.addAction(self.cpu_chk_dev)
+        self.ag.addAction(self.gpu_chk_dev)
+        self.ag.triggered.connect(self.onTriggered)
         
     def get_data_path(self):
         """
@@ -317,6 +320,20 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         else:
             
             event.ignore()
+            
+    def onTriggered(self, action):
+        """
+        Sets the current device that does the major compuation. CPU or GPU.
+        """
+        
+        # TODO: Set the current device.
+        if self.cpu_chk_dev.isChecked():
+            
+            pass
+        
+        elif self.gpu_chk_dev.isChecked():
+            
+            pass
         
     def run_gs_thread(self):
         """
