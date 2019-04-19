@@ -348,6 +348,11 @@ class LSTSVM(BaseTSVM):
 
             mat_H_t = np.transpose(mat_H)
             mat_G_t = np.transpose(mat_G)
+            
+            mat_I_H = np.identity(mat_H.shape[0]) # (m_1 x m_1)
+            mat_I_G = np.identity(mat_G.shape[0]) # (m_2 x m_2)
+            
+            mat_I = np.identity(mat_G.shape[1]) # (n x n)
 
             # Regulariztion term used for ill-possible condition
             reg_term = 2 ** float(-7)
@@ -355,21 +360,22 @@ class LSTSVM(BaseTSVM):
             # TODO: There are redundant computation below, which needs to be fixed
             # Determine parameters of hypersurfaces # Using SMW formula
             if mat_A.shape[0] < mat_B.shape[0]:
+                
+                y = (1 / reg_term) * (mat_I - np.dot(np.dot(mat_G_t, \
+                    np.linalg.inv((reg_term * mat_I_G) + np.dot(mat_G, mat_G_t))), mat_G))
+                
+                mat_H_y = np.dot(mat_H, y)
+                mat_y_Ht = np.dot(y, mat_H_t)
+                mat_H_y_Ht = np.dot(mat_H_y, mat_H_t)
+                
+                h_surf1_inv = np.linalg.inv(self.C1 * mat_I_H + mat_H_y_Ht)
+                h_surf2_inv = np.linalg.inv((mat_I_H / self.C2) + mat_H_y_Ht)
 
-                y = (1 / reg_term) * (np.identity(mat_G.shape[1]) -
-                                      np.dot(np.dot(mat_G_t, np.linalg.inv((reg_term *
-                                                                            np.identity(mat_G.shape[0])) + np.dot(mat_G, mat_G_t))),
-                                             mat_G))
+                hyper_surf1 = np.dot(-1 * (y - np.dot(np.dot(mat_y_Ht, h_surf1_inv), mat_H_y)), \
+                                     np.dot(mat_G_t, mat_e2))
 
-                hyper_surf1 = np.dot(-1 * (y - np.dot(np.dot(np.dot(y, mat_H_t),
-                                                             np.linalg.inv(self.C1 * np.identity(mat_H.shape[0])
-                                                                           + np.dot(np.dot(mat_H, y), mat_H_t))), np.dot(mat_H,
-                                                                                                                         y))), np.dot(mat_G_t, np.ones((mat_G.shape[0], 1))))
-
-                hyper_surf2 = np.dot(self.C2 * (y - np.dot(np.dot(np.dot(y, mat_H_t),
-                                                                  np.linalg.inv((np.identity(mat_H.shape[0]) / self.C2)
-                                                                                + np.dot(np.dot(mat_H, y), mat_H_t))), np.dot(mat_H,
-                                                                                                                              y))), np.dot(mat_H_t, np.ones((mat_H.shape[0], 1))))
+                hyper_surf2 = np.dot(self.C2 * (y - np.dot(np.dot(mat_y_Ht, h_surf2_inv), mat_H_y)), \
+                                     np.dot(mat_H_t, mat_e1))
 
                 # Parameters of hypersurfaces
                 self.w1 = hyper_surf1[:hyper_surf1.shape[0] - 1, :]
@@ -380,20 +386,21 @@ class LSTSVM(BaseTSVM):
 
             else:
 
-                z = (1 / reg_term) * (np.identity(mat_H.shape[1]) -
-                                      np.dot(np.dot(mat_H_t, np.linalg.inv(reg_term *
-                                                                           np.identity(mat_H.shape[0]) + np.dot(mat_H, mat_H_t))),
-                                             mat_H))
+                z = (1 / reg_term) * (mat_I - np.dot(np.dot(mat_H_t, \
+                    np.linalg.inv(reg_term * mat_I_H + np.dot(mat_H, mat_H_t))), mat_H))
+                    
+                mat_G_z = np.dot(mat_G, z)
+                mat_z_Gt = np.dot(z, mat_G_t)
+                mat_G_y_Gt = np.dot(mat_G_z, mat_G_t)
+                
+                g_surf1_inv = np.linalg.inv((mat_I_G / self.C1) + mat_G_y_Gt)
+                g_surf2_inv = np.linalg.inv(self.C2 * mat_I_G + mat_G_y_Gt)
 
-                hyper_surf1 = np.dot(self.C1 * (z - np.dot(np.dot(np.dot(z, mat_G_t),
-                                                                  np.linalg.inv((np.identity(mat_G.shape[0]) / self.C1)
-                                                                                + np.dot(np.dot(mat_G, z), mat_G_t))), np.dot(mat_G,
-                                                                                                                              z))), np.dot(mat_G_t, np.ones((mat_G.shape[0], 1))))
+                hyper_surf1 = np.dot(-self.C1 * (z - np.dot(np.dot(mat_z_Gt, g_surf1_inv), mat_G_z)), \
+                                     np.dot(mat_G_t, mat_e2))
 
-                hyper_surf2 = np.dot((z - np.dot(np.dot(np.dot(z, mat_G_t),
-                                                        np.linalg.inv(self.C2 * np.identity(mat_G.shape[0])
-                                                                      + np.dot(np.dot(mat_G, z), mat_G_t))), np.dot(mat_G,
-                                                                                                                    z))), np.dot(mat_H_t, np.ones((mat_H.shape[0], 1))))
+                hyper_surf2 = np.dot((z - np.dot(np.dot(mat_z_Gt, g_surf2_inv), mat_G_z)), \
+                                     np.dot(mat_H_t, mat_e1))
 
                 self.w1 = hyper_surf1[:hyper_surf1.shape[0] - 1, :]
                 self.b1 = hyper_surf1[-1, :]
