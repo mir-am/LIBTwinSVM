@@ -172,23 +172,25 @@ class BaseTSVM(BaseEstimator):
         
         print("Computes distances on the CPU.")
         
-        dist = np.zeros((X.shape[0], 2), dtype=np.float64)
+        #dist = np.zeros((X.shape[0], 2), dtype=np.float64)
         
-        kernel_f = {'linear': lambda i: X[i, :],
-                    'RBF': lambda i: rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
+        kernel_f = {'linear': lambda : X,
+                    'RBF': lambda : rbf_kernel(X, self.mat_C_t, self.gamma)}
         
-        # TODO: prediction can be sped up using NumPy's np.apply?!. It removes
-        # below for loop.
-        for i in range(X.shape[0]):
-
-            # Prependicular distance of data pint i from hyperplanes
-            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) \
-                + self.b1)
-
-            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) \
-                + self.b2)
+#        # TODO: prediction can be sped up using NumPy's np.apply?!. It removes
+#        # below for loop.
+#        for i in range(X.shape[0]):
+#
+#            # Prependicular distance of data pint i from hyperplanes
+#            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) \
+#                + self.b1)
+#
+#            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) \
+#                + self.b2)
             
-        return dist
+        return np.column_stack((np.abs(np.dot(kernel_f[self.kernel](), \
+                                self.w2) + self.b2), np.abs(np.dot(kernel_f[self.kernel](), \
+                                                           self.w1) + self.b1)))
     
     def __decision_function_GPU(self, X):
         """
@@ -198,9 +200,13 @@ class BaseTSVM(BaseEstimator):
         print("Computes distances on the GPU.")
         
         X = cp.asarray(X)
+        
+        kernel_f = {'linear': lambda : X,
+                    'RBF': lambda : GPU_rbf_kernel(X, self.mat_C_t, self.gamma)}
     
-        return cp.column_stack((cp.abs(cp.dot(X, self.w2) + self.b2), 
-                                cp.abs(cp.dot(X, self.w1) + self.b1)))
+        return cp.column_stack((cp.abs(cp.dot(kernel_f[self.kernel](), \
+                                self.w2) + self.b2), cp.abs(cp.dot(kernel_f[self.kernel](), \
+                                                           self.w1) + self.b1)))
         
 class TSVM(BaseTSVM):
 
@@ -336,6 +342,8 @@ class LSTSVM(BaseTSVM):
         super(LSTSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
         self.clf_name = 'LSTSVM'
+        # Regulariztion term used for ill-possible condition
+        self.__reg_term = 2 ** float(-7)
         
         if get_current_device() == 'CPU':
             
@@ -433,15 +441,10 @@ class LSTSVM(BaseTSVM):
             
             mat_I = np.identity(mat_G.shape[1]) # (n x n)
 
-            # Regulariztion term used for ill-possible condition
-            reg_term = 2 ** float(-7)
-
-            # TODO: There are redundant computation below, which needs to be fixed
-            # Determine parameters of hypersurfaces # Using SMW formula
             if mat_A.shape[0] < mat_B.shape[0]:
                 
-                y = (1 / reg_term) * (mat_I - np.dot(np.dot(mat_G_t, \
-                    np.linalg.inv((reg_term * mat_I_G) + np.dot(mat_G, mat_G_t))), mat_G))
+                y = (1 / self.__reg_term) * (mat_I - np.dot(np.dot(mat_G_t, \
+                    np.linalg.inv((self.__reg_term * mat_I_G) + np.dot(mat_G, mat_G_t))), mat_G))
                 
                 mat_H_y = np.dot(mat_H, y)
                 mat_y_Ht = np.dot(y, mat_H_t)
@@ -465,8 +468,8 @@ class LSTSVM(BaseTSVM):
 
             else:
 
-                z = (1 / reg_term) * (mat_I - np.dot(np.dot(mat_H_t, \
-                    np.linalg.inv(reg_term * mat_I_H + np.dot(mat_H, mat_H_t))), mat_H))
+                z = (1 / self.__reg_term) * (mat_I - np.dot(np.dot(mat_H_t, \
+                    np.linalg.inv(self.__reg_term * mat_I_H + np.dot(mat_H, mat_H_t))), mat_H))
                     
                 mat_G_z = np.dot(mat_G, z)
                 mat_z_Gt = np.dot(z, mat_G_t)
@@ -538,6 +541,69 @@ class LSTSVM(BaseTSVM):
     
             self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
             self.b2 = hyper_p_2[-1, :]
+            
+        elif self.kernel == 'RBF':
+            
+            mat_C = cp.vstack((mat_A, mat_B))
+            
+            self.mat_C_t = cp.transpose(mat_C)[:, :int(mat_C.shape[0] * self.rect_kernel)]
+            
+            mat_H = cp.column_stack((GPU_rbf_kernel(mat_A, self.mat_C_t,
+                                                    self.gamma), mat_e1))
+            
+            mat_G = cp.column_stack((GPU_rbf_kernel(mat_B, self.mat_C_t,
+                                                    self.gamma), mat_e2))
+            
+            mat_H_t = cp.transpose(mat_H)
+            mat_G_t = cp.transpose(mat_G)
+            
+            mat_I_H = cp.identity(mat_H.shape[0])
+            mat_I_G = cp.identity(mat_G.shape[0])
+            
+            mat_I = cp.identity(mat_G.shape[1])
+            
+            if mat_A.shape[0] < mat_B.shape[0]:
+                
+                y = (1 / self.__reg_term) * (mat_I - cp.dot(cp.dot(mat_G_t, \
+                    cp.linalg.inv((self.__reg_term * mat_I_G) + cp.dot(mat_G, mat_G_t))), mat_G))
+                
+                mat_H_y = cp.dot(mat_H, y)
+                mat_y_Ht = cp.dot(y, mat_H_t)
+                mat_H_y_Ht = cp.dot(mat_H_y, mat_H_t)
+                
+                h_surf1_inv = cp.linalg.inv(self.C1 * mat_I_H + mat_H_y_Ht)
+                h_surf2_inv = cp.linalg.inv((mat_I_H / self.C2) + mat_H_y_Ht)
+                
+                hyper_surf1 = cp.dot(-1 * (y - cp.dot(cp.dot(mat_y_Ht, h_surf1_inv), mat_H_y)), \
+                                     cp.dot(mat_G_t, mat_e2))
+
+                hyper_surf2 = cp.dot(self.C2 * (y - cp.dot(cp.dot(mat_y_Ht, h_surf2_inv), mat_H_y)), \
+                                     cp.dot(mat_H_t, mat_e1))
+                
+            else:
+                
+                z = (1 / self.__reg_term) * (mat_I - cp.dot(cp.dot(mat_H_t, \
+                    cp.linalg.inv(self.__reg_term * mat_I_H + cp.dot(mat_H, mat_H_t))), mat_H))
+                
+                mat_G_z = cp.dot(mat_G, z)
+                mat_z_Gt = cp.dot(z, mat_G_t)
+                mat_G_y_Gt = cp.dot(mat_G_z, mat_G_t)
+                
+                g_surf1_inv = cp.linalg.inv((mat_I_G / self.C1) + mat_G_y_Gt)
+                g_surf2_inv = cp.linalg.inv(self.C2 * mat_I_G + mat_G_y_Gt)
+                
+                hyper_surf1 = cp.dot(-self.C1 * (z - cp.dot(cp.dot(mat_z_Gt, g_surf1_inv), mat_G_z)), \
+                                     cp.dot(mat_G_t, mat_e2))
+
+                hyper_surf2 = cp.dot((z - cp.dot(cp.dot(mat_z_Gt, g_surf2_inv), mat_G_z)), \
+                                     cp.dot(mat_H_t, mat_e1))
+                
+            self.w1 = hyper_surf1[:hyper_surf1.shape[0] - 1, :]
+            self.b1 = hyper_surf1[-1, :]
+
+            self.w2 = hyper_surf2[:hyper_surf2.shape[0] - 1, :]
+            self.b2 = hyper_surf2[-1, :]
+            
 
 def rbf_kernel(x, y, u):
     """
