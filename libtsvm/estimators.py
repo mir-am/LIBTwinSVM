@@ -238,11 +238,24 @@ class TSVM(BaseTSVM):
         super(TSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
         self.clf_name = 'TSVM'
-
-    def fit(self, X_train, y_train):
+        
+        # Regulariztion term used for ill-possible condition
+        self.__reg_term = 2 ** float(-7)
+        
+        if get_current_device() == 'CPU':
+            
+            self.fit_method = self.__fit_CPU
+            
+        elif get_current_device() == 'GPU':
+            
+            print("Selected the GPU.")
+            
+            self.fit_method = self.__fit_GPU
+            
+    def fit(self, X, y):
         """
         It fits the binary TwinSVM model according to the given training data.
-
+        
         Parameters
         ----------
         X_train : array-like, shape (n_samples, n_features)
@@ -251,8 +264,26 @@ class TSVM(BaseTSVM):
 
         y_train : array-like, shape(n_samples,)
             Target values or class labels.
-
         """
+        
+        return self.fit_method(X, y)
+        
+
+    def __fit_CPU(self, X_train, y_train):
+        """
+        It fits the binary TwinSVM model using CPU
+        
+        Parameters
+        ----------
+        X_train : array-like, shape (n_samples, n_features)
+           Training feature vectors, where n_samples is the number of samples
+           and n_features is the number of features.
+
+        y_train : array-like, shape(n_samples,)
+            Target values or class labels.
+        """
+        
+        print("Fits on the CPU.")
 
         # Matrix A or class 1 samples
         mat_A = X_train[y_train == 1]
@@ -277,7 +308,6 @@ class TSVM(BaseTSVM):
             self.mat_C_t = np.transpose(mat_C)[:, :int(mat_C.shape[0] * self.rect_kernel)]
 
             mat_H = np.column_stack((rbf_kernel(mat_A, self.mat_C_t, self.gamma), mat_e1))
-
             mat_G = np.column_stack((rbf_kernel(mat_B, self.mat_C_t, self.gamma), mat_e2))
 
         mat_H_t = np.transpose(mat_H)
@@ -289,7 +319,7 @@ class TSVM(BaseTSVM):
 
         mat_H_H = np.linalg.inv(np.dot(mat_H_t, mat_H) + (reg_term * np.identity(mat_H.shape[1])))
         mat_G_G = np.linalg.inv(np.dot(mat_G_t, mat_G) + (reg_term * np.identity(mat_G.shape[1])))
-
+        
         # Wolfe dual problem of class 1
         mat_dual1 = np.dot(np.dot(mat_G, mat_H_H), mat_G_t)
         # Wolfe dual problem of class -1
@@ -311,7 +341,81 @@ class TSVM(BaseTSVM):
         # Class -1
         self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
         self.b2 = hyper_p_2[-1, :]
+        
+    def __fit_GPU(self, X, y):
+        """
+        It fits the binary TwinSVM model using GPU
 
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training feature vectors, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+        """
+
+        print("Fits on the GPU.") 
+
+        X = cp.asarray(X)
+        y = cp.asarray(y)
+        
+        # Matrix A or class 1 data
+        mat_A = X[y == 1]
+        
+        # Matrix B or class -1 data
+        mat_B = X[y == -1]
+        
+        mat_e1 = cp.ones((mat_A.shape[0], 1))
+        mat_e2 = cp.ones((mat_B.shape[0], 1))
+        
+        if self.kernel == 'linear':  # Linear kernel
+
+            mat_H = cp.column_stack((mat_A, mat_e1))
+            mat_G = cp.column_stack((mat_B, mat_e2))
+
+        elif self.kernel == 'RBF':  # Non-linear
+
+            # class 1 & class -1
+            mat_C = cp.vstack((mat_A, mat_B))
+
+            self.mat_C_t = cp.transpose(mat_C)[:, :int(mat_C.shape[0] * self.rect_kernel)]
+
+            mat_H = cp.column_stack((GPU_rbf_kernel(mat_A, self.mat_C_t, self.gamma), mat_e1))
+            mat_G = cp.column_stack((GPU_rbf_kernel(mat_B, self.mat_C_t, self.gamma), mat_e2))
+            
+        mat_H_t = cp.transpose(mat_H)
+        mat_G_t = cp.transpose(mat_G)
+
+        # Compute inverses: 
+        mat_H_H = cp.linalg.inv(cp.dot(mat_H_t, mat_H) + (self.__reg_term * cp.identity(mat_H.shape[1])))
+        mat_G_G = cp.linalg.inv(cp.dot(mat_G_t, mat_G) + (self.__reg_term * cp.identity(mat_G.shape[1])))
+
+        # Wolfe dual problem of class 1
+        mat_dual1 = cp.dot(cp.dot(mat_G, mat_H_H), mat_G_t)
+
+        # Wolfe dual problem of class -1
+        mat_dual2 = cp.dot(cp.dot(mat_H, mat_G_G), mat_H_t)
+
+        # Obtaining Lagrange multipliers using ClipDCD optimizer
+        alpha_d1 = cp.array(clipdcd.optimize(cp.asnumpy(mat_dual1), \
+                                             self.C1)).reshape(mat_dual1.shape[0], 1)
+        alpha_d2 = cp.array(clipdcd.optimize(cp.asnumpy(mat_dual2), \
+                                             self.C2)).reshape(mat_dual2.shape[0], 1)
+
+        # Obtain hyperplanes
+        hyper_p_1 = -1 * cp.dot(cp.dot(mat_H_H, mat_G_t), alpha_d1)
+
+        # Class 1
+        self.w1 = hyper_p_1[:hyper_p_1.shape[0] - 1, :]
+        self.b1 = hyper_p_1[-1, :]
+
+        hyper_p_2 = cp.dot(cp.dot(mat_G_G, mat_H_t), alpha_d2)
+
+        # Class -1
+        self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
+        self.b2 = hyper_p_2[-1, :]
         
 class LSTSVM(BaseTSVM):
     """
@@ -374,7 +478,7 @@ class LSTSVM(BaseTSVM):
 
     def __fit_CPU(self, X, y):
         """
-        It fits the binary Least Squares TwinSVM model using CPU
+        It fits the binary Least Squares TwinSVM model using CPU.
 
         Parameters
         ----------
