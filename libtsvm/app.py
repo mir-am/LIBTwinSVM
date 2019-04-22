@@ -44,6 +44,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.run_btn.clicked.connect(self.gather_usr_input)
         self.save_res_btn.clicked.connect(self.get_save_path)
         self.vis_plot_btn.clicked.connect(self.plot_figure)
+        self.vis_select_btn.clicked.connect(self.get_save_path_fig)
         
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
@@ -420,6 +421,25 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         self.user_in.fig_dpi =  self.vis_dpi_val.value()
         self.user_in.fig_save_path = self.vis_save_val.text()
+        
+        
+    def get_save_path_fig(self):
+        """
+        Gets save path for storing the figure of visualization.
+        """
+        
+        fig_path = QFileDialog.getExistingDirectory(self, "Select a directory")
+         
+        if fig_path:
+            
+            self.vis_save_val.setText(fig_path)
+            
+    def run_plot_thread(self):
+        """
+        Runs visualization in a separate thread.
+        """        
+        
+        pass
             
         
         
