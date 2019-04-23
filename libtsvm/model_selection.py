@@ -637,25 +637,25 @@ class ThreadGS(QObject):
             Grids of search elements.
         """
         
-        clf_obj = None
+        clf_obj = self.usr_input.get_selected_clf()
     
-        if self.usr_input.clf_type == 'tsvm':
-            
-            clf_obj = TSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
-            
-        elif self.usr_input.clf_type == 'lstsvm':
-            
-            clf_obj = LSTSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
-            
-        if self.usr_input.class_type == 'multiclass':
-            
-            if self.usr_input.mc_scheme == 'ova':
-                
-                clf_obj = OneVsAllClassifier(clf_obj)
-                
-            elif self.usr_input.mc_scheme == 'ovo':
-                
-                clf_obj = OneVsOneClassifier(clf_obj)
+#        if self.usr_input.clf_type == 'tsvm':
+#            
+#            clf_obj = TSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
+#            
+#        elif self.usr_input.clf_type == 'lstsvm':
+#            
+#            clf_obj = LSTSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
+#            
+#        if self.usr_input.class_type == 'multiclass':
+#            
+#            if self.usr_input.mc_scheme == 'ova':
+#                
+#                clf_obj = OneVsAllClassifier(clf_obj)
+#                
+#            elif self.usr_input.mc_scheme == 'ovo':
+#                
+#                clf_obj = OneVsOneClassifier(clf_obj)
                 
         eval_method = Validator(self.usr_input.X_train, self.usr_input.y_train,
                                 self.usr_input.class_type, self.usr_input.test_method_tuple,
