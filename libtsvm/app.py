@@ -66,7 +66,11 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.tt_split_rbtn.toggled.connect(lambda checked: not checked and \
                                 self.tt_percentage.setEnabled(False))
         
+        self.vis_save_fig_chk.toggled.connect(self.vis_save_val.setEnabled)
+        self.vis_save_fig_chk.toggled.connect(self.vis_select_btn.setEnabled)
+        
         self.cv_rbtn.toggled.connect(self.cv_folds.setEnabled)
+        
         
         # Device menu
         self.ag = QActionGroup(self.device_menu, exclusive=True)
@@ -421,8 +425,12 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.user_in.C2 = 2 ** self.vis_C2_val.value()
         self.user_in.u = 2 ** self.vis_u_value.value()
         
-        self.user_in.fig_dpi =  self.vis_dpi_val.value()
-        self.user_in.fig_save_path = self.vis_save_val.text()
+        if self.vis_save_fig_chk.isChecked():
+            
+            self.user_in.fig_save = True
+            self.user_in.fig_dpi =  self.vis_dpi_val.value()
+            # TODO: Check whether the path is valid or not.
+            self.user_in.fig_save_path = self.vis_save_val.text()
         
         self.run_plot_thread()
         
@@ -449,6 +457,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         vis_t.moveToThread(t)
         t.started.connect(vis_t.plot)
         
+        vis_t.sig_update_plt.connect(self.update_plot)
+        
         t.start()
     
     @pyqtSlot(object)    
@@ -457,7 +467,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         Inserts the figure canvas to display the plot in the GUI.
         """
         
-        self.vis_plot_frame.addWidget(fig_canvas)
+        print("Draw....")
+        
+        self.plot_frame_grid.addWidget(fig_canvas, 0, 0, 1, 1)
         
             
 def show_dialog(title, msg_txt, diag_type):

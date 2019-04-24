@@ -4,6 +4,7 @@
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
 
+from os.path import join
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -63,7 +64,7 @@ def bin_plot(estimator, X, y):
     # Line Equation hyperplane 2
     slope2, intercept2 = hyperplane_eq(estimator.w2, estimator.b2) 
     
-    fig = plt.figure(1)
+    fig = plt.gcf()
     axes = plt.gca()
     
     # Plot Training data
@@ -91,6 +92,7 @@ def bin_plot(estimator, X, y):
     plt.show()
 
 
+
 class VisualThread(QObject):
     """
     It runs the visualization in a separate thread.
@@ -111,7 +113,6 @@ class VisualThread(QObject):
         # Matplotlib initialization
         self.fig = Figure()
         self.canvas = FigureCanvas(self.fig)
-        self.sig_update_plt.emit(self.canvas)
         
     @pyqtSlot()
     def plot(self):
@@ -134,9 +135,14 @@ class VisualThread(QObject):
         elif self.usr_input.class_type == 'multiclass':
             
             pass
-    
+        
+        self.sig_update_plt.emit(self.canvas)
+        
     @pyqtSlot()    
     def create_fig(self):
+        
+        X_c1 = self.usr_input.X_train[self.usr_input.y_train == 1]
+        X_c2 = self.usr_input.X_train[self.usr_input.y_train == -1]
         
         self.clf_obj.fit(self.usr_input.X_train, self.usr_input.y_train)
 
@@ -147,14 +153,16 @@ class VisualThread(QObject):
         slope2, intercept2 = hyperplane_eq(self.clf_obj.w2, self.clf_obj.b2) 
         
         ax = self.fig.add_subplot(111)
+        ax.clear()
         
         # Plot Training data
-        ax.scatter(self.usr_input.X_train[:, 0], self.usr_input.X_train[:, 1], marker='^', color='red',
+        ax.scatter(X_c1[:, 0], X_c1[:, 1], marker='^', color='red',
                     label='Samples of class +1') #cmap=plt.cm.Paired)
-        ax.scatter(self.usr_input.X_train[:, 0], self.usr_input.X_train[:, 1], marker='s', color='blue',
+        ax.scatter(X_c2[:, 0], X_c2[:, 1], marker='s', color='blue',
                     label='Samples of class -1') #cmap=plt.cm.Paired)
     
         x_range = ax.get_xlim() # X-axis range
+        y_range = ax.get_ylim()
        
         # Min and Max of feature X1 and creating X values for creating line
         xx_1 = np.linspace(x_range[0], x_range[1])
@@ -166,8 +174,15 @@ class VisualThread(QObject):
         ax.plot(xx_1, yy_1, 'k-', label='Hyperplane') # Hyperplane of class 1
         ax.plot(xx_1, yy_2, 'k-') # Hyperplane of class 2        
        
-        ax.set_ylim(-0.7, 8)
+        ax.set_ylim(y_range[0], y_range[1])
         ax.set_xlim(x_range[0], x_range[1])
+        
+        ax.legend()
+        
+        if self.usr_input.fig_save:
+            
+            self.fig.savefig(join(self.usr_input.fig_save_path,'linear-tsvm.png'),
+                             format='png', dpi=self.usr_input.fig_dpi)
         
         self.canvas.draw()
         

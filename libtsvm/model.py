@@ -108,6 +108,9 @@ class UserInput:
     u : float
         The parameter of the RBF kernel function.
         
+    fig_save : boolean
+        Whether to save the figure or not.
+        
     fig_dpi : int
         DPI of the figure. It determines the quality of the output image.
         
@@ -140,6 +143,7 @@ class UserInput:
         self.C1 = 1.0
         self.C2 = 1.0
         self.u = 1.0
+        self.fig_save = False
         self.fig_dpi = None
         self.fig_save_path = None
         
