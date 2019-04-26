@@ -125,9 +125,10 @@ class DataReader():
             data characteristics
         """
         
+        unq_cls_lables = np.unique(self.y_train)
+        
         return DataInfo(self.X_train.shape[0], self.X_train.shape[1], 
-                        self.y_train.size ,np.unique(self.y_train).size,
-                        self.hdr_names)
+                        unq_cls_lables.size, unq_cls_lables, self.hdr_names)
     
 
 def conv_str_fl(data):

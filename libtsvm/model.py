@@ -8,6 +8,10 @@
 This modules models data, user input in classes and functions
 """
 
+from libtsvm.estimators import TSVM, LSTSVM
+from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
+
+
 class DataInfo:
     """
     It stores dataset characteristics such as no. samples, no. features and etc.
@@ -104,6 +108,9 @@ class UserInput:
     u : float
         The parameter of the RBF kernel function.
         
+    fig_save : boolean
+        Whether to save the figure or not.
+        
     fig_dpi : int
         DPI of the figure. It determines the quality of the output image.
         
@@ -136,6 +143,7 @@ class UserInput:
         self.C1 = 1.0
         self.C2 = 1.0
         self.u = 1.0
+        self.fig_save = False
         self.fig_dpi = None
         self.fig_save_path = None
         
@@ -231,3 +239,59 @@ class UserInput:
             raise RuntimeError("input_complete has not been set yet! "
                                "Check out UserInput Class Docs.")
             
+    def get_selected_clf(self):
+        """
+        It returns the classifier that is selected by user.
+        
+        Returns
+        -------
+        clf_obj : object
+            An estimator object.
+        
+        .. warning::
+            
+        """
+        
+        clf_obj = None
+    
+        if self.clf_type == 'tsvm':
+            
+            clf_obj = TSVM(self.kernel_type, self.rect_kernel)
+            
+        elif self.clf_type == 'lstsvm':
+            
+            clf_obj = LSTSVM(self.kernel_type, self.rect_kernel)
+            
+        if self.class_type == 'multiclass':
+            
+            if self.mc_scheme == 'ova':
+                
+                clf_obj = OneVsAllClassifier(clf_obj)
+                
+            elif self.mc_scheme == 'ovo':
+                
+                clf_obj = OneVsOneClassifier(clf_obj)
+                
+        return clf_obj
+    
+    def get_clf_params(self):
+        """
+        It returns hyper-parameters of the classifier in a dictionary.
+        
+        Returns
+        -------
+        dict
+            Hyper-parameters of the classifier.   
+        """
+        
+        if self.kernel_type == 'linear':
+        
+            return {'C1': self.C1, 'C2': self.C2}
+        
+        elif self.kernel_type == 'RBF':
+            
+            return {'C1': self.C1, 'C2': self.C2, 'gamma': self.u}
+        
+        
+        
+        

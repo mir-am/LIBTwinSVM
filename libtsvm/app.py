@@ -6,12 +6,14 @@
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget, QActionGroup
 from PyQt5.QtCore import QThread, pyqtSlot
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from sklearn.utils.multiclass import type_of_target
 from libtsvm.ui import view
 from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
 from libtsvm.model_selection import ThreadGS
+from libtsvm.visualize import VisualThread
 from libtsvm.misc import validate_step_size, validate_path
 from datetime import datetime
 import numpy as np
@@ -44,6 +46,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.run_btn.clicked.connect(self.gather_usr_input)
         self.save_res_btn.clicked.connect(self.get_save_path)
         self.vis_plot_btn.clicked.connect(self.plot_figure)
+        self.vis_select_btn.clicked.connect(self.get_save_path_fig)
         
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
@@ -63,7 +66,11 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.tt_split_rbtn.toggled.connect(lambda checked: not checked and \
                                 self.tt_percentage.setEnabled(False))
         
+        self.vis_save_fig_chk.toggled.connect(self.vis_save_val.setEnabled)
+        self.vis_save_fig_chk.toggled.connect(self.vis_select_btn.setEnabled)
+        
         self.cv_rbtn.toggled.connect(self.cv_folds.setEnabled)
+        
         
         # Device menu
         self.ag = QActionGroup(self.device_menu, exclusive=True)
@@ -104,7 +111,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
     def load_data(self):
         """
-        Loads a dataset
+        Loads a dataset.
         """
         
         self.data_reader = DataReader(self.path_box.text(), self.sep_char_box.text(),
@@ -414,15 +421,57 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
             self.user_in.kernel_type = 'RBF'
             
-        self.user_in.C1 = self.vis_C1_val.value()
-        self.user_in.C2 = self.vis_C2_val.value()
-        self.user_in.u = self.vis_u_value.value()
+        self.user_in.C1 = 2 ** self.vis_C1_val.value()
+        self.user_in.C2 = 2 ** self.vis_C2_val.value()
+        self.user_in.u = 2 ** self.vis_u_value.value()
         
-        self.user_in.fig_dpi =  self.vis_dpi_val.value()
-        self.user_in.fig_save_path = self.vis_save_val.text()
+        if self.vis_save_fig_chk.isChecked():
             
+            self.user_in.fig_save = True
+            self.user_in.fig_dpi =  self.vis_dpi_val.value()
+            # TODO: Check whether the path is valid or not.
+            self.user_in.fig_save_path = self.vis_save_val.text()
         
+        self.run_plot_thread()
         
+    def get_save_path_fig(self):
+        """
+        Gets save path for storing the figure of visualization.
+        """
+        
+        fig_path = QFileDialog.getExistingDirectory(self, "Select a directory")
+         
+        if fig_path:
+            
+            self.vis_save_val.setText(fig_path)
+            
+    def run_plot_thread(self):
+        """
+        Runs visualization in a separate thread.
+        """        
+        
+        t = QThread()
+        vis_t = VisualThread(self.user_in)
+        self.__threads.append((t, vis_t))
+        
+        vis_t.moveToThread(t)
+        t.started.connect(vis_t.plot)
+        
+        vis_t.sig_update_plt.connect(self.update_plot)
+        
+        t.start()
+    
+    @pyqtSlot(object)    
+    def update_plot(self, fig_canvas):
+        """
+        Inserts the figure canvas to display the plot in the GUI.
+        """
+        
+        print("Draw....")
+        
+        self.plot_frame_grid.addWidget(fig_canvas, 0, 0, 1, 1)
+        
+            
 def show_dialog(title, msg_txt, diag_type):
     """
     A message box that shows extra information to users.
