@@ -8,6 +8,7 @@
 This modules models data, user input in classes and functions
 """
 
+from datetime import datetime
 from libtsvm.estimators import TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
 
@@ -212,6 +213,33 @@ class UserInput:
                 
                 return "One-vs-One"
             
+    def _get_clf_name(self):
+        """
+        It returns the name of the user's selected classifier.
+        """
+        
+        if self.clf_type == 'tsvm':
+            
+            clf = 'TSVM'
+            
+        elif self.clf_type == 'lstsvm':
+            
+            clf = 'LSTSVM'
+            
+        if self.class_type == 'binary':
+            
+            return clf
+        
+        elif self.class_type == 'multiclass':
+          
+            if self.mc_scheme == 'ova':
+                
+                return "OVA-" + clf
+            
+            elif self.mc_scheme == 'ovo':
+                
+                return "OVO-" + clf
+            
     def get_current_selection(self):
         """
         It returns a user's current selection for confirmation
@@ -292,6 +320,14 @@ class UserInput:
             
             return {'C1': self.C1, 'C2': self.C2, 'gamma': self.u}
         
+    def get_fig_name(self):
+        """
+        Returns the figure's name based on the user's selection for saving a file.
+        """
+        
+        return "Plot_%s_%s_%s_%s" % (self._get_clf_name(), self.kernel_type,
+                                        self.data_filename,
+                                        datetime.now().strftime('%Y-%m-%d %H-%M'))
         
         
         
