@@ -68,8 +68,14 @@ class DataReader():
         """
         
         df = pd.read_csv(self.file_path, sep=self.sep)
-
-        # First extract class labels
+        
+        if shuffle:
+            
+            df = df.sample(frac=1).reset_index(drop=True)
+            
+            #print(df)
+        
+        # extract class labels
         self.y_train = df.iloc[:, 0].values
         df.drop(df.columns[0], axis=1, inplace=True)
             
@@ -77,13 +83,6 @@ class DataReader():
         
             df = (df - df.mean()) / df.std()
         
-            #print(df)
-            
-        if shuffle:
-            
-            df = df.sample(frac=1).reset_index(drop=True)
-            
-            #print(df)
         
         self.X_train = df.values # Feature values
         self.hdr_names = list(df.columns.values) if self.header else []
