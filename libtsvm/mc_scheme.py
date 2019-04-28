@@ -37,7 +37,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
     clf_name : str
         Name of the classifier.
 
-    bin_cls_ : list
+    bin_clf_ : list
         Stores intances of each binary :class:`TSVM` classifier.
     """
 
@@ -68,7 +68,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         valid
         """
 
-        check_is_fitted(self, ['bin_cls_'])
+        check_is_fitted(self, ['bin_clf_'])
         X = check_array(X, dtype=np.float64)
 
         n_samples, n_features = X.shape
@@ -103,7 +103,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         y = self._validate_targets(y)
 
         # Allocate n(n-1)/2 binary classifiers
-        self.bin_cls_ = [clone(self.estimator) for i in range(((self.classes_.size * \
+        self.bin_clf_ = [clone(self.estimator) for i in range(((self.classes_.size * \
                         (self.classes_.size - 1)) // 2))]
 
         p = 0
@@ -125,7 +125,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
                 sub_prob_y_i_j[sub_prob_y_i_j == j] = -1
                 sub_prob_y_i_j[sub_prob_y_i_j == i] = 1
 
-                self.bin_cls_[p].fit(sub_prob_X_i_j, sub_prob_y_i_j)
+                self.bin_clf_[p].fit(sub_prob_X_i_j, sub_prob_y_i_j)
 
                 p = p + 1
 
@@ -162,7 +162,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
                 for j in range(i + 1, self.classes_.size):
 
-                    y_pred = self.bin_cls_[p].predict(X[k, :].reshape(1, X.shape[1]))
+                    y_pred = self.bin_clf_[p].predict(X[k, :].reshape(1, X.shape[1]))
 
                     if y_pred == 1:
 
@@ -194,6 +194,9 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
     ----------
     clf_name : str
         Name of the classifier.
+        
+    bin_clf_ : list
+        Stores intances of each binary :class:`TSVM` classifier.
     """
     
     def __init__(self, estimator):
