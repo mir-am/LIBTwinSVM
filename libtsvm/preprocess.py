@@ -47,14 +47,14 @@ class DataReader():
         dataset's filename
     """
     
-    def __init__(self, file_path, sep, header):
+    def __init__(self, file_path, sep=',', header=True):
         
         self.file_path = file_path
         self.sep = sep
         self.header = header
         
 
-    def load_data(self, shuffle, normalize):
+    def load_data(self, shuffle=False, normalize=False):
         """
         It reads a CSV file into pandas DataFrame.
             
@@ -70,7 +70,7 @@ class DataReader():
         df = pd.read_csv(self.file_path, sep=self.sep)
 
         # First extract class labels
-        self.y_train = df.iloc[:, 0].values
+        self.y_train = df.iloc[:, 0].values.astype(np.int)
         df.drop(df.columns[0], axis=1, inplace=True)
             
         if normalize:
