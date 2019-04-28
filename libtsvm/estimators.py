@@ -11,9 +11,14 @@ In this module, Standard TwinSVM and Least Squares TwinSVM estimators are define
 from sklearn.base import BaseEstimator
 from libtsvm import get_current_device
 from libtsvm.optimizer import clipdcd
+from libtsvm import __GPU_enabled
 from cupy import prof
-import cupy as cp
+#import cupy as cp
 import numpy as np
+
+if __GPU_enabled:
+    
+    from libtsvm import cp
 
 
 class BaseTSVM(BaseEstimator):
@@ -150,7 +155,7 @@ class BaseTSVM(BaseEstimator):
         Performs prediction on the CPU.
         """
         
-        print("Performs prediction on the CPU.")
+        #print("Performs prediction on the CPU.")
         
         # Assign data points to class +1 or -1 based on distance from hyperplanes
         return 2 * np.argmin(self.__decision_function_CPU(X), axis=1) - 1
@@ -170,7 +175,7 @@ class BaseTSVM(BaseEstimator):
         Computes distances on the CPU.
         """
         
-        print("Computes distances on the CPU.")
+        #print("Computes distances on the CPU.")
         
         #dist = np.zeros((X.shape[0], 2), dtype=np.float64)
         
