@@ -68,8 +68,14 @@ class DataReader():
         """
         
         df = pd.read_csv(self.file_path, sep=self.sep)
-
-        # First extract class labels
+    
+        if shuffle:
+            
+            df = df.sample(frac=1).reset_index(drop=True)
+            
+            #print(df)
+        
+        # extract class labels
         self.y_train = df.iloc[:, 0].values.astype(np.int)
         df.drop(df.columns[0], axis=1, inplace=True)
             
@@ -77,13 +83,6 @@ class DataReader():
         
             df = (df - df.mean()) / df.std()
         
-            #print(df)
-            
-        if shuffle:
-            
-            df = df.sample(frac=1).reset_index(drop=True)
-            
-            #print(df)
         
         self.X_train = df.values # Feature values
         self.hdr_names = list(df.columns.values) if self.header else []
@@ -125,9 +124,10 @@ class DataReader():
             data characteristics
         """
         
+        unq_cls_lables = np.unique(self.y_train)
+        
         return DataInfo(self.X_train.shape[0], self.X_train.shape[1], 
-                        self.y_train.size ,np.unique(self.y_train).size,
-                        self.hdr_names)
+                        unq_cls_lables.size, unq_cls_lables, self.hdr_names)
     
 
 def conv_str_fl(data):
