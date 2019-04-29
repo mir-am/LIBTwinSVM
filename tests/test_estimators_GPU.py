@@ -61,8 +61,7 @@ class TestEstimatorsGPU(unittest.TestCase):
         clf.fit(self.X_1, self.y_1)
         pred = clf.predict(self.X_1)
         
-        acc = accuracy_score(self.y_1, pred) * 100
-        print("Acc: %.2f" % (acc))
+        assert_greater(np.mean(self.y_1 == pred), 0.55)
         
     def test_rbf_lstsvm_gpu(self):
         """
@@ -73,8 +72,7 @@ class TestEstimatorsGPU(unittest.TestCase):
         clf.fit(self.X_2, self.y_2)
         pred = clf.predict(self.X_2)
         
-        acc = accuracy_score(self.y_2, pred) * 100
-        print("Acc: %.2f" % (acc))
+        assert_greater(np.mean(self.y_2 == pred), 0.75)
         
     def test_rect_lstsvm_gpu(self):
         """
@@ -85,6 +83,38 @@ class TestEstimatorsGPU(unittest.TestCase):
         clf.fit(self.X_2, self.y_2)
         pred = clf.predict(self.X_2)
         
-        acc = accuracy_score(self.y_2, pred) * 100
-        print("Acc: %.2f" % (acc))
+        assert_greater(np.mean(self.y_2 == pred), 0.75)
+        
+    def test_linear_tsvm_gpu(self):
+        """
+        It tests linear TSVM classifier using GPU.
+        """
+        
+        clf = TSVM('linear', 1, 0.5, 0.5)
+        clf.fit(self.X_1, self.y_1)
+        pred = clf.predict(self.X_1)
+        
+        assert_greater(np.mean(self.y_1 == pred), 0.95)
+        
+    def test_rbf_tsvm_gpu(self):
+        """
+        It tests TSVM classifier with RBF kernel using GPU.
+        """
+        
+        clf = TSVM('RBF', 1, 1, 1, 2**-1)
+        clf.fit(self.X_2, self.y_2)
+        pred = clf.predict(self.X_2)
+        
+        assert_greater(np.mean(self.y_2 == pred), 0.85)
+        
+    def test_rect_tsvm_gpu(self):
+        """
+        It tests TSVM classifier with Rectangular kernel using GPU.
+        """
+        
+        clf = TSVM('RBF', 0.5, 1, 1, 2**-1)
+        clf.fit(self.X_2, self.y_2)
+        pred = clf.predict(self.X_2)
+        
+        assert_greater(np.mean(self.y_2 == pred), 0.83)
         

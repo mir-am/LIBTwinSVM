@@ -422,6 +422,7 @@ class TSVM(BaseTSVM):
         self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
         self.b2 = hyper_p_2[-1, :]
         
+        
 class LSTSVM(BaseTSVM):
     """
     Least Squares Twin Support Vector Machine (LSTSVM) for binary classification
