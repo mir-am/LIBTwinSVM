@@ -164,9 +164,6 @@ class VisualThread(QObject):
             
             self.clf_obj.set_params(**self.usr_input.get_clf_params())
             
-            #bin_plot(clf_obj, self.usr_input.X_train, self.usr_input.y_train)
-            
-            
         elif self.usr_input.class_type == 'multiclass':
             
             self.clf_obj.estimator.set_params(**self.usr_input.get_clf_params())
@@ -262,9 +259,9 @@ class VisualThread(QObject):
                    yy_1 = slope1 * xx + intercept1
                    yy_2 = slope2 * xx + intercept2 
                 
-                   ax.plot(xx, yy_1, 'k-', color=colors[idx])
-                   ax.plot(xx, yy_2, 'k-', color=colors[idx])
-        
+                   ax.plot(xx, yy_1, 'k-', label='Hyperplane')
+                   ax.plot(xx, yy_2, 'k-')
+                           
         ax.set_ylim(y_range[0], y_range[1])
         ax.set_xlim(x_range[0], x_range[1])
         
@@ -284,6 +281,9 @@ class VisualThread(QObject):
         Non-linear decision boundary for TSVM-based classifiers.
         """
         
+        # Plot
+        ax = self.fig.add_subplot(111)
+        
         xx, yy = make_mesh(self.usr_input.X_train[:, 0], self.usr_input.X_train[:, 1])
         
         # Datapoints in inputspace
@@ -294,18 +294,26 @@ class VisualThread(QObject):
         z = self.clf_obj.predict(data_points)
         z = z.reshape(xx.shape)
         
-        # Plot
-        ax = self.fig.add_subplot(111)
-        
-        ax.contourf(xx, yy, z, levels=[-1, 0], colors='dimgray', alpha=0.8)
-        
-        # Split training points into separate classes
-        X_c1 = self.usr_input.X_train[self.usr_input.y_train == 1]
-        X_c2 = self.usr_input.X_train[self.usr_input.y_train == -1]
-        
-        # plot training samples of both classes
-        ax.scatter(X_c1[:, 0], X_c1[:, 1], marker='^', s=(50,), c='b', cmap=plt.cm.coolwarm)
-        ax.scatter(X_c2[:, 0], X_c2[:, 1], marker='o', s=(50,), c='r', cmap=plt.cm.coolwarm)
+        if self.usr_input.class_type == 'binary':
+            
+            # Split training points into separate classes
+            X_c1 = self.usr_input.X_train[self.usr_input.y_train == 1]
+            X_c2 = self.usr_input.X_train[self.usr_input.y_train == -1]
+            
+            # plot training samples of both classes
+            ax.scatter(X_c1[:, 0], X_c1[:, 1], marker='^', s=(50,), c='b')
+            ax.scatter(X_c2[:, 0], X_c2[:, 1], marker='o', s=(50,), c='r')
+            
+            ax.contourf(xx, yy, z, levels=[-1, 0], colors='dimgray', alpha=0.8)
+            
+        elif self.usr_input.class_type == 'multiclass':
+            
+            ax.scatter(self.usr_input.X_train[:, 0],
+                       self.usr_input.X_train[:, 1],
+                       c=self.usr_input.y_train, s=(50,), cmap=pl.cm.coolwarm,
+                       edgecolors='k')
+            
+            ax.contourf(xx, yy, z, cmap=pl.cm.coolwarm, alpha=0.8)
         
         # Limit axis values
         ax.set_xlim(xx.min(), xx.max())
