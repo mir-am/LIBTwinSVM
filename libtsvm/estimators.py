@@ -9,11 +9,9 @@ In this module, Standard TwinSVM and Least Squares TwinSVM estimators are define
 """
 
 from sklearn.base import BaseEstimator
-from libtsvm import get_current_device
+from libtsvm import get_current_device, __GPU_enabled
 from libtsvm.optimizer import clipdcd
-from libtsvm import __GPU_enabled
 from cupy import prof
-#import cupy as cp
 import numpy as np
 
 if __GPU_enabled:
@@ -78,7 +76,7 @@ class BaseTSVM(BaseEstimator):
         
         if get_current_device() == 'CPU':
             
-            self.pred_method = self.__predict__CPU
+            self.pred_method = self.__predict_CPU
             self.df_method = self.__decision_function_CPU
             
         elif get_current_device() == 'GPU':
@@ -150,12 +148,12 @@ class BaseTSVM(BaseEstimator):
         
         return self.df_method(X)
     
-    def __predict__CPU(self, X):
+    def __predict_CPU(self, X):
         """
         Performs prediction on the CPU.
         """
         
-        #print("Performs prediction on the CPU.")
+        print("Performs prediction on the CPU.")
         
         # Assign data points to class +1 or -1 based on distance from hyperplanes
         return 2 * np.argmin(self.__decision_function_CPU(X), axis=1) - 1
@@ -175,7 +173,7 @@ class BaseTSVM(BaseEstimator):
         Computes distances on the CPU.
         """
         
-        #print("Computes distances on the CPU.")
+        print("Computes distances on the CPU.")
         
         #dist = np.zeros((X.shape[0], 2), dtype=np.float64)
         
@@ -288,7 +286,7 @@ class TSVM(BaseTSVM):
             Target values or class labels.
         """
         
-        print("Fits on the CPU.")
+        print("%s-Fits on the CPU." % self.clf_name)
 
         # Matrix A or class 1 samples
         mat_A = X_train[y_train == 1]
@@ -496,7 +494,7 @@ class LSTSVM(BaseTSVM):
             Target values or class labels.
         """
         
-        print("Fits on the CPU.")
+        print("%s-Fits on the CPU." % self.clf_name)
 
         # Matrix A or class 1 data
         mat_A = X[y == 1]
@@ -599,7 +597,6 @@ class LSTSVM(BaseTSVM):
 
                 self.w2 = hyper_surf2[:hyper_surf2.shape[0] - 1, :]
                 self.b2 = hyper_surf2[-1, :]
-
 
     def __fit_GPU(self, X, y):
         """

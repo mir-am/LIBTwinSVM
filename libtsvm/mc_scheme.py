@@ -14,7 +14,12 @@ from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils import column_or_1d
 from sklearn.base import clone
+from libtsvm import get_current_device, __GPU_enabled
 import numpy as np
+
+if __GPU_enabled:
+    
+    from libtsvm import cp
 
 
 class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
@@ -45,6 +50,18 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
         self.estimator = estimator
         self.clf_name = 'OVO-' + estimator.clf_name
+        
+        if get_current_device() == 'CPU':
+            
+            self.fit_method = self.__fit_CPU
+            self.pred_method = self.__predict_CPU
+            
+        elif get_current_device() == 'GPU':
+            
+            print("Selected the GPU.")
+            
+            self.fit_method = self.__fit_GPU
+            self.pred_method = self.__predict_GPU
 
     def _validate_targets(self, y):
         """
@@ -81,6 +98,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
         return X
 
+
     def fit(self, X, y):
         """
         It fits the OVO-classfier model according to the given training data.
@@ -98,9 +116,31 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         -------
         self : object
         """
-
+        
         X, y = check_X_y(X, y, dtype=np.float64)
         y = self._validate_targets(y)
+        
+        return self.fit_method(X, y)
+        
+    def __fit_CPU(self, X, y):
+        """
+        It fits the OVO-classfier model on the CPU.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training feature vectors, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+
+        Returns
+        -------
+        self : object
+        """
+        
+        print("%s - Fits on the CPU." % self.clf_name) 
 
         # Allocate n(n-1)/2 binary classifiers
         self.bin_clf_ = [clone(self.estimator) for i in range(((self.classes_.size * \
@@ -132,7 +172,62 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         self.shape_fit_ = X.shape
 
         return self
+    
+    def __fit_GPU(self, X, y):
+        """
+        It fits the OVO-classfier model on the GPU.
 
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Training feature vectors, where n_samples is the number of samples
+            and n_features is the number of features.
+
+        y : array-like, shape(n_samples,)
+            Target values or class labels.
+
+        Returns
+        -------
+        self : object
+        """
+        
+        print("%s - Fits on the GPU." % self.clf_name) 
+
+        # Move dataset to the GPU device
+        X = cp.asarray(X)
+        y = cp.asarray(y)
+        
+        # Allocate n(n-1)/2 binary classifiers
+        self.bin_clf_ = [clone(self.estimator) for i in range(((self.classes_.size * \
+                        (self.classes_.size - 1)) // 2))]
+
+        p = 0
+
+        for i in range(self.classes_.size):
+
+            for j in range(i + 1, self.classes_.size):
+
+                #print("%d, %d" % (i, j))
+
+                # Break multi-class problem into a binary problem
+                sub_prob_X_i_j = X[(y == i) | (y == j)]
+                sub_prob_y_i_j = y[(y == i) | (y == j)]
+
+                # print(sub_prob_y_i_j)
+
+                # For binary classification, labels must be {-1, +1}
+                # i-th class -> +1 and j-th class -> -1
+                sub_prob_y_i_j[sub_prob_y_i_j == j] = -1
+                sub_prob_y_i_j[sub_prob_y_i_j == i] = 1
+
+                self.bin_clf_[p].fit(sub_prob_X_i_j, sub_prob_y_i_j)
+
+                p = p + 1
+
+        self.shape_fit_ = X.shape
+
+        return self
+    
     def predict(self, X):
         """
         Performs classification on samples in X using the OVO-classifier model.
@@ -147,8 +242,27 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         y_pred : array, shape (n_samples,)
             Predicted class lables of test data.
         """
-
+        
         X = self._validate_for_predict(X)
+        
+        return self.pred_method(X)
+
+    def __predict_CPU(self, X):
+        """
+        Performs classification on samples in X using the CPU
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Feature vectors of test data.
+
+        Returns
+        -------
+        y_pred : array, shape (n_samples,)
+            Predicted class lables of test data.
+        """
+        
+        print("%s - Predict on the CPU." % self.clf_name)
 
         # Initialze votes
         votes = np.zeros((X.shape[0], self.classes_.size), dtype=np.int)
@@ -179,6 +293,53 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
         return self.classes_.take(np.asarray(max_votes, dtype=np.int))
     
+    def __predict_GPU(self, X):
+        """
+        Performs classification on samples in X using the GPU
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Feature vectors of test data.
+
+        Returns
+        -------
+        y_pred : array, shape (n_samples,)
+            Predicted class lables of test data.
+        """
+        
+        print("%s - Predict on the GPU." % self.clf_name)
+        
+        X = cp.asarray(X)
+        
+        votes = cp.zeros((X.shape[0], self.classes_.size), dtype=cp.int16)
+        
+        for k in range(X.shape[0]):
+
+            p = 0
+
+            for i in range(self.classes_.size):
+
+                for j in range(i + 1, self.classes_.size):
+
+                    y_pred = self.bin_clf_[p].predict(X[k, :].reshape(1, X.shape[1]))
+
+                    if y_pred == 1:
+
+                        votes[k, i] = votes[k, i] + 1
+
+                    else:
+
+                        votes[k, j] = votes[k, j] + 1
+
+                    p = p + 1
+
+         # Labels of test samples based max-win strategy
+        max_votes = cp.argmax(votes, axis=1)
+        
+        return self.classes_.take(np.asarray(cp.asnumpy(max_votes),
+                                             dtype=np.int))
+
 
 class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
     
