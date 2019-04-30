@@ -425,6 +425,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.user_in.C2 = 2 ** self.vis_C2_val.value()
         self.user_in.u = 2 ** self.vis_u_value.value()
         
+        self.user_in.linear_db = True if self.vis_db_chk.isChecked() else False
+    
         if self.vis_save_fig_chk.isChecked():
             
             self.user_in.fig_save = True
