@@ -2,6 +2,8 @@
 
 Cython
 Numpy
+# NumPydoc ver. 0.7.0 should be install for building docs properly
+numpydoc==0.7.0
 PyQt5
 sklearn
 pandas

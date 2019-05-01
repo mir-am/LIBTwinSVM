@@ -7,5 +7,6 @@ This is the `LIBTwinSVM <https://github.com/mir-am/LIBTwinSVM>`_ 's documentatio
    :caption: Contents:
 
    examples/index
+   api
 
 
