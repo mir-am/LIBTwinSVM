@@ -19,14 +19,14 @@ To use the application and training a specific data, the first step is to import
 --------------------
  Step 2: Classifying
 --------------------
-For this section, the data must be already imported and we are going to see how **Classify** tab works.
+For this section, the data must be already imported and you are going to see how **Classify** tab works.
  1. Switch the tabs to **Classify** tab. 
   .. image:: images/4.jpg
- 2. Now we have a bunch of options to choose such as **Classifiers**, **Kernel** type, **Evaluation** Method and **Hyper Parameters**.
- We can choose one of them, or leave them with their default values and jump to the next step. 
- 3. There is a save result box on that page. Before starting the training, we have to select a location so the application saves the final results for us. You can also check the **Log FIle** if you need the application logs.
+ 2. Now you have a bunch of options to choose such as **Classifiers**, **Kernel** type, **Evaluation** Method and **Hyper Parameters**.
+ you can choose one of them, or leave them with their default values and just go to the next step. 
+ 3. There is a save result box on that page. Before starting the training, you have to select a location so the application saves the final results for us. You can also check the **Log FIle** if you need the application logs.
   .. image:: images/5.jpg
- 4. Now It is time to *Classify*. By Clicking on the **Run!** button, you will see a **Confirmation** message, pops up on the screen just to make sure everything is the way we wanted.
+ 4. Now It is time to *Classify*. By Clicking on the **Run!** button, you will see a **Confirmation** message, pops up on the screen just to check if everything is exactly the way you had set before training.
   .. image:: images/6.jpg
  5. Click OK if everything is the way you want and it takes a few seconds to several minutes (depends on the data size) to be done!
   .. image:: images/7.jpg
