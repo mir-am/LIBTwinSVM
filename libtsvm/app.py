@@ -18,6 +18,7 @@ from libtsvm.misc import validate_step_size, validate_path
 from datetime import datetime
 import numpy as np
 import sys
+import webbrowser
 
 
 class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
@@ -69,6 +70,10 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.vis_save_fig_chk.toggled.connect(self.vis_save_val.setEnabled)
         self.vis_save_fig_chk.toggled.connect(self.vis_select_btn.setEnabled)
         
+        self.vis_lin_rbtn.toggled.connect(self.vis_db_chk.setEnabled)
+        self.vis_lin_rbtn.toggled.connect(lambda checked: not checked and \
+                                self.vis_db_chk.setEnabled(False))
+        
         self.cv_rbtn.toggled.connect(self.cv_folds.setEnabled)
         
         
@@ -77,6 +82,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.ag.addAction(self.cpu_chk_dev)
         self.ag.addAction(self.gpu_chk_dev)
         self.ag.triggered.connect(self.onTriggered)
+        
+        # Help menu
+        self.actionDocumentation.triggered.connect(lambda: webbrowser.open("https://libtwinsvm.readthedocs.io/en/latest/"))
         
     def get_data_path(self):
         """
@@ -450,7 +458,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
     def run_plot_thread(self):
         """
         Runs visualization in a separate thread.
-        """        
+        """
+        
+        self.vis_status_msg.setText("Please wait...")        
         
         t = QThread()
         vis_t = VisualThread(self.user_in)
@@ -472,6 +482,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         print("Draw....")
         
         self.plot_frame_grid.addWidget(fig_canvas, 0, 0, 1, 1)
+        
+        self.vis_status_msg.setText("Done!") 
         
             
 def show_dialog(title, msg_txt, diag_type):
