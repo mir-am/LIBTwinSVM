@@ -189,79 +189,103 @@ class VisualThread(QObject):
         ax = self.fig.add_subplot(111)
         ax.clear()
         
-        if self.usr_input.class_type == 'binary':
-            
-           X_c1 = self.usr_input.X_train[self.usr_input.y_train == 1]
-           X_c2 = self.usr_input.X_train[self.usr_input.y_train == -1]
+        if not self.usr_input.linear_db:
         
-            # Plot Training data
-           ax.scatter(X_c1[:, 0], X_c1[:, 1], marker='^', color='red',
-                       label='Samples of class +1') #cmap=plt.cm.Paired)
-           ax.scatter(X_c2[:, 0], X_c2[:, 1], marker='s', color='blue',
-                       label='Samples of class -1') #cmap=plt.cm.Paired)
+            if self.usr_input.class_type == 'binary':
+                
+               X_c1 = self.usr_input.X_train[self.usr_input.y_train == 1]
+               X_c2 = self.usr_input.X_train[self.usr_input.y_train == -1]
+            
+                # Plot Training data
+               ax.scatter(X_c1[:, 0], X_c1[:, 1], marker='^', color='red',
+                           label='Samples of class +1') #cmap=plt.cm.Paired)
+               ax.scatter(X_c2[:, 0], X_c2[:, 1], marker='s', color='blue',
+                           label='Samples of class -1') #cmap=plt.cm.Paired)
+               
+               x_range = ax.get_xlim() # X-axis range
+               y_range = ax.get_ylim()
            
-           x_range = ax.get_xlim() # X-axis range
-           y_range = ax.get_ylim()
-       
-           # Min and Max of feature X1 and creating X values for creating line
-           xx_1 = np.linspace(x_range[0], x_range[1])
-           
-           # Line Equation hyperplane 1
-           slope1, intercept1 = hyperplane_eq(self.clf_obj.w1, self.clf_obj.b1)  
-    
-           # Line Equation hyperplane 2
-           slope2, intercept2 = hyperplane_eq(self.clf_obj.w2, self.clf_obj.b2) 
-    
-           yy_1 = slope1 * xx_1 + intercept1
-           yy_2 = slope2 * xx_1 + intercept2  
+               # Min and Max of feature X1 and creating X values for creating line
+               xx_1 = np.linspace(x_range[0], x_range[1])
+               
+               # Line Equation hyperplane 1
+               slope1, intercept1 = hyperplane_eq(self.clf_obj.w1, self.clf_obj.b1)  
         
-           # Plot two hyperplanes
-           ax.plot(xx_1, yy_1, 'k-', label='Hyperplane') # Hyperplane of class 1
-           ax.plot(xx_1, yy_2, 'k-') # Hyperplane of class 2 
-    
-        elif self.usr_input.class_type == 'multiclass':
+               # Line Equation hyperplane 2
+               slope2, intercept2 = hyperplane_eq(self.clf_obj.w2, self.clf_obj.b2) 
+        
+               yy_1 = slope1 * xx_1 + intercept1
+               yy_2 = slope2 * xx_1 + intercept2  
             
-            y = np.unique(self.usr_input.y_train)
-            colors = pl.cm.Paired(np.linspace(0, 1, y.size))
+               # Plot two hyperplanes
+               ax.plot(xx_1, yy_1, 'k-', label='Hyperplane') # Hyperplane of class 1
+               ax.plot(xx_1, yy_2, 'k-') # Hyperplane of class 2 
+        
+            elif self.usr_input.class_type == 'multiclass':
+                
+                y = np.unique(self.usr_input.y_train)
+                colors = pl.cm.Paired(np.linspace(0, 1, y.size))
+                
+                for idx, label in enumerate(y):
+                    
+                    X_i = self.usr_input.X_train[self.usr_input.y_train == label]
+                    
+                    ax.scatter(X_i[:, 0], X_i[:, 1], color=colors[idx])
+                    
+                x_range = ax.get_xlim() # X-axis range
+                y_range = ax.get_ylim() 
             
-            for idx, label in enumerate(y):
+                # Min and Max of feature X1 and creating X values for creating line
+                xx = np.linspace(x_range[0], x_range[1])
                 
-                X_i = self.usr_input.X_train[self.usr_input.y_train == label]
-                
-                ax.scatter(X_i[:, 0], X_i[:, 1], color=colors[idx])
-                
+                if self.usr_input.mc_scheme == 'ova':
+                    
+                    hyper_planes = [(clf.w1, clf.b1) for clf in self.clf_obj.bin_clf_]
+                    
+                    for idx, h in enumerate(hyper_planes):
+                    
+                        slope, intercept = hyperplane_eq(h[0], h[1])
+                        
+                        yy = slope * xx + intercept
+                        
+                        ax.plot(xx, yy, 'k-', label='Plane %d' % (idx+1),
+                                color=colors[idx])
+                    
+                elif self.usr_input.mc_scheme == 'ovo':
+                    
+                    for idx, h in enumerate(self.clf_obj.bin_clf_):
+                    
+                       slope1, intercept1 = hyperplane_eq(h.w1, h.b1)
+                       slope2, intercept2 = hyperplane_eq(h.w2, h.b2)
+                        
+                       yy_1 = slope1 * xx + intercept1
+                       yy_2 = slope2 * xx + intercept2 
+                    
+                       ax.plot(xx, yy_1, 'k-', label='Hyperplane')
+                       ax.plot(xx, yy_2, 'k-')
+        else:
+
+            print("Linear decision boundary...")
+            
+            xx, yy = make_mesh(self.usr_input.X_train[:, 0],
+                               self.usr_input.X_train[:, 1])
+        
+            # Datapoints in inputspace
+            data_points = np.c_[xx.ravel(), yy.ravel()]
+        
+            z = self.clf_obj.predict(data_points)
+            z = z.reshape(xx.shape)
+            
+            ax.scatter(self.usr_input.X_train[:, 0],
+                       self.usr_input.X_train[:, 1],
+                       c=self.usr_input.y_train, s=(50,), cmap=pl.cm.coolwarm,
+                       edgecolors='k')
+            
             x_range = ax.get_xlim() # X-axis range
             y_range = ax.get_ylim()
-        
-            # Min and Max of feature X1 and creating X values for creating line
-            xx = np.linspace(x_range[0], x_range[1])
             
-            if self.usr_input.mc_scheme == 'ova':
+            ax.contourf(xx, yy, z, cmap=pl.cm.coolwarm, alpha=0.8)
                 
-                hyper_planes = [(clf.w1, clf.b1) for clf in self.clf_obj.bin_clf_]
-                
-                for idx, h in enumerate(hyper_planes):
-                
-                    slope, intercept = hyperplane_eq(h[0], h[1])
-                    
-                    yy = slope * xx + intercept
-                    
-                    ax.plot(xx, yy, 'k-', label='Plane %d' % (idx+1),
-                            color=colors[idx])
-                
-            elif self.usr_input.mc_scheme == 'ovo':
-                
-                for idx, h in enumerate(self.clf_obj.bin_clf_):
-                
-                   slope1, intercept1 = hyperplane_eq(h.w1, h.b1)
-                   slope2, intercept2 = hyperplane_eq(h.w2, h.b2)
-                    
-                   yy_1 = slope1 * xx + intercept1
-                   yy_2 = slope2 * xx + intercept2 
-                
-                   ax.plot(xx, yy_1, 'k-', label='Hyperplane')
-                   ax.plot(xx, yy_2, 'k-')
-                           
         ax.set_ylim(y_range[0], y_range[1])
         ax.set_xlim(x_range[0], x_range[1])
         

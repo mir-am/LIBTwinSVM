@@ -109,6 +109,9 @@ class UserInput:
     u : float
         The parameter of the RBF kernel function.
         
+    linear_db : boolean
+        Whether to plot decision boundary or not.
+        
     fig_save : boolean
         Whether to save the figure or not.
         
@@ -144,6 +147,7 @@ class UserInput:
         self.C1 = 1.0
         self.C2 = 1.0
         self.u = 1.0
+        self.linear_db = False # Linear decision boundary
         self.fig_save = False
         self.fig_dpi = None
         self.fig_save_path = None

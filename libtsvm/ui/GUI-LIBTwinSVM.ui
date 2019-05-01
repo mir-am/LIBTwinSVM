@@ -884,38 +884,6 @@
               <string>Figure</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_23">
-              <item row="1" column="1" rowspan="2" colspan="3">
-               <widget class="QFrame" name="vis_plot_frame">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Plain</enum>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_24">
-                 <item row="0" column="0">
-                  <layout class="QGridLayout" name="plot_frame_grid"/>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QPushButton" name="vis_plot_btn">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Plot</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="vis_status">
-                <property name="text">
-                 <string>Status:</string>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="0">
                <spacer name="verticalSpacer">
                 <property name="orientation">
@@ -943,6 +911,38 @@
                 <property name="textFormat">
                  <enum>Qt::AutoText</enum>
                 </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QPushButton" name="vis_plot_btn">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Plot</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="vis_status">
+                <property name="text">
+                 <string>Status:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" rowspan="2" colspan="3">
+               <widget class="QFrame" name="vis_plot_frame">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_24">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="plot_frame_grid"/>
+                 </item>
+                </layout>
                </widget>
               </item>
               <item row="0" column="3">
@@ -1128,20 +1128,57 @@
              </layout>
             </widget>
            </item>
-           <item row="2" column="0" colspan="2">
+           <item row="2" column="0" colspan="3">
             <widget class="QGroupBox" name="vis_options_gbox">
              <property name="title">
               <string>Options</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_22">
-              <item row="1" column="0">
-               <widget class="QLabel" name="vis_dpi_label">
-                <property name="text">
-                 <string>DPI:</string>
+              <item row="0" column="2" rowspan="2">
+               <widget class="QGroupBox" name="vis_save_gbox">
+                <property name="title">
+                 <string/>
                 </property>
+                <layout class="QGridLayout" name="gridLayout_21">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <item>
+                    <widget class="QCheckBox" name="vis_save_fig_chk">
+                     <property name="text">
+                      <string>Save Figure</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="vis_save_label">
+                     <property name="text">
+                      <string>Path:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="vis_save_val">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="vis_select_btn">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>Select</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="0" column="1">
                <widget class="QSpinBox" name="vis_dpi_val">
                 <property name="minimum">
                  <number>8</number>
@@ -1154,40 +1191,19 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="2">
-               <layout class="QHBoxLayout" name="horizontalLayout_6">
-                <item>
-                 <widget class="QCheckBox" name="vis_save_fig_chk">
-                  <property name="text">
-                   <string>Save Figure</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="vis_save_label">
-                  <property name="text">
-                   <string>Path:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLineEdit" name="vis_save_val">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="vis_select_btn">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Select</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+              <item row="0" column="0">
+               <widget class="QLabel" name="vis_dpi_label">
+                <property name="text">
+                 <string>DPI:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QCheckBox" name="vis_db_chk">
+                <property name="text">
+                 <string>Decision Boundary</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
