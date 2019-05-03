@@ -37,6 +37,9 @@ def check_libs_exist():
         
         exit()
 
+libs = []
+link_args = []
+
 # Choose appropriate libraries depeneding on the OS
 if platform == 'win32':
     
@@ -50,7 +53,8 @@ elif platform == 'linux':
     
 elif platform == 'darwin':
     # TODO: Add libs for OSX.
-    pass
+    
+    link_args = ['-framework Accelerate']
 
 
 setup(name='clipdcd',
@@ -65,6 +69,7 @@ setup(name='clipdcd',
         language="c++",
         libraries=libs,
         library_dirs=['.\\armadillo-code\\lib_win64'],
+        extra_link_args=link_args,
         )),
       include_dirs=[np.get_include(), './armadillo-code/include'])
       
