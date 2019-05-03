@@ -39,7 +39,7 @@ def check_libs_exist():
 
 libs = []
 link_args = []
-compile_args = ['-std=c++11']
+compile_args = ['-std=c++11', '-DARMA_DONT_USE_WRAPPER']
 
 # Choose appropriate libraries depeneding on the OS
 if platform == 'win32':
@@ -56,7 +56,7 @@ elif platform == 'darwin':
     # TODO: Add libs for OSX.
     
     link_args = ['-framework Accelerate']
-    compile_args = compile_args + ['-stdlib=libc++']
+    compile_args = compile_args + ['-stdlib=libc++', '-mmacosx-version-min=10.9']
 
 
 setup(name='clipdcd',
