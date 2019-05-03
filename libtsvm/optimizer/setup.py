@@ -69,6 +69,7 @@ setup(name='clipdcd',
         language="c++",
         libraries=libs,
         library_dirs=['.\\armadillo-code\\lib_win64'],
+        extra_compile_args=['-std=c++11'],
         extra_link_args=link_args,
         )),
       include_dirs=[np.get_include(), './armadillo-code/include'])
