@@ -29,9 +29,9 @@ LIBTwinSVM depends on the following packages.
 | Cython  |  | Apache License 2.0 |
 | Numpy |  | BSD-new license |
 | PyQt5  |  | GPL |
-| sklearn  |  | BSD-new license |
-| pandas  |  | BSD-new license |
+| Scikit-learn  |  | BSD-new license |
+| Pandas  |  | BSD-new license |
 | xlsxwriter |  | BSD license |
-| NumPydoc |  | - |
+| NumPydoc |  | _ |
 
 
