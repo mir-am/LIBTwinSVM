@@ -16,3 +16,22 @@ You can read some of its core features below:
 - It supports **grid search** over C and gamma parameters.
 - **Saving** the detailed classification result in an **Excel-format spreadsheet** file in the custom location.
 - **Keeping log** of the entire training session to keep track of best training results.
+
+
+
+## Installation Guide
+### Dependencies
+
+LIBTwinSVM depends on the following packages.
+
+| Package  | Description | License |
+| ------------- | ------------- | ------------- |
+| Cython  |  | Apache License 2.0 |
+| Numpy |  | BSD-new license |
+| PyQt5  |  | GPL |
+| sklearn  |  | BSD-new license |
+| pandas  |  | BSD-new license |
+| xlsxwriter |  | BSD license |
+| NumPydoc |  | - |
+
+
