@@ -109,6 +109,9 @@ class UserInput:
     u : float
         The parameter of the RBF kernel function.
         
+    input_complete : boolean
+        Whether all the required inputs are set.
+        
     linear_db : boolean
         Whether to plot decision boundary or not.
         
