@@ -5,6 +5,7 @@ Usage Examples
    :maxdepth: 1
 
    gui
+   visual
 
 --------------------------------------
  A one-minute example of the GUI usage
