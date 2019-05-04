@@ -25,7 +25,7 @@ You can read some of its core features below:
 LIBTwinSVM depends on the following packages.
 
 | Package  | Description | License |
-| ------------- | ------------- | ------------- |
+| :-------------: | :-------------: | :-------------: |
 | Cython  |  | Apache License 2.0 |
 | Numpy |  | BSD-new license |
 | PyQt5  |  | GPL |
