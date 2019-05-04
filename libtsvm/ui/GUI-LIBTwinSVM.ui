@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>881</width>
+    <width>990</width>
     <height>708</height>
    </rect>
   </property>
@@ -1213,6 +1213,26 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="model_tab">
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <attribute name="title">
+        <string>Model</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_25">
+        <item row="0" column="0">
+         <widget class="QFrame" name="model_tab_frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1223,8 +1243,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>881</width>
-     <height>21</height>
+     <width>990</width>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp">
@@ -1236,14 +1256,6 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="device_menu">
-    <property name="title">
-     <string>Device</string>
-    </property>
-    <addaction name="cpu_chk_dev"/>
-    <addaction name="gpu_chk_dev"/>
-   </widget>
-   <addaction name="device_menu"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="cpu_chk_dev">

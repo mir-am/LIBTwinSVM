@@ -78,10 +78,10 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         
         # Device menu
-        self.ag = QActionGroup(self.device_menu, exclusive=True)
-        self.ag.addAction(self.cpu_chk_dev)
-        self.ag.addAction(self.gpu_chk_dev)
-        self.ag.triggered.connect(self.onTriggered)
+        #self.ag = QActionGroup(self.device_menu, exclusive=True)
+        #self.ag.addAction(self.cpu_chk_dev)
+        #self.ag.addAction(self.gpu_chk_dev)
+        #self.ag.triggered.connect(self.onTriggered)
         
         # Help menu
         self.actionDocumentation.triggered.connect(lambda: webbrowser.open("https://libtwinsvm.readthedocs.io/en/latest/"))
@@ -336,19 +336,19 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
             event.ignore()
             
-    def onTriggered(self, action):
-        """
-        Sets the current device that does the major compuation. CPU or GPU.
-        """
-        
-        # TODO: Set the current device.
-        if self.cpu_chk_dev.isChecked():
-            
-            pass
-        
-        elif self.gpu_chk_dev.isChecked():
-            
-            pass
+#    def onTriggered(self, action):
+#        """
+#        Sets the current device that does the major compuation. CPU or GPU.
+#        """
+#        
+#        # TODO: Set the current device.
+#        if self.cpu_chk_dev.isChecked():
+#            
+#            pass
+#        
+#        elif self.gpu_chk_dev.isChecked():
+#            
+#            pass
         
     def run_gs_thread(self):
         """
