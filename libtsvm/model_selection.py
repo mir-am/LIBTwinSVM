@@ -8,7 +8,7 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
-from libtsvm.estimators import TSVM, LSTSVM
+from libtsvm.estimators import BaseTSVM, TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
 from libtsvm.misc import time_fmt
 from datetime import datetime
@@ -128,7 +128,6 @@ def eval_metrics(y_true, y_pred):
         
 
 class Validator:
-
     """
     It evaluates a TSVM-based estimator based on the specified evaluation method.
     
@@ -140,11 +139,7 @@ class Validator:
         
     y_train : array-like, shape (n_samples,)
         Target values or class labels.
-        
-    problem_type : str, {'binary', 'multiclass'}
-        Type of the classification problem. It is either binary (bin) or
-        multi-classification (mc)
-        
+                
     validator_type : tuple
         A two-element tuple which contains type of evaluation method and its
         parameter. Example: ('CV', 5) -> 5-fold cross-validation,
@@ -154,12 +149,10 @@ class Validator:
         A TSVM-based estimator which inherits from the :class:`BaseTSVM`.
     """
 
-    def __init__(self, X_train, y_train, problem_type, validator_type,
-                 estimator):
+    def __init__(self, X_train, y_train, validator_type, estimator):
 
         self.train_data = X_train
         self.labels_data = y_train
-        self.problem_type = problem_type
         self.validator = validator_type
         self.estimator = estimator
 
@@ -355,7 +348,7 @@ class Validator:
             An evaluation method for assesing a TSVM-based estimator's performance.
         """
 
-        if self.problem_type == 'binary':
+        if isinstance(self.estimator, BaseTSVM):
 
             if self.validator[0] == 'CV':
 
@@ -365,7 +358,8 @@ class Validator:
 
                 return self.tt_validator
 
-        elif self.problem_type == 'multiclass':
+        elif isinstance(self.estimator, OneVsAllClassifier) or \
+             isinstance(self.estimator, OneVsOneClassifier):
 
             if self.validator[0] == 'CV':
 
@@ -430,7 +424,7 @@ def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
     return list(param_grid)
 
 
-def get_results_filename(file_name, validator_obj):
+def get_results_filename(file_name, clf_name, kernel_name, test_method):
     """
     It returns the filename of the results based on user's input.
     
@@ -439,9 +433,16 @@ def get_results_filename(file_name, validator_obj):
     file_name : str
         Name of the dataset file.
         
-    validator_obj : object
-        The evaluation method that was used for the assesment of the classifier.
+    clf_name : str
+        Name of the classifier.
         
+    kernel_name : str
+        Name of kernel function.
+        
+    test_method : tuple
+         A two-element tuple which contains type of evaluation method and its
+        parameter.
+            
     Returns
     -------
     output : str
@@ -449,21 +450,12 @@ def get_results_filename(file_name, validator_obj):
     """
     
     # (Name of validator, validator's attribute) - ('CV', 5-folds)
-    validator_type, validator_attr = validator_obj.validator
-    
-    if validator_obj.problem_type == 'binary':
-        
-        kernel_t = validator_obj.estimator.kernel
-        
-    elif validator_obj.problem_type == 'multiclass':
-        
-        kernel_t = validator_obj.estimator.estimator.kernel
-                                              
+    validator_type, validator_attr = test_method
+                                                  
     eval_type = "%d-F-CV" % validator_attr if validator_type == 'CV' else 'Tr%d-Te%d' % \
                 ((1.0 - validator_attr) * 100, validator_attr * 100)
 
-    output_file = "%s_%s_%s_%s_%s" % (validator_obj.estimator.clf_name, kernel_t,
-                                      eval_type, file_name,
+    output_file = "%s_%s_%s_%s_%s" % (clf_name, kernel_name, eval_type, file_name,
                                       datetime.now().strftime('%Y-%m-%d %H-%M'))
     
     return output_file
@@ -658,14 +650,16 @@ class ThreadGS(QObject):
 #                clf_obj = OneVsOneClassifier(clf_obj)
                 
         eval_method = Validator(self.usr_input.X_train, self.usr_input.y_train,
-                                self.usr_input.class_type, self.usr_input.test_method_tuple,
-                                clf_obj)
+                                self.usr_input.test_method_tuple, clf_obj)
     
         search_elem = search_space(self.usr_input.kernel_type, 'full',
                                    self.usr_input.C1_range, self.usr_input.C2_range,
                                    self.usr_input.u_range, self.usr_input.step_size)
         
-        results_fn = get_results_filename(self.usr_input.data_filename, eval_method)
+        results_fn = get_results_filename(self.usr_input.data_filename,
+                                          self.usr_input._get_clf_name(),
+                                          self.usr_input.kernel_type,
+                                          self.usr_input.test_method_tuple)
         
         # Logging section ####################################################
         if self.usr_input.log_file:
