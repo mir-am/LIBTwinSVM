@@ -1,11 +1,7 @@
-Usage Examples
+API's examples
 ==============
 
 .. toctree::
    :maxdepth: 1
 
-   GUI/index
-   API/index
-
-
-
+   bin_clf

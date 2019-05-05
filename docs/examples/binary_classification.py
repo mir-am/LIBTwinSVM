@@ -29,14 +29,16 @@ kernel = 'linear'
 tsvm_clf = TSVM(kernel=kernel)
 
 # Step 3: Evaluate the estimator using train/test split
-problem_type = 'binary' # Type of classification problem
 eval_method = 't_t_split' # Train/Test split
 test_set_size = 30 # 30% of samples
 
-val = Validator(X, y, problem_type, (eval_method, test_set_size), tsvm_clf)
+val = Validator(X, y, (eval_method, test_set_size), tsvm_clf)
 eval_func = val.choose_validator()
 
-acc, std, full_report = eval_func({'C1': 2**-2, 'C2': 2**1})
+# Hyper-parameters of the classifier
+h_params =  {'C1': 2**-3, 'C2': 2**-5}
+
+acc, std, full_report = eval_func(h_params)
 
 print("Accuracy: %.2f" % acc)
 print(full_report)

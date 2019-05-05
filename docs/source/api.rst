@@ -1,5 +1,5 @@
-API documentation
-===============
+API Reference
+=============
 
 This page contains the list of the project's modules
 
