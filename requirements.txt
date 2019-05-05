@@ -8,4 +8,5 @@ PyQt5
 sklearn
 pandas
 xlsxwriter
+joblib
 

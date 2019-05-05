@@ -12,6 +12,7 @@ from libtsvm.estimators import BaseTSVM, TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
 from libtsvm.misc import time_fmt
 from datetime import datetime
+from joblib import dump
 import os
 import numpy as np
 import pandas as pd
@@ -512,9 +513,33 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     return os.path.abspath(output_file)  
 
 
+def save_model(validator, params, output_file):
+    """
+    It saves an estimator with specified hyper-parameters and 
+    a evaluation method.
+    
+    Parameters
+    ----------
+    validator : object
+        An evaluation method.
+        
+    params : dict
+        Hyper-parameters of the estimator.
+        
+    output_file : str
+        The full path and filename of the saved model.
+    """
+    
+    # The evaluation method
+    eval_func = validator.choose_validator()
+    eval_func(params)
+    
+    dump(validator.estimator, output_file)
+
+
 class ThreadGS(QObject):
     """
-    It runs the Grid Search in a separate Thread.
+    It runs the Grid Search in a separate thread.
     
     Parameters
     ----------
@@ -556,6 +581,7 @@ class ThreadGS(QObject):
         
         result_list = []
         max_acc, max_acc_std = 0, 0
+        optimal_params = None
     
         search_total = len(search_space)
         self.sig_pbar_set.emit(search_total) # Set range of the progress bar
@@ -581,6 +607,8 @@ class ThreadGS(QObject):
                     
                     max_acc = acc
                     max_acc_std = acc_std  
+                    optimal_params = element
+                    print(optimal_params)
                     
                     #########################################################
                     # To minmize I/O operations, only best accuray will be
@@ -605,10 +633,11 @@ class ThreadGS(QObject):
             
                 run = run + 1
                 
-        return result_list
+        return result_list, optimal_params
     
     @pyqtSlot()            
     def initialize(self): 
+        # TODO: Revise docs of this method
         """
         It passes a user's input to the functions and classes for solving a
         classification task. The steps that this function performs can be summarized
@@ -667,10 +696,18 @@ class ThreadGS(QObject):
                                 'log_'+results_fn+'.txt'), 'w', 1)
         ######################################################################
         
-        clf_results = self.run_gs(eval_method.choose_validator(), search_elem)
+        clf_results, opt_params = self.run_gs(eval_method.choose_validator(),
+                                              search_elem)
         
         save_result(eval_method, self.usr_input.class_type, clf_results,
                     os.path.join(self.usr_input.result_path, results_fn+'.xlsx'))
+        
+        if self.usr_input.save_best_model:
+            
+            print("Saving best model on disk.")
+            save_model(eval_method, opt_params,
+                       os.path.join(self.usr_input.result_path,
+                                    'model_'+results_fn+'.joblib'))
         
         # Close logging file #################################################
         if self.usr_input.log_file:

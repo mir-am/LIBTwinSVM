@@ -252,9 +252,10 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             self.user_in.u_range = (self.u_lbound.value(), self.u_ubound.value())
             
         self.user_in.step_size = self.step_box_val.value()
-
-        # TODO: Check whether the path exists or not.    
+ 
         self.user_in.result_path = self.save_path_box.text()
+            
+        self.user_in.save_best_model = True if self.best_mode_chk.isChecked() else False
                             
         # All the input variables are inserted.
         self.user_in.input_complete = True

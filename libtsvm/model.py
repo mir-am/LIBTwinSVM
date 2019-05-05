@@ -73,6 +73,12 @@ class UserInput:
     result_path : str
         Path for saving classification results.
         
+    clf_results : boolean (default=True)
+        Whether to save the classification results or not.
+        
+    save_best_model : boolean (default=False)
+        Whether to save the best fitted model or not.    
+    
     log_file : boolean
         Whether to create a log file or not.
         
@@ -134,6 +140,8 @@ class UserInput:
         self.mc_scheme = None
         #self.filename = None
         self.result_path = ''
+        self.clf_results = True
+        self.save_best_model = False
         self.log_file = False
         self.kernel_type = None
         self.rect_kernel = 1.0
