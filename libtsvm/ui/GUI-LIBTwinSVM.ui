@@ -1246,6 +1246,300 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
+          <layout class="QGridLayout" name="gridLayout_26">
+           <item row="2" column="1">
+            <widget class="QGroupBox" name="model_test_gbox">
+             <property name="title">
+              <string>Test Phase</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_32">
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="status_gbox">
+                <property name="title">
+                 <string/>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_27">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_7">
+                   <item>
+                    <widget class="QLabel" name="model_status_label">
+                     <property name="text">
+                      <string>Status:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="model_status_msg">
+                     <property name="font">
+                      <font>
+                       <weight>75</weight>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>Load test samples first!</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <item>
+                 <widget class="QPushButton" name="model_eval_btn">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Evaluate</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="model_pred_chk">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Save Predictions</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QLabel" name="mdoel_acc_label">
+                  <property name="text">
+                   <string>Accuracy:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="model_acc_val">
+                  <property name="text">
+                   <string>0.0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="3" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QLabel" name="model_te_time_label">
+                  <property name="text">
+                   <string>Test Time:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="model_te_time_val">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="0">
+            <widget class="QGroupBox" name="model_tab_gbox">
+             <property name="title">
+              <string>Model</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_29">
+              <item row="0" column="0">
+               <widget class="QPushButton" name="pushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>Load</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <spacer name="horizontalSpacer_11">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QGroupBox" name="mdoel_tab_info">
+                <property name="title">
+                 <string>Info</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_30">
+                 <item row="3" column="0" colspan="2">
+                  <widget class="QGroupBox" name="model_hyp_gbox">
+                   <property name="title">
+                    <string>Hyper-Parameters</string>
+                   </property>
+                   <layout class="QGridLayout" name="gridLayout_31">
+                    <item row="0" column="1">
+                     <widget class="QLabel" name="model_C1_val">
+                      <property name="text">
+                       <string>0.25</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="model_C1_label">
+                      <property name="text">
+                       <string>C1:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QLabel" name="model_C2_label">
+                      <property name="text">
+                       <string>C2:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="3">
+                     <widget class="QLabel" name="model_C2_val">
+                      <property name="text">
+                       <string>0.1</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="4">
+                     <widget class="QLabel" name="model_u_label">
+                      <property name="text">
+                       <string>u:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="5">
+                     <widget class="QLabel" name="model_u_val">
+                      <property name="text">
+                       <string>0.125</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="model_clf_name">
+                   <property name="text">
+                    <string>Standard TwinSVM</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="model_clf_label">
+                   <property name="text">
+                    <string>Classifier:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="model_ker_name">
+                   <property name="text">
+                    <string>Linear</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="model_ker_label">
+                   <property name="text">
+                    <string>Kernel:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="model_no_p_label">
+                   <property name="text">
+                    <string>No. Parameters:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLabel" name="model_n_p_val">
+                   <property name="text">
+                    <string>1000</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <spacer name="horizontalSpacer_10">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="0" colspan="3">
+            <widget class="QGroupBox" name="model_import_gbox">
+             <property name="title">
+              <string>Import</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_28">
+              <item row="0" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QLabel" name="model_path">
+                  <property name="text">
+                   <string>Path:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="model_path_box"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="model_path_btn">
+                  <property name="text">
+                   <string>Select</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
