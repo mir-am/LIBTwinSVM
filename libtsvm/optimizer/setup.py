@@ -16,7 +16,7 @@ Externel dependencies:
 """
 
 from distutils.core import setup, Extension
-from Cython.Build import cythonize
+#from Cython.Build import cythonize
 from os.path import join
 from sys import platform, exit
 from ctypes.util import find_library
@@ -59,20 +59,29 @@ elif platform == 'darwin':
     compile_args = compile_args + ['-stdlib=libc++', '-mmacosx-version-min=10.9']
 
 
-setup(name='clipdcd',
-      version='0.2.0',
-      author='Mir, A.',
-      author_email='mir-am@hotmail.com',
-      url='https://github.com/mir-am/LightTwinSVM',
-      description='clipDCD opimtizer implemented in C++ and improved by Mir, A.',
-      ext_modules=cythonize(Extension(
-        "clipdcd",
+ext_clipdcd = Extension("clipdcd",
         sources=[join("src", "clipdcd.pyx"), join("src", "clippdcd_opt.cpp")],
         language="c++",
         libraries=libs,
         library_dirs=['.\\armadillo-code\\lib_win64'],
         extra_compile_args=compile_args,
         extra_link_args=link_args,
-        )),
-      include_dirs=[np.get_include(), './armadillo-code/include'])
+        include_dirs=[np.get_include(), './armadillo-code/include'])
+
+#setup(name='clipdcd',
+#      version='0.2.0',
+#      author='Mir, A.',
+#      author_email='mir-am@hotmail.com',
+#      url='https://github.com/mir-am/LightTwinSVM',
+#      description='clipDCD opimtizer implemented in C++ and improved by Mir, A.',
+#      ext_modules=cythonize(Extension(
+#        "clipdcd",
+#        sources=[join("src", "clipdcd.pyx"), join("src", "clippdcd_opt.cpp")],
+#        language="c++",
+#        libraries=libs,
+#        library_dirs=['.\\armadillo-code\\lib_win64'],
+#        extra_compile_args=compile_args,
+#        extra_link_args=link_args,
+#        include_dirs=[np.get_include(), './armadillo-code/include']
+#        )))
       

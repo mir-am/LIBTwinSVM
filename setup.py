@@ -12,12 +12,14 @@ LIBTwinSVM Program - A Library for Twin Support Vector Machines
 """
 
 from libtsvm import __version__
+from libtsvm.optimizer.setup import ext_clipdcd
+from shutil import rmtree
+from setuptools import find_packages, setup, Command
+from Cython.Build import cythonize
+import os.path
 import io
 import os
 import sys
-from shutil import rmtree
-from setuptools import find_packages, setup, Command
-import os.path
 
 
 # Package meta-data.
@@ -30,10 +32,8 @@ REQUIRES_PYTHON = '>=3.5'
 VERSION = '0.1.0-alpha'
 
 
-REQUIRED = [
-	"cython", "numpy", "matplotlib", "pyQt5", "sklearn","pandas","xlsxwriter","joblib","numpydoc==0.7.0"
-    # 'requests', 'maya', 'records',
-]
+REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "sklearn","pandas",
+            "xlsxwriter", "joblib","numpydoc==0.7.0"]
 
 
 
@@ -112,13 +112,14 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+    ext_modules=cythonize(ext_clipdcd),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
-    install_requires=REQUIRED,
+    install_requires=REQ_PACKAGES,
     # extras_require=EXTRAS,
     include_package_data=True,
     license='GNU General Public License v3.0',
