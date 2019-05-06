@@ -1,12 +1,12 @@
 # The following Python pacakges is required for building and running LIBTwinSVM:
 
-Cython
-Numpy
-# NumPydoc ver. 0.7.0 should be install for building docs properly
-numpydoc==0.7.0
-PyQt5
+cython
+numpy
+matplotlib
+pyQt5
 sklearn
 pandas
 xlsxwriter
 joblib
-
+# NumPydoc ver. 0.7.0 should be install for building docs properly
+numpydoc==0.7.0
