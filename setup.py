@@ -12,10 +12,8 @@ LIBTwinSVM Program - A Library for Twin Support Vector Machines
 """
 
 from libtsvm import __version__
-from libtsvm.optimizer.setup import ext_clipdcd
 from shutil import rmtree
 from setuptools import find_packages, setup, Command
-from Cython.Build import cythonize
 import os.path
 import io
 import os
@@ -60,8 +58,13 @@ else:
     about['__version__'] = VERSION
 
 
-
-
+def build_ext_clipdcd():
+    """It builds the clipdcd extension module"""
+    
+    from libtsvm.optimizer.setup import ext_clipdcd
+    from Cython.Build import cythonize    
+    
+    cythonize(ext_clipdcd)
 
 # class UploadCommand(Command):
 #     """Support setup.py upload."""
@@ -99,43 +102,49 @@ else:
         
 #         sys.exit()
 
+def setup_package():
 
-# Where the magic happens:
-setup(
-    name=NAME,
-    version=about['__version__'],
-    description=DESCRIPTION,
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author=AUTHOR,
-    author_email=EMAIL,
-    python_requires=REQUIRES_PYTHON,
-    url=URL,
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
-    ext_modules=cythonize(ext_clipdcd),
-    # If your package is a single module, use this instead of 'packages':
-    # py_modules=['mypackage'],
-
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
-    install_requires=REQ_PACKAGES,
-    # extras_require=EXTRAS,
-    include_package_data=True,
-    license='GNU General Public License v3.0',
-    classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'License :: OSI Approved :: GNU General Public License v3.0',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: Implementation :: CPython',
-    ],
-    # $ setup.py publish support.
-#    cmdclass={
-#        'upload': UploadCommand,
-#    },
-)
+    setup(
+        name=NAME,
+        version=about['__version__'],
+        description=DESCRIPTION,
+        long_description=long_description,
+        long_description_content_type='text/markdown',
+        author=AUTHOR,
+        author_email=EMAIL,
+        python_requires=REQUIRES_PYTHON,
+        url=URL,
+        packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+        # If your package is a single module, use this instead of 'packages':
+        # py_modules=['mypackage'],
+    
+        # entry_points={
+        #     'console_scripts': ['mycli=mymodule:cli'],
+        # },
+        setup_requires=REQ_PACKAGES,
+        # extras_require=EXTRAS,
+        include_package_data=True,
+        license='GNU General Public License v3.0',
+        classifiers=[
+            # Trove classifiers
+            # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+            'License :: OSI Approved :: GNU General Public License v3.0',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
+            'Programming Language :: Python :: Implementation :: CPython',
+        ],
+        # $ setup.py publish support.
+    #    cmdclass={
+    #        'upload': UploadCommand,
+    #    },
+    )
+    
+    build_ext_clipdcd()
+    
+    
+if __name__ == '__main__':
+    setup_package()
+    

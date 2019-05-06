@@ -15,8 +15,8 @@ Externel dependencies:
 - Cython (http://cython.org/)
 """
 
-from distutils.core import setup, Extension
-#from Cython.Build import cythonize
+#from distutils.core import setup, Extension
+from Cython.Build import cythonize
 from os.path import join
 from sys import platform, exit
 from ctypes.util import find_library
@@ -59,14 +59,56 @@ elif platform == 'darwin':
     compile_args = compile_args + ['-stdlib=libc++', '-mmacosx-version-min=10.9']
 
 
-ext_clipdcd = Extension("clipdcd",
-        sources=[join("src", "clipdcd.pyx"), join("src", "clippdcd_opt.cpp")],
-        language="c++",
-        libraries=libs,
-        library_dirs=['.\\armadillo-code\\lib_win64'],
-        extra_compile_args=compile_args,
-        extra_link_args=link_args,
-        include_dirs=[np.get_include(), './armadillo-code/include'])
+#ext_clipdcd = Extension("clipdcd",
+#        sources=[join("src", "clipdcd.pyx"), join("src", "clippdcd_opt.cpp")],
+#        language="c++",
+#        libraries=libs,
+#        library_dirs=['.\\armadillo-code\\lib_win64'],
+#        extra_compile_args=compile_args,
+#        extra_link_args=link_args,
+#        include_dirs=[np.get_include(), './armadillo-code/include'])
+
+def configuration(parent_package='', top_path=None):
+    """A setup config for building clipdcd extension module """
+    
+    from numpy.distutils.misc_util import Configuration
+    
+    config = Configuration('optimizer', parent_package, top_path)
+    
+    config.add_library('clipdcd-lib',
+                       language='c++',
+                       sources=[join("src", "clippdcd_opt.cpp"),
+                                join("src", "clippdcd_opt.h")],
+                        include_dirs=[np.get_include(), join('armadillo-code',
+                                       'include')],
+                        extra_compile_args=compile_args,
+                     )
+            
+    
+    sources = [join("src", "clipdcd.pyx")]
+    depends = [join("src", "clippdcd_opt.cpp"), join("src", "clippdcd_opt.h")]
+    
+    config.add_extension('clipdcd',
+                         sources=sources,
+                         depends=depends,
+                         language="c++",
+                         libraries=libs + ['clipdcd-lib'],
+                         library_dirs=[join('armadillo-code', 'lib_win64')],
+                         extra_compile_args=compile_args,
+                         extra_link_args=link_args,
+                         include_dirs=[np.get_include(), join('armadillo-code',
+                                       'include')])
+    
+    config.ext_modules = cythonize(config.ext_modules)
+    
+    return config
+
+if __name__ == '__main__':
+    from numpy.distutils.core import setup
+    setup(**configuration(top_path='').todict())
+    
+    
+    
 
 #setup(name='clipdcd',
 #      version='0.2.0',
