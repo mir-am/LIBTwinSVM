@@ -306,3 +306,21 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         
         test_lables = np.argmin(pred, axis=1)  
         return self.classes_.take(np.asarray(test_lables, dtype=np.int))
+
+
+def mc_clf_no_params(bin_clfs):
+    """
+    It calculates number of parameters for a multi-class model.
+    
+    Parameters
+    ----------
+    bin_clfs : list
+        Instances of binary TSVM-based estimators.
+        
+    Returns
+    -------
+    int
+        Number of parameters of a multi-class model.
+    """
+    
+    return sum([clf.w1.shape[0] + clf.w2.shape[0] + 2 for clf in bin_clfs])
