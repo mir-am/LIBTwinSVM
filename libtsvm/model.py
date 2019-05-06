@@ -130,8 +130,8 @@ class UserInput:
     fig_save_path : str
         The path at which a figure will be saved.
         
-    model_path : str
-        The path at which a model will be loaded.
+    pre_trained_model : object
+        A pre-trained TSVM-based classifer.
     """
     
     def __init__(self):
@@ -168,7 +168,7 @@ class UserInput:
         
         # Model
         # TODO: may not be needed!
-        self.model_path = None
+        self.pre_trained_model = None
         
     def _get_kernel_selection(self):
         """

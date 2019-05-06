@@ -11,8 +11,8 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_sc
 from libtsvm.estimators import BaseTSVM, TSVM, LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier, mc_clf_no_params
 from libtsvm.misc import time_fmt
+from libtsvm.model_eval import save_model
 from datetime import datetime
-from joblib import dump, load
 import os
 import numpy as np
 import pandas as pd
@@ -511,75 +511,6 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     excel_file.save()
 
     return os.path.abspath(output_file)  
-
-
-def save_model(validator, params, output_file):
-    """
-    It saves an estimator with specified hyper-parameters and 
-    a evaluation method.
-    
-    Parameters
-    ----------
-    validator : object
-        An evaluation method.
-        
-    params : dict
-        Hyper-parameters of the estimator.
-        
-    output_file : str
-        The full path and filename of the saved model.
-    """
-    
-    # The evaluation method
-    eval_func = validator.choose_validator()
-    eval_func(params)
-    
-    dump(validator.estimator, output_file)
-
-
-def load_model(model_path):
-    """
-    It loads a pre-trained TSVM-based estimator.
-    
-    Parameters
-    ----------
-    model_path : str
-        The path at which the model is stored.
-    
-    Returns
-    -------
-    object
-        A pre-trained estimator.
-        
-    dict
-        Model information.
-    """
-    
-    pre_trained_clf = load(model_path)
-    
-    if isinstance(pre_trained_clf, BaseTSVM):
-        
-        kernel_name = pre_trained_clf.kernel
-        rect_kernel = pre_trained_clf.rect_kernel
-        model_no_params = str(pre_trained_clf.w1.shape[0] + \
-                              pre_trained_clf.w2.shape[0] + 2)
-        model_h_param = pre_trained_clf.get_params()
-    
-    elif isinstance(pre_trained_clf, OneVsAllClassifier) or \
-         isinstance(pre_trained_clf, OneVsOneClassifier):
-    
-        kernel_name = pre_trained_clf.estimator.kernel
-        rect_kernel = pre_trained_clf.estimator.rect_kernel
-        model_no_params = str(mc_clf_no_params(pre_trained_clf.bin_clf_))
-        model_h_param = pre_trained_clf.estimator.get_params()
-        
-    else:
-    
-        raise ValueError("An unsupported estimator is loaded!")             
-             
-    return pre_trained_clf, {'model_name': pre_trained_clf.clf_name,
-                             'kernel': kernel_name, 'rect_kernel': rect_kernel,
-                             'no_params': model_no_params, 'h_params': model_h_param}
 
 
 class ThreadGS(QObject):

@@ -12,7 +12,8 @@ from libtsvm.ui import view
 from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
-from libtsvm.model_selection import ThreadGS, load_model
+from libtsvm.model_selection import ThreadGS
+from libtsvm.model_eval import load_model, ModelThread
 from libtsvm.visualize import VisualThread
 from libtsvm.misc import validate_step_size, validate_path
 from datetime import datetime
@@ -50,6 +51,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.vis_select_btn.clicked.connect(self.get_save_path_fig)
         self.model_path_btn.clicked.connect(self.get_model_path)
         self.model_load_btn.clicked.connect(self.load_model_info)
+        self.model_eval_btn.clicked.connect(self.eval_model_test)
         
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
@@ -517,7 +519,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         It loads a pre-trained model and displays its info.
         """
         
-        model, model_info = load_model(self.model_path_box.text())
+        self.user_in.pre_trained_model, model_info = load_model(self.model_path_box.text())
         
         print(model_info)
         self.user_in.kernel_type = model_info['kernel']
@@ -529,6 +531,47 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.model_C1_val.setText(str(model_info['h_params']['C1']))
         self.model_C2_val.setText(str(model_info['h_params']['C2']))
         self.model_u_val.setText(str(model_info['h_params']['gamma']))
+        
+    def eval_model_test(self):
+        """
+        Checks required fields and then runs model evaluation in its own thread.
+        """
+        
+        if self.user_in.pre_trained_model is None:
+            
+                show_dialog("Model", "You must load a pre-trained model for"
+                            " evaluation.", QMessageBox.Warning)
+                
+        else:
+            
+            self.run_eval_model_thread()
+        
+    def run_eval_model_thread(self):
+        """
+        It evaluates a pre-trained model on test samples in a separate thread.
+        """
+        
+        t = QThread()
+        model_t = ModelThread(self.user_in)
+        self.__threads.append((t, model_t))
+        
+        model_t.moveToThread(t)
+        t.started.connect(model_t.eval_model)
+        
+        # Signals
+        model_t.sig_update_model_eval.connect(self.update_eval_model)
+        
+        t.start()
+        
+    @pyqtSlot(str, str)
+    def update_eval_model(self, test_acc, test_time):
+        """
+        It shows the results of a pre-trained model evaluation on test samples 
+        in the model tab.
+        """
+        
+        self.model_acc_val.setText(test_acc)
+        self.model_te_time_val.setText(test_time)
         
         
 def show_dialog(title, msg_txt, diag_type):
