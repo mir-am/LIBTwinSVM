@@ -129,6 +129,9 @@ class UserInput:
         
     fig_save_path : str
         The path at which a figure will be saved.
+        
+    model_path : str
+        The path at which a model will be loaded.
     """
     
     def __init__(self):
@@ -162,6 +165,10 @@ class UserInput:
         self.fig_save = False
         self.fig_dpi = None
         self.fig_save_path = None
+        
+        # Model
+        # TODO: may not be needed!
+        self.model_path = None
         
     def _get_kernel_selection(self):
         """

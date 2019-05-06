@@ -12,7 +12,7 @@ from libtsvm.ui import view
 from libtsvm.ui import confirm_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
-from libtsvm.model_selection import ThreadGS
+from libtsvm.model_selection import ThreadGS, load_model
 from libtsvm.visualize import VisualThread
 from libtsvm.misc import validate_step_size, validate_path
 from datetime import datetime
@@ -48,6 +48,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.save_res_btn.clicked.connect(self.get_save_path)
         self.vis_plot_btn.clicked.connect(self.plot_figure)
         self.vis_select_btn.clicked.connect(self.get_save_path_fig)
+        self.model_path_btn.clicked.connect(self.get_model_path)
+        self.model_load_btn.clicked.connect(self.load_model_info)
         
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
@@ -140,8 +142,10 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         self.user_in.class_type = type_of_target(self.user_in.y_train)
         
+        # Enable other tabs' functionalities
         self.enable_classify()
         self.enable_visualize()
+        self.enable_model()
         
     def update_data_info(self, hdr_name):
         """
@@ -199,6 +203,14 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             self.vis_status_msg.setText("Number of features must be equal or"
                                         " less than 3.")
             
+    def enable_model(self):
+        """
+        Enables evaluation of pre-trained models.
+        """
+        
+        self.model_eval_btn.setEnabled(True)
+        self.model_pred_chk.setEnabled(True)
+        
     def gather_usr_input(self):
         """
         It gathers all the input variables that set by a user.
@@ -484,9 +496,41 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         self.plot_frame_grid.addWidget(fig_canvas, 0, 0, 1, 1)
         
-        self.vis_status_msg.setText("Done!") 
+        self.vis_status_msg.setText("Done!")
         
+    def get_model_path(self):
+        """
+        It gets the path at which the fitted model is stored.
+        """
+        
+        model_filename, _ = QFileDialog.getOpenFileName(self, "Import pre-trained model",
+                                                       "", "Model files (*.joblib)")
+        print(model_filename)
+        
+        if model_filename:
             
+            self.model_path_box.setText(model_filename)
+            self.model_load_btn.setEnabled(True)
+            
+    def load_model_info(self):
+        """
+        It loads a pre-trained model and displays its info.
+        """
+        
+        model, model_info = load_model(self.model_path_box.text())
+        
+        print(model_info)
+        self.user_in.kernel_type = model_info['kernel']
+        self.user_in.rect_kernel = model_info['rect_kernel']
+        
+        self.model_clf_name.setText(model_info['model_name'])
+        self.model_ker_name.setText(self.user_in._get_kernel_selection())
+        self.model_n_p_val.setText(model_info['no_params'])
+        self.model_C1_val.setText(str(model_info['h_params']['C1']))
+        self.model_C2_val.setText(str(model_info['h_params']['C2']))
+        self.model_u_val.setText(str(model_info['h_params']['gamma']))
+        
+        
 def show_dialog(title, msg_txt, diag_type):
     """
     A message box that shows extra information to users.

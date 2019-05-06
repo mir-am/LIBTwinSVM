@@ -10,6 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # icons_rc should be imported as follows
 from . import icons_rc
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -633,10 +634,10 @@ class Ui_MainWindow(object):
         self.model_tab_gbox.setObjectName("model_tab_gbox")
         self.gridLayout_29 = QtWidgets.QGridLayout(self.model_tab_gbox)
         self.gridLayout_29.setObjectName("gridLayout_29")
-        self.pushButton = QtWidgets.QPushButton(self.model_tab_gbox)
-        self.pushButton.setEnabled(False)
-        self.pushButton.setObjectName("pushButton")
-        self.gridLayout_29.addWidget(self.pushButton, 0, 0, 1, 1)
+        self.model_load_btn = QtWidgets.QPushButton(self.model_tab_gbox)
+        self.model_load_btn.setEnabled(False)
+        self.model_load_btn.setObjectName("model_load_btn")
+        self.gridLayout_29.addWidget(self.model_load_btn, 0, 0, 1, 1)
         spacerItem12 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_29.addItem(spacerItem12, 0, 1, 1, 1)
         self.mdoel_tab_info = QtWidgets.QGroupBox(self.model_tab_gbox)
@@ -838,7 +839,7 @@ class Ui_MainWindow(object):
         self.model_te_time_label.setText(_translate("MainWindow", "Test Time:"))
         self.model_te_time_val.setText(_translate("MainWindow", "0"))
         self.model_tab_gbox.setTitle(_translate("MainWindow", "Model"))
-        self.pushButton.setText(_translate("MainWindow", "Load"))
+        self.model_load_btn.setText(_translate("MainWindow", "Load"))
         self.mdoel_tab_info.setTitle(_translate("MainWindow", "Info"))
         self.model_hyp_gbox.setTitle(_translate("MainWindow", "Hyper-Parameters"))
         self.model_C1_val.setText(_translate("MainWindow", "0.25"))
@@ -863,7 +864,6 @@ class Ui_MainWindow(object):
         self.actionDocumentation.setText(_translate("MainWindow", "Documentation"))
         self.actionView_License.setText(_translate("MainWindow", "View License "))
         self.actionAbout.setText(_translate("MainWindow", "About"))
-
 
 if __name__ == "__main__":
     import sys
