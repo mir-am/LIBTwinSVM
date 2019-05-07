@@ -1,0 +1,4 @@
+[submodule "libtsvm/optimizer/armadillo-code"]
+	path = libtsvm/optimizer/armadillo-code
+	url = https://github.com/mir-am/armadillo-code
+	branch = master
