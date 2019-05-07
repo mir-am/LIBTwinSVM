@@ -56,6 +56,10 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
         
+        self.model_pred_chk.clicked.connect(self.get_save_pred_path)
+#        self.model_pred_chk.toggled.connect(lambda checked: not checked and \
+#                                            self.get_save_pred_path(False))
+        
         # Enable widgets based on the user selection
         self.rect_kernel_rbtn.toggled.connect(self.rect_kernel_percent.setEnabled)
         self.rect_kernel_rbtn.toggled.connect(lambda checked: not checked and \
@@ -513,6 +517,29 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
             self.model_path_box.setText(model_filename)
             self.model_load_btn.setEnabled(True)
+            
+    def get_save_pred_path(self):
+        """
+        It gets a path to save the file of predicted labels.
+        """
+        
+        if self.model_pred_chk.isChecked():
+        
+            pred_file_path = QFileDialog.getExistingDirectory(self, "Select a directory")
+            
+            # TODO: Check whether the path is valid or not.
+            if pred_file_path:
+                
+                self.user_in.save_pred_path = pred_file_path
+                self.user_in.save_pred = True
+                print(self.user_in.save_pred_path)
+                
+        else:
+            
+            self.user_in.save_pred_path = ''
+            self.user_in.save_pred = False
+            print("Empty path for save pred")
+        
             
     def load_model_info(self):
         """

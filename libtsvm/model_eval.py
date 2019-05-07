@@ -16,6 +16,8 @@ from libtsvm.estimators import BaseTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier, mc_clf_no_params
 from libtsvm.misc import time_fmt
 from datetime import datetime
+from os.path import join
+from numpy import savetxt
 
 
 def save_model(validator, params, output_file):
@@ -121,4 +123,13 @@ class ModelThread(QObject):
         
         self.sig_update_model_eval.emit("%.2f%%" % test_acc,
                                         time_fmt(elapsed_t.seconds))
+        
+        if self.usr_in.save_pred:
+            
+            f_name = 'test_labels_model_%s_%s_%s_%s.txt' % (
+                    self.usr_in.pre_trained_model.clf_name,
+                    self.usr_in.kernel_type, self.usr_in.data_filename,
+                    datetime.now().strftime('%Y-%m-%d %H-%M'))
+            
+            savetxt(join(self.usr_in.save_pred_path, f_name), pred, fmt='%d')
     

@@ -132,12 +132,21 @@ class UserInput:
         
     pre_trained_model : object
         A pre-trained TSVM-based classifer.
+        
+    save_pred : boolean
+        Whether to save predicted labels of test samples in a file or not.
+        
+    save_pred_path : str
+        The path at which the file of predicted labels will be saved.
     """
     
     def __init__(self):
-
+        
+        # Data
         self.X_train, self.y_train = None, None
         self.data_filename = ''
+        
+        # Classify
         self.clf_type = None
         self.class_type = None
         self.mc_scheme = None
@@ -167,8 +176,9 @@ class UserInput:
         self.fig_save_path = None
         
         # Model
-        # TODO: may not be needed!
         self.pre_trained_model = None
+        self.save_pred = False
+        self.save_pred_path = ''
         
     def _get_kernel_selection(self):
         """
