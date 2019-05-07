@@ -75,6 +75,8 @@ def configuration(parent_package='', top_path=None):
     
     config = Configuration('optimizer', parent_package, top_path)
     
+    # TODO: Check whether compile and link flags for both library and extension
+    # is needed.
     config.add_library('clipdcd-lib',
                        language='c++',
                        sources=[join("src", "clippdcd_opt.cpp"),
@@ -104,12 +106,12 @@ def configuration(parent_package='', top_path=None):
     return config
 
 if __name__ == '__main__':
+    
     from numpy.distutils.core import setup
+    
     setup(**configuration(top_path='').todict())
     
     
-    
-
 #setup(name='clipdcd',
 #      version='0.2.0',
 #      author='Mir, A.',
