@@ -15,6 +15,7 @@ def configuration(parent_package='', top_path=None):
     
     config = Configuration('libtsvm', parent_package, top_path)
     
+    config.add_subpackage('ui')
     # Optimizer subpackage which needs to be compiled.
     config.add_subpackage('optimizer')
     
