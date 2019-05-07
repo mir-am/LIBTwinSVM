@@ -273,8 +273,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
  
         self.user_in.result_path = self.save_path_box.text()
             
+        self.user_in.save_clf_results = True if self.clf_results_chk.isChecked() else False
         self.user_in.save_best_model = True if self.best_mode_chk.isChecked() else False
-                            
+        
         # All the input variables are inserted.
         self.user_in.input_complete = True
         
@@ -302,16 +303,19 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             total_valid.append(False)
             show_dialog("Invalid Step Size", "Step size exceeds the chosen range"
                         " for hyper-parameters.", QMessageBox.Warning)
+           
+        if any([self.user_in.save_clf_results, self.user_in.save_best_model,
+               self.user_in.log_file]):
             
-        if validate_path(self.user_in.result_path):
+            if validate_path(self.user_in.result_path):
+                
+                total_valid.append(True)
             
-            total_valid.append(True)
-        
-        else:
-            
-            total_valid.append(False)
-            show_dialog("Invalid Save Path", "The path for saving classification"
-                        " results does not exist.", QMessageBox.Warning)
+            else:
+                
+                total_valid.append(False)
+                show_dialog("Invalid Save Path", "The path for saving classification"
+                            " results does not exist.", QMessageBox.Warning)
             
         return all(total_valid)
         

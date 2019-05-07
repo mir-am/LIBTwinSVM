@@ -675,9 +675,11 @@ class ThreadGS(QObject):
         clf_results, opt_params = self.run_gs(eval_method.choose_validator(),
                                               search_elem)
         
-        save_result(eval_method, self.usr_input.class_type, clf_results,
-                    os.path.join(self.usr_input.result_path, results_fn))
+        if self.usr_input.save_clf_results:
         
+            save_result(eval_method, self.usr_input.class_type, clf_results,
+                        os.path.join(self.usr_input.result_path, results_fn))
+            
         if self.usr_input.save_best_model:
             
             print("Saving best model on disk.")
