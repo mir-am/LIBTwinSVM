@@ -27,7 +27,7 @@ URL = 'https://github.com/mir-am/LIBTwinSVM'
 EMAIL = "mir-am@hotmail.com | MahdiRahbar@Gmail.com"
 AUTHOR = "Mir, A. and Mahdi Rahbar"
 REQUIRES_PYTHON = '>=3.5'
-VERSION = '0.1.0-alpha'
+VERSION = '%s' % __version__
 
 
 REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "sklearn","pandas",
@@ -49,22 +49,22 @@ except FileNotFoundError:
 
 
 # Load the package's __version__.py module as a dictionary.
-about = {}
-if not VERSION:
-    project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
-    with open(os.path.join(here, project_slug, '__version__.py')) as f:
-        exec(f.read(), about)
-else:
-    about['__version__'] = VERSION
+#about = {}
+#if not VERSION:
+#    project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
+#    with open(os.path.join(here, project_slug, '__version__.py')) as f:
+#        exec(f.read(), about)
+#else:
+#    about['__version__'] = VERSION
 
 
-def build_ext_clipdcd():
-    """It builds the clipdcd extension module"""
-    
-    from libtsvm.optimizer.setup import ext_clipdcd
-    from Cython.Build import cythonize    
-    
-    cythonize(ext_clipdcd)
+#def build_ext_clipdcd():
+#    """It builds the clipdcd extension module"""
+#    
+#    from libtsvm.optimizer.setup import ext_clipdcd
+#    from Cython.Build import cythonize    
+#    
+#    cythonize(ext_clipdcd)
 
 # class UploadCommand(Command):
 #     """Support setup.py upload."""
@@ -101,12 +101,27 @@ def build_ext_clipdcd():
 #         os.system('git push --tags')
         
 #         sys.exit()
+    
+def configuration(parent_package='', top_path=None):
+    
+    from numpy.distutils.misc_util import Configuration
+    
+    config = Configuration(None, parent_package, top_path)
+    
+    config.set_options(ignore_setup_xxx_py=True,
+                       assume_default_configuration=True,
+                       delegate_options_to_subpackages=True) #,
+                       #quiet=True)
+                       
+    config.add_subpackage('libtsvm')
+    
+    return config
 
 def setup_package():
 
-    setup(
+    metadata = dict(
         name=NAME,
-        version=about['__version__'],
+        version=VERSION,
         description=DESCRIPTION,
         long_description=long_description,
         long_description_content_type='text/markdown',
@@ -121,7 +136,7 @@ def setup_package():
         # entry_points={
         #     'console_scripts': ['mycli=mymodule:cli'],
         # },
-        setup_requires=REQ_PACKAGES,
+        install_requires=REQ_PACKAGES,
         # extras_require=EXTRAS,
         include_package_data=True,
         license='GNU General Public License v3.0',
@@ -135,14 +150,14 @@ def setup_package():
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: Implementation :: CPython',
-        ],
-        # $ setup.py publish support.
-    #    cmdclass={
-    #        'upload': UploadCommand,
-    #    },
-    )
+        ])
     
-    build_ext_clipdcd()
+    # We assume that numpy is not present on users' system.
+    #from numpy.distutils.core import setup
+    
+    metadata['configuration'] = configuration
+    
+    setup(**metadata)
     
     
 if __name__ == '__main__':
