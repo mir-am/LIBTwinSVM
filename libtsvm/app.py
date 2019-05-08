@@ -216,6 +216,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         self.model_eval_btn.setEnabled(True)
         self.model_pred_chk.setEnabled(True)
+        self.model_status_msg.setText("Select a pre-trained model.")
         
     def gather_usr_input(self):
         """
@@ -517,10 +518,12 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
                                                        "", "Model files (*.joblib)")
         print(model_filename)
         
+        # TODO: Check whether the given path is valid
         if model_filename:
             
             self.model_path_box.setText(model_filename)
             self.model_load_btn.setEnabled(True)
+            self.model_status_msg.setText("Load the pre-trained model.")
             
     def get_save_pred_path(self):
         """
@@ -564,6 +567,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.model_C2_val.setText(str(model_info['h_params']['C2']))
         self.model_u_val.setText(str(model_info['h_params']['gamma']))
         
+        self.model_status_msg.setText("Ready to evaluate!")
+        
     def eval_model_test(self):
         """
         Checks required fields and then runs model evaluation in its own thread.
@@ -604,6 +609,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         self.model_acc_val.setText(test_acc)
         self.model_te_time_val.setText(test_time)
+        
+        self.model_status_msg.setText("Done!")
         
         
 def show_dialog(title, msg_txt, diag_type):
