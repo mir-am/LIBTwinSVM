@@ -557,6 +557,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.user_in.rect_kernel = model_info['rect_kernel']
         
         self.model_clf_name.setText(model_info['model_name'])
+        self.model_clf_type_val.setText(model_info['clf_type'])
         self.model_ker_name.setText(self.user_in._get_kernel_selection())
         self.model_n_p_val.setText(model_info['no_params'])
         self.model_C1_val.setText(str(model_info['h_params']['C1']))

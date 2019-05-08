@@ -71,6 +71,7 @@ def load_model(model_path):
         model_no_params = str(pre_trained_clf.w1.shape[0] + \
                               pre_trained_clf.w2.shape[0] + 2)
         model_h_param = pre_trained_clf.get_params()
+        model_clf_type = 'Binary'
     
     elif isinstance(pre_trained_clf, OneVsAllClassifier) or \
          isinstance(pre_trained_clf, OneVsOneClassifier):
@@ -79,6 +80,7 @@ def load_model(model_path):
         rect_kernel = pre_trained_clf.estimator.rect_kernel
         model_no_params = str(mc_clf_no_params(pre_trained_clf.bin_clf_))
         model_h_param = pre_trained_clf.estimator.get_params()
+        model_clf_type = 'Multi-class'
         
     else:
     
@@ -86,7 +88,8 @@ def load_model(model_path):
              
     return pre_trained_clf, {'model_name': pre_trained_clf.clf_name,
                              'kernel': kernel_name, 'rect_kernel': rect_kernel,
-                             'no_params': model_no_params, 'h_params': model_h_param}
+                             'no_params': model_no_params, 'h_params': model_h_param,
+                             'clf_type': model_clf_type}
     
     
 class ModelThread(QObject):
