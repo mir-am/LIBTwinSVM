@@ -12,12 +12,14 @@ LIBTwinSVM Program - A Library for Twin Support Vector Machines
 """
 
 from libtsvm import __version__
+from pkg_resources import parse_version
 from shutil import rmtree
-from setuptools import find_packages, setup, Command
+#from setuptools import find_packages, setup, Command
 import os.path
 import io
 import os
 import sys
+import traceback
 
 
 # Package meta-data.
@@ -28,11 +30,11 @@ EMAIL = "mir-am@hotmail.com | MahdiRahbar@Gmail.com"
 AUTHOR = "Mir, A. and Mahdi Rahbar"
 REQUIRES_PYTHON = '>=3.5'
 VERSION = '%s' % __version__
-
-
 REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "sklearn","pandas",
             "xlsxwriter", "joblib","numpydoc==0.7.0"]
 
+NUMPY_MIN_VERSION = '1.14.0'
+CYTHON_MIN_VERSION = '0.28'
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -102,6 +104,79 @@ except FileNotFoundError:
         
 #         sys.exit()
     
+def get_numpy_status():
+    """
+    It checks whether numpy is installed. If so, checks whether it is up-to-date.
+    """
+    
+    np_status = {}
+    
+    try:
+        
+        import numpy
+        
+        np_status['version'] = numpy.__version__
+        np_status['up_to_date'] = parse_version(np_status['version']) >=  \
+        parse_version(NUMPY_MIN_VERSION)
+        
+    except ImportError:
+        
+        traceback.print_exc()
+        
+        np_status['version'] = ""
+        np_status['up_to_date'] = False
+        
+    return np_status
+
+
+def get_cython_status():
+    """
+    It checks whether Cython is installed. If so, checks whether it is up-to-date.
+    """
+    
+    cy_status = {}
+    
+    try:
+        
+        import cython
+        
+        cy_status['version'] = cython.__version__
+        cy_status['up_to_date'] = parse_version(cy_status['version']) >=  \
+        parse_version(CYTHON_MIN_VERSION)
+        
+    except ImportError:
+        
+        traceback.print_exc()
+        
+        cy_status['version'] = ""
+        cy_status['up_to_date'] = False
+        
+    return cy_status
+
+
+def check_install_updated(pkg_name, pkg_status, req_str, help_instr):
+    """
+    It checks whether a package is installed and up-to-date.
+    """
+    
+    if pkg_status['version']:
+        
+        if pkg_status['up_to_date'] is False:
+            
+            raise ImportError("Your current version of %s %s is out-of-date. %s %s" %  \
+                              (pkg_name, pkg_status['version'], req_str,
+                               help_instr))
+            
+        else:
+            
+            print("Found %s %s" % (pkg_name, pkg_status['version']))
+        
+    else:
+        
+        raise ImportError("%s is not installed. %s %s "
+                          % (pkg_name, req_str, help_instr))
+    
+    
 def configuration(parent_package='', top_path=None):
     
     from numpy.distutils.misc_util import Configuration
@@ -129,7 +204,7 @@ def setup_package():
         author_email=EMAIL,
         python_requires=REQUIRES_PYTHON,
         url=URL,
-        packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
+        #packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
         # If your package is a single module, use this instead of 'packages':
         # py_modules=['mypackage'],
     
@@ -152,8 +227,41 @@ def setup_package():
             'Programming Language :: Python :: Implementation :: CPython',
         ])
     
-    # We assume that numpy is not present on users' system.
-    #from numpy.distutils.core import setup
+    help_instr = ("Please check out the installation guide of the LIBTwinSVM:\n"
+                  "https://libtwinsvm.readthedocs.io/en/latest/")
+    np_req_str = "LIBTwinSVM requires NumPy >= %s \n" % NUMPY_MIN_VERSION
+    cy_req_str = ("Please install cython with a version >= %s in order to"
+                  "build the LIBTwinSVM library.")
+    
+    # Check numpy status and its version on users' system
+    np_status = get_numpy_status()
+    cy_status = get_cython_status()
+    
+    check_install_updated(np_status)
+    check_install_updated(cy_status)
+    
+#    if np_status['version']:
+#        
+#        if np_status['up_to_date'] is False:
+#            
+#            raise ImportError("Your current version of Numerical Python "
+#                              "(NumPy) %s is out-of-date. %s %s" %  \
+#                              (np_status['version'], np_req_str, help_instr))
+#            
+#        else:
+#            
+#            print("Found Numerical Python (NumPy) %s" % np_status['version'])
+#        
+#    else:
+#        
+#        raise ImportError("Numerical Python (NumPy) is not installed. %s %s "
+#                          % (np_req_str, help_instr))
+    
+    
+    
+    
+    
+    from numpy.distutils.core import setup
     
     metadata['configuration'] = configuration
     

@@ -16,7 +16,6 @@ Externel dependencies:
 """
 
 #from distutils.core import setup, Extension
-from Cython.Build import cythonize
 from os.path import join
 from sys import platform, exit
 from ctypes.util import find_library
@@ -72,6 +71,7 @@ def configuration(parent_package='', top_path=None):
     """A setup config for building clipdcd extension module """
     
     from numpy.distutils.misc_util import Configuration
+    from Cython.Build import cythonize
     
     config = Configuration('optimizer', parent_package, top_path)
     
