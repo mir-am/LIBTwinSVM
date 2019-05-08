@@ -127,27 +127,33 @@ class BaseTSVM(BaseEstimator):
         
         Returns
         -------
-        : array, shape(n_samples, 2)
+        array-like, shape(n_samples, 2)
             distance from both hyperplanes.
         """
         
-        dist = np.zeros((X.shape[0], 2), dtype=np.float64)
+#        dist = np.zeros((X.shape[0], 2), dtype=np.float64)
+#        
+#        kernel_f = {'linear': lambda i: X[i, :],
+#                    'RBF': lambda i: rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
+#        
+##         TODO: prediction can be sped up using NumPy's np.apply?!. It removes
+##         below for loop.
+#        for i in range(X.shape[0]):
+#
+#            # Prependicular distance of data pint i from hyperplanes
+#            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) \
+#                + self.b1)
+#
+#            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) \
+#                + self.b2)
+#        
+#        return dist
         
-        kernel_f = {'linear': lambda i: X[i, :],
-                    'RBF': lambda i: rbf_kernel(X[i, :], self.mat_C_t, self.gamma)}
+        kernel_f = {'linear': lambda : X, 'RBF': lambda : rbf_kernel(X,
+                                             self.mat_C_t, self.gamma)}
         
-        # TODO: prediction can be sped up using NumPy's np.apply?!. It removes
-        # below for loop.
-        for i in range(X.shape[0]):
-
-            # Prependicular distance of data pint i from hyperplanes
-            dist[i, 1] = np.abs(np.dot(kernel_f[self.kernel](i), self.w1) \
-                + self.b1)
-
-            dist[i, 0] = np.abs(np.dot(kernel_f[self.kernel](i), self.w2) \
-                + self.b2)
-            
-        return dist
+        return np.column_stack((np.abs(np.dot(kernel_f[self.kernel](), self.w2) \
+               + self.b2), np.abs(np.dot(kernel_f[self.kernel](), self.w1) + self.b1)))
     
 
 class TSVM(BaseTSVM):
