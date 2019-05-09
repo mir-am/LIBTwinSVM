@@ -18,6 +18,7 @@ from shutil import rmtree
 import os.path
 import io
 import os
+import subprocess
 import sys
 import traceback
 
@@ -176,6 +177,38 @@ def check_install_updated(pkg_name, pkg_status, req_str, help_instr):
         raise ImportError("%s is not installed. %s %s "
                           % (pkg_name, req_str, help_instr))
     
+
+# This function is written with inspiration from NumPy's setup.py
+def check_arma_submodule():
+    """
+    Verify that Armadillo submodule is initialized and checked out.
+    """
+
+    if not os.path.exists('.git'):
+        return # Not a git reposiroty
+    
+    help_instr = ("Please use the following command to initialize Armadillo"
+                  " submodule:\ngit submodule update --init")
+    
+    # Check submodule is not missing
+    with open('.gitmodules') as f:
+        for l in f:
+            if 'path' in l:
+                p = l.split('=')[-1].strip()
+                if not os.path.exists(p):
+                    raise ValueError('Submodule %s missing.\n%s' % (p, help_instr))
+    
+    # Check submodule is clean                
+    proc = subprocess.Popen(['git', 'submodule', 'status'],
+                            stdout=subprocess.PIPE)
+    status, _ = proc.communicate()
+    status = status.decode("ascii", "replace")
+    for line in status.splitlines():
+        if line.startswith('-') or line.startswith('+'):
+            raise ValueError('Submodule not clean: %s\n%s' % (line, help_instr))
+    
+    print("Found Armadillo submodule.")
+    
     
 def configuration(parent_package='', top_path=None):
     
@@ -227,11 +260,15 @@ def setup_package():
             'Programming Language :: Python :: Implementation :: CPython',
         ])
     
+    
+    # Check dependencies and requirements ####################################
     help_instr = ("Please check out the installation guide of the LIBTwinSVM:\n"
                   "https://libtwinsvm.readthedocs.io/en/latest/")
     np_req_str = "LIBTwinSVM requires NumPy >= %s.\n" % NUMPY_MIN_VERSION
     cy_req_str = ("Please install cython with a version >= %s in order to"
                   " build the LIBTwinSVM library." % CYTHON_MIN_VERSION)
+    
+    check_arma_submodule()
     
     # Check numpy status and its version on users' system
     np_status = get_numpy_status()
@@ -240,34 +277,13 @@ def setup_package():
     check_install_updated('Numerical Python (NumPy)', np_status, np_req_str,
                           help_instr)
     check_install_updated('Cython', cy_status, cy_req_str, help_instr)
-    
-#    if np_status['version']:
-#        
-#        if np_status['up_to_date'] is False:
-#            
-#            raise ImportError("Your current version of Numerical Python "
-#                              "(NumPy) %s is out-of-date. %s %s" %  \
-#                              (np_status['version'], np_req_str, help_instr))
-#            
-#        else:
-#            
-#            print("Found Numerical Python (NumPy) %s" % np_status['version'])
-#        
-#    else:
-#        
-#        raise ImportError("Numerical Python (NumPy) is not installed. %s %s "
-#                          % (np_req_str, help_instr))
-    
-    
-    
-    
+    ##########################################################################
     
     from numpy.distutils.core import setup
     
     metadata['configuration'] = configuration
     
     setup(**metadata)
-    
     
 if __name__ == '__main__':
     setup_package()
