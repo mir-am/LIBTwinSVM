@@ -229,16 +229,17 @@ def setup_package():
     
     help_instr = ("Please check out the installation guide of the LIBTwinSVM:\n"
                   "https://libtwinsvm.readthedocs.io/en/latest/")
-    np_req_str = "LIBTwinSVM requires NumPy >= %s \n" % NUMPY_MIN_VERSION
+    np_req_str = "LIBTwinSVM requires NumPy >= %s.\n" % NUMPY_MIN_VERSION
     cy_req_str = ("Please install cython with a version >= %s in order to"
-                  "build the LIBTwinSVM library.")
+                  " build the LIBTwinSVM library." % CYTHON_MIN_VERSION)
     
     # Check numpy status and its version on users' system
     np_status = get_numpy_status()
     cy_status = get_cython_status()
     
-    check_install_updated(np_status)
-    check_install_updated(cy_status)
+    check_install_updated('Numerical Python (NumPy)', np_status, np_req_str,
+                          help_instr)
+    check_install_updated('Cython', cy_status, cy_req_str, help_instr)
     
 #    if np_status['version']:
 #        
