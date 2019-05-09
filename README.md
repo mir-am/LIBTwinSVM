@@ -26,14 +26,14 @@ LIBTwinSVM is an easy-to-use implementation of Twin Support Vector Machine.  It 
 
 LIBTwinSVM depends on the following packages.
 
-| Package  | Description | License |
-| :-------------: | :-------------: | :-------------: |
-| Cython  |  | Apache License 2.0 |
-| Numpy |  | BSD 3-Clause |
-| matplotlib  |  | _ |
-| PyQt5  |  | GPL |
-| Scikit-learn  |  | BSD 3-Clause |
-| Pandas  |  | BSD 3-Clause |
-| xlsxwriter |  | BSD 3-Clause |
-| joblib |  | BSD 3-Clause |
-| NumPydoc |  | _ |
+|   Package                                      |                      Description                               |       License         |
+| ---------------------------------------------- | -------------------------------------------------------------- | --------------------- |
+| [Cython](https://cython.org/)                  |  To use C++ code in Python.                                    | Apache License 2.0    |
+| [NumPy](https://www.numpy.org/)                |  Fast linear algebra operations.                               | BSD 3-Clause          | 
+| [Matplotlib](https://matplotlib.org/)          |  Visualization and geometrical representation of classifiers.  | [Matplotlib License](https://matplotlib.org/users/license.html)                    |
+| [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro)  | To create a GUI for using the LIBTwinSVM's features.| GPL |
+| [Scikit-learn](https://scikit-learn.org/)      | For TwinSVM-based models evaluation and selection.             | BSD 3-Clause |
+| [Pandas](https://pandas.pydata.org/)           | For reading and processing datasets.                           | BSD 3-Clause |
+| [XlsxWriter](https://xlsxwriter.readthedocs.io/) | For saving classification results in an Excel file.          | BSD 3-Clause |
+| [Joblib](https://xlsxwriter.readthedocs.io/)   | For saving and loading TwinSVM-based models.                   | BSD 3-Clause |
+| [numpydoc](https://numpydoc.readthedocs.io/en/latest/) | API code documentation.                                | BSD License  |
