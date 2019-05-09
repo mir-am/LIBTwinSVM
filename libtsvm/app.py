@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
+# LIBTwinSVM: A Library for Twin Support Vector Machines
 # Developers: Mir, A. and Mahdi Rahbar
-# Version: 0.1 - 2019-03-20
+# Version: 0.1.0 - 2019-03-20
 # License: GNU General Public License v3.0
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget, QActionGroup
 from PyQt5.QtCore import QThread, pyqtSlot
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from sklearn.utils.multiclass import type_of_target
-from libtsvm.ui import view
-from libtsvm.ui import confirm_diag
+from libtsvm.ui import view, confirm_diag, about_diag
 from libtsvm.model import UserInput
 from libtsvm.preprocess import DataReader
 from libtsvm.model_selection import ThreadGS
@@ -93,6 +93,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         # Help menu
         self.actionDocumentation.triggered.connect(lambda: webbrowser.open("https://libtwinsvm.readthedocs.io/en/latest/"))
+        self.actionAbout.triggered.connect(lambda: AboutDialog())
         
     def get_data_path(self):
         """
@@ -661,7 +662,21 @@ class ConfrimDialog(confirm_diag.Ui_confirm_diag, QDialog):
         self.show()
         self.exec_()
         
+   
+class AboutDialog(about_diag.Ui_license_diag, QDialog):
+    """
+    It shows brief infomation about the LIBTwinSVM such as home page and its
+    license.
+    """
+    
+    def __init__(self):
         
+        super(AboutDialog, self).__init__()
+
+        self.setupUi(self)
+        self.show()
+        self.exec_()        
+
 
         
 #def confirm_dialog(usr_input):
