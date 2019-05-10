@@ -13,7 +13,7 @@ LIBTwinSVM Program - A Library for Twin Support Vector Machines
 
 from libtsvm import __version__
 from pkg_resources import parse_version
-from shutil import rmtree
+from shutil import copy
 #from setuptools import find_packages, setup, Command
 import os.path
 import io
@@ -33,6 +33,7 @@ REQUIRES_PYTHON = '>=3.5'
 VERSION = '%s' % __version__
 REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "sklearn","pandas",
             "xlsxwriter", "joblib","numpydoc==0.7.0"]
+PKG_DATA = {}
 
 NUMPY_MIN_VERSION = '1.14.0'
 CYTHON_MIN_VERSION = '0.28'
@@ -127,6 +128,22 @@ if SETUPTOOLS_COMMANDS.intersection(sys.argv):
     )
 else:
     extra_setuptools_args = dict()
+
+    
+### Utility functinos for installation #######################################    
+    
+def cp_libs_win():
+    """
+    Copies external libraries for installing package on Windows.
+    """
+    
+    src = os.path.join('libtsvm', 'optimizer', 'armadillo-code', 'lib_win64',
+                       '*.dll')
+    dst = os.path.join('libtsvm', 'optimizer')
+    
+    copy(src, dst)
+    
+    print("Copied the BLAS libraries...")
 
     
 def get_numpy_status():
@@ -234,6 +251,8 @@ def check_arma_submodule():
     print("Found Armadillo submodule.")
     
     
+##############################################################################
+    
 def configuration(parent_package='', top_path=None):
     
     from numpy.distutils.misc_util import Configuration
@@ -250,6 +269,31 @@ def configuration(parent_package='', top_path=None):
     return config
 
 def setup_package():
+    
+    # Check dependencies and requirements ####################################
+    help_instr = ("Please check out the installation guide of the LIBTwinSVM:\n"
+                  "https://libtwinsvm.readthedocs.io/en/latest/")
+    np_req_str = "LIBTwinSVM requires NumPy >= %s.\n" % NUMPY_MIN_VERSION
+    cy_req_str = ("Please install cython with a version >= %s in order to"
+                  " build the LIBTwinSVM library." % CYTHON_MIN_VERSION)
+    
+    check_arma_submodule()
+    
+    # Check numpy status and its version on users' system
+    np_status = get_numpy_status()
+    cy_status = get_cython_status()
+    
+    check_install_updated('Numerical Python (NumPy)', np_status, np_req_str,
+                          help_instr)
+    check_install_updated('Cython', cy_status, cy_req_str, help_instr)
+    ##########################################################################
+    
+    # Platform-dependent options
+    if sys.platform == 'win32':
+        
+        cp_libs_win()
+        
+        PKG_DATA = {'libtsvm': [os.path.join('libtsvm', 'optimizer', '*.dll')]}
 
     metadata = dict(
         name=NAME,
@@ -261,6 +305,7 @@ def setup_package():
         author_email=EMAIL,
         python_requires=REQUIRES_PYTHON,
         url=URL,
+        package_data=PKG_DATA,
         #packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
         # If your package is a single module, use this instead of 'packages':
         # py_modules=['mypackage'],
@@ -282,25 +327,6 @@ def setup_package():
             'Programming Language :: Python :: Implementation :: CPython',
         ],
         **extra_setuptools_args)
-    
-    
-    # Check dependencies and requirements ####################################
-    help_instr = ("Please check out the installation guide of the LIBTwinSVM:\n"
-                  "https://libtwinsvm.readthedocs.io/en/latest/")
-    np_req_str = "LIBTwinSVM requires NumPy >= %s.\n" % NUMPY_MIN_VERSION
-    cy_req_str = ("Please install cython with a version >= %s in order to"
-                  " build the LIBTwinSVM library." % CYTHON_MIN_VERSION)
-    
-    check_arma_submodule()
-    
-    # Check numpy status and its version on users' system
-    np_status = get_numpy_status()
-    cy_status = get_cython_status()
-    
-    check_install_updated('Numerical Python (NumPy)', np_status, np_req_str,
-                          help_instr)
-    check_install_updated('Cython', cy_status, cy_req_str, help_instr)
-    ##########################################################################
     
     from numpy.distutils.core import setup
     
