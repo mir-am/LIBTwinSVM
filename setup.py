@@ -105,6 +105,30 @@ except FileNotFoundError:
         
 #         sys.exit()
     
+# using setuptool features
+SETUPTOOLS_COMMANDS = set([
+    'develop', 'release', 'bdist_egg', 'bdist_rpm',
+    'bdist_wininst', 'install_egg_info', 'build_sphinx',
+    'egg_info', 'easy_install', 'upload', 'bdist_wheel',
+    '--single-version-externally-managed',
+])
+if SETUPTOOLS_COMMANDS.intersection(sys.argv):
+    import setuptools
+
+    extra_setuptools_args = dict(
+        zip_safe=False,  # the package can run out of an .egg file
+        include_package_data=True,
+        extras_require={
+            'alldeps': (
+                'numpy >= {0}'.format(NUMPY_MIN_VERSION),
+                'cython >= {0}'.format(CYTHON_MIN_VERSION),
+            ),
+        },
+    )
+else:
+    extra_setuptools_args = dict()
+
+    
 def get_numpy_status():
     """
     It checks whether numpy is installed. If so, checks whether it is up-to-date.
@@ -245,8 +269,6 @@ def setup_package():
         #     'console_scripts': ['mycli=mymodule:cli'],
         # },
         install_requires=REQ_PACKAGES,
-        # extras_require=EXTRAS,
-        include_package_data=True,
         license='GNU General Public License v3.0',
         classifiers=[
             # Trove classifiers
@@ -258,7 +280,8 @@ def setup_package():
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: Implementation :: CPython',
-        ])
+        ],
+        **extra_setuptools_args)
     
     
     # Check dependencies and requirements ####################################

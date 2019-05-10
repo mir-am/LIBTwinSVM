@@ -1,0 +1,3 @@
+recursive-include dataset *.csv
+recursive-include libtsvm/optimizer *.c *.cpp *.h *.pyx *.pxd
+recursive-include libtsvm/optimizer/armadillo-code *
