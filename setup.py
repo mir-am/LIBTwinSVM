@@ -137,11 +137,15 @@ def cp_libs_win():
     Copies external libraries for installing package on Windows.
     """
     
-    src = os.path.join('libtsvm', 'optimizer', 'armadillo-code', 'lib_win64',
-                       '*.dll')
+    src_1 = os.path.join('libtsvm', 'optimizer', 'armadillo-code', 'lib_win64',
+                         'lapack_win64_MT.dll')
+    src_2 = os.path.join('libtsvm', 'optimizer', 'armadillo-code', 'lib_win64',
+                         'blas_win64_MT.dll')
+    
     dst = os.path.join('libtsvm', 'optimizer')
     
-    copy(src, dst)
+    copy(src_1, dst)
+    copy(src_2, dst)
     
     print("Copied the BLAS libraries...")
 
