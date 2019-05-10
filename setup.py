@@ -115,10 +115,15 @@ SETUPTOOLS_COMMANDS = set([
 ])
 if SETUPTOOLS_COMMANDS.intersection(sys.argv):
     import setuptools
+    
+    class BinaryDistribution(setuptools.Distribution):
+        def has_ext_modules(foo):
+            return True
 
     extra_setuptools_args = dict(
         zip_safe=False,  # the package can run out of an .egg file
         include_package_data=True,
+        distclass=BinaryDistribution,
         extras_require={
             'alldeps': (
                 'numpy >= {0}'.format(NUMPY_MIN_VERSION),
