@@ -37,3 +37,40 @@ LIBTwinSVM depends on the following packages.
 | [XlsxWriter](https://xlsxwriter.readthedocs.io/) | For saving classification results in an Excel file.          | BSD 3-Clause |
 | [Joblib](https://xlsxwriter.readthedocs.io/)   | For saving and loading TwinSVM-based models.                   | BSD 3-Clause |
 | [numpydoc](https://numpydoc.readthedocs.io/en/latest/) | API code documentation.                                | BSD License  |
+
+### Installation from the source
+
+**1.  Downloading LIBTWinSVM**
+
+First make sure that [Git](https://git-scm.com/) is installed as it is required for getting the source code. Then open Git in any arbitrary path and enter the following command:
+
+```
+git clone --recursive https://github.com/mir-am/LIBTwinSVM
+```
+
+**2. Downloading Reuirments**
+
+If you already have *Cython* and *Numpy* installed, you can skip to the next section.
+
+* Linux & Mac OS: For installing Numpy & Cython on your computer, you should enter the following command in the terminal.
+```
+pip3 install numpy cython
+```
+
+* Windows: for installing the requirments on windows, you should enter the following command in the command prompt. 
+```
+pip install numpy cython
+```
+
+**3. Installing LIBTwinSVM**
+
+Go to LIBTwinSVM folder where you have downloaded the source code in step 2. Then enter the following command in the terminal:
+
+* Linux & Mac OS:
+```python
+pip3 install .
+```
+* Windows:
+```python
+pip install .
+```
