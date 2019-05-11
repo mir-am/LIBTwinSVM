@@ -44,6 +44,7 @@ compile_args = ['-std=c++11', '-DARMA_DONT_USE_WRAPPER']
 if platform == 'win32':
     
     libs = ['lapack_win64_MT', 'blas_win64_MT']
+    link_args = link_args + ['/MT']
 
 elif platform == 'linux':
     
