@@ -101,7 +101,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         """
         
         data_filename, _ = QFileDialog.getOpenFileName(self, "Import dataset",
-                                                       "", "CSV files (*.csv)")
+                           "", "CSV files (*.csv);; LIBSVM datafiles (*.libsvm)")
         
         if data_filename:
             
@@ -145,7 +145,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         show_dialog("Data Status", "Loaded the dataset successfully.", 
                          QMessageBox.Information)
         
-        self.update_data_info(self.data_reader.hdr_names)
+        self.update_data_info()
         
         self.user_in.class_type = type_of_target(self.user_in.y_train)
         
@@ -154,7 +154,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.enable_visualize()
         self.enable_model()
         
-    def update_data_info(self, hdr_name):
+    def update_data_info(self):
         """
         Updates the data information like no. features, no. samples and etc.
         
@@ -169,6 +169,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.no_samples.setText(str(self.data_info.no_samples))
         self.no_features.setText(str(self.data_info.no_features))
         self.no_classes.setText(str(self.data_info.no_class))
+        
+        print(self.data_info.header_names)
         
         if len(self.data_info.header_names) != 0:
             

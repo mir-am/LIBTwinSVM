@@ -67,7 +67,23 @@ class DataReader():
             Whether to normalize the dataset or not.
         """
         
-        df = pd.read_csv(self.file_path, sep=self.sep)
+        f_name, f_ext = splitext(self.file_path)
+        
+        if f_ext == '.csv':
+        
+            df = pd.read_csv(self.file_path, sep=self.sep)
+            self.hdr_names = list(df.columns.values) if self.header else []
+        
+        elif f_ext == '.libsvm':
+            
+            X, y, _ = read_libsvm(self.file_path)
+        
+            df = pd.DataFrame(np.hstack((y.reshape(X.shape[0], 1), X)))
+            self.hdr_names = []
+            
+        else:
+            
+            raise ValueError("Dataset format is not supported: %s" % f_ext)
         
         if shuffle:
             
@@ -85,8 +101,8 @@ class DataReader():
         
         
         self.X_train = df.values # Feature values
-        self.hdr_names = list(df.columns.values) if self.header else []
-        self.filename = splitext(split(self.file_path)[-1])[0]
+        self.filename = splitext(split(f_name)[-1])[0]
+        print(self.filename)
         
     def get_data(self):
         """
