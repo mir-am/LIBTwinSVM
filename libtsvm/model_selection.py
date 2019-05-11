@@ -280,7 +280,6 @@ class Validator:
                'fp': fp, 'fn': fn}, **dict_param}
 
     def cv_validator_mc(self, dict_param):
-
         """
         It evaluates a multi-class TSVM-based estimator using the cross-validation.
         
@@ -336,6 +335,46 @@ class Validator:
                'micro_precision': np.mean(mean_precision), 'm_prec_std':
                np.std(mean_precision), 'mirco_f1': np.mean(mean_f1), 'm_f1_std':
                np.std(mean_f1)}, **dict_param}
+            
+    def tt_validator_mc(self, dict_param):
+        """
+        It evaluates a multi-class TSVM-based estimator using the train/test 
+        split method.
+        
+        Parameters
+        ----------
+        dict_param : dict
+            Values of hyper-parameters for a TSVM-based estimator
+            
+        Returns
+        -------
+        float
+            Accuracy of the model.
+            
+        float
+            Zero standard deviation.
+            
+        dict
+            Evaluation metrics such as Recall, Percision and F1-measure.
+        """
+        
+        self.estimator.estimator.set_params(**dict_param)
+
+        X_train, X_test, y_train, y_test = train_test_split(self.train_data, \
+                                           self.labels_data, test_size=self.validator[1], \
+                                           random_state=42)
+        
+        self.estimator.fit(X_train, y_train)
+        output = self.estimator.predict(X_test)
+        
+        acc = accuracy_score(y_test, output) * 100
+        
+        return acc, 0.0, {**{'accuracy': acc, 'acc_std': 0.0,
+               'micro_recall': recall_score(y_test, output, average='micro') * 100,
+               'm_rec_std': 0.0, 'micro_precision': precision_score(y_test,
+               output, average='micro') * 100, 'm_prec_std': 0.0, 'mirco_f1':
+               f1_score(y_test, output, average='micro') * 100, 'm_f1_std': 0.0},
+               **dict_param}
 
     def choose_validator(self):
 
@@ -365,6 +404,10 @@ class Validator:
             if self.validator[0] == 'CV':
 
                 return self.cv_validator_mc
+            
+            elif self.validator[0] == 't_t_split':
+                
+                return self.tt_validator_mc
 
 
 def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
@@ -488,14 +531,16 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     str
         Path to the saved spreadsheet (Excel) file.
     """
+    
+    mc_cols = ['accuracy', 'acc_std', 'micro_recall', 'm_rec_std',
+               'micro_precision', 'm_prec_std', 'mirco_f1', 'm_f1_std']
 
     column_names = {'binary': {'CV': ['accuracy', 'acc_std', 'recall_p', 'r_p_std', 'precision_p', 'p_p_std', \
                            'f1_p', 'f1_p_std', 'recall_n', 'r_n_std', 'precision_n', 'p_n_std', 'f1_n',\
                            'f1_n_std', 'tp', 'tn', 'fp', 'fn'],
                     't_t_split': ['accuracy', 'recall_p', 'precision_p', 'f1_p', 'recall_n', 'precision_n', \
                                   'f1_n', 'tp', 'tn', 'fp', 'fn']},
-                    'multiclass':{'CV': ['accuracy', 'acc_std', 'micro_recall', 'm_rec_std', 'micro_precision', \
-                                         'm_prec_std', 'mirco_f1', 'm_f1_std']}}
+                    'multiclass':{'CV': mc_cols, 't_t_split': mc_cols}}
 
     excel_file = pd.ExcelWriter(output_file + ".xlsx", engine='xlsxwriter')
     

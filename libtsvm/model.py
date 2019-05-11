@@ -218,8 +218,8 @@ class UserInput:
         
         elif self.test_method_tuple[0] == 't_t_split':
             
-            return "Train/Test split (%d%%/%d%%)" % (self.test_method_tuple[1],
-                                     100 - self.test_method_tuple[1])
+            return "Train/Test split (%d%%/%d%%)" % (100-(self.test_method_tuple[1]*100),
+                                     self.test_method_tuple[1]*100)
             
     def _get_mc_scheme(self):
         """

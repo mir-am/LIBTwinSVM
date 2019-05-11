@@ -265,6 +265,8 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
             self.user_in.test_method_tuple = ('t_t_split',
                                               (100  - self.tt_percentage.value()) / 100)
+            
+        print(self.tt_percentage.value())
         
         self.user_in.C1_range = (self.C1_lbound.value(), self.C1_ubound.value())
         self.user_in.C2_range = (self.C2_lbound.value(), self.C2_ubound.value())
