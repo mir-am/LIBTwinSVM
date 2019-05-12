@@ -42,22 +42,33 @@ LIBTwinSVM depends on the following packages.
 
 **1.  Downloading LIBTWinSVM**
 
-First make sure that [Git](https://git-scm.com/) is installed as it is required for getting the source code. Then open Git in any arbitrary path and enter the following command:
+First, make sure that [Git](https://git-scm.com/) is installed as it is required for getting the source code. Then open Git in any arbitrary path and enter the following command:
 
 ```
 git clone --recursive https://github.com/mir-am/LIBTwinSVM
 ```
 
-**2. Downloading Reuirments**
+**2. Downloading Requirements**
 
-If you already have *Cython* and *Numpy* installed, you can skip to the next section.
+Before installing any packages, we recommend you to upgrade pip:
+
+* Linux & Mac OS:
+```python
+pip3 install -U pip
+```
+* Windows:
+```python
+pip install -U pip
+```
+
+For LIBTwinSVM installation, *Numpy* and *Cython* must be installed. You can install them by entering the following commands in your terminal. If you already have *Cython* and *Numpy* installed, you can skip to the next section.
 
 * Linux & Mac OS: For installing Numpy & Cython on your computer, you should enter the following command in the terminal.
 ```
 pip3 install numpy cython
 ```
 
-* Windows: for installing the requirments on windows, you should enter the following command in the command prompt. 
+* Windows: for installing the requirements on windows, you should enter the following command in the command prompt. 
 ```
 pip install numpy cython
 ```
