@@ -5,3 +5,4 @@ API's examples
    :maxdepth: 1
 
    bin_clf
+   mc_clf
