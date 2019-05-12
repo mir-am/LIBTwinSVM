@@ -13,9 +13,8 @@ LIBTwinSVM Program - A Library for Twin Support Vector Machines
 
 from libtsvm import __version__
 from pkg_resources import parse_version
-from shutil import copy
+from shutil import copy, copy2
 #from setuptools import find_packages, setup, Command
-import os.path
 import io
 import os
 import subprocess
@@ -37,6 +36,8 @@ PKG_DATA = {}
 
 NUMPY_MIN_VERSION = '1.14.0'
 CYTHON_MIN_VERSION = '0.28'
+
+WIN_BUILD_WHEEL = False
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -119,11 +120,20 @@ if SETUPTOOLS_COMMANDS.intersection(sys.argv):
     class BinaryDistribution(setuptools.Distribution):
         def has_ext_modules(foo):
             return True
+        
+    if 'bdist_wheel' in sys.argv:
+        
+        WIN_BUILD_WHEEL = True
+        data_files = [(os.path.join('libtsvm', 'optimizer'),
+        [os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll')])]
+    
+        print("Added LAPACK and BLAS DLLs to the wheel.")
 
     extra_setuptools_args = dict(
         zip_safe=False,  # the package can run out of an .egg file
         include_package_data=True,
         distclass=BinaryDistribution,
+        data_files=data_files,
         extras_require={
             'alldeps': (
                 'numpy >= {0}'.format(NUMPY_MIN_VERSION),
@@ -131,6 +141,9 @@ if SETUPTOOLS_COMMANDS.intersection(sys.argv):
             ),
         },
     )
+        
+    
+        
 else:
     extra_setuptools_args = dict()
 
@@ -259,6 +272,43 @@ def check_arma_submodule():
     
     print("Found Armadillo submodule.")
     
+# This code is borrowed from Matthew Brett's windows-wheel-builder
+#def add_dll_wheel(dist_path='dist'):
+#    """
+#    Adds runtime DLLs to pre-built wheels for Windows.
+#    """
+#    
+#    from glob import glob
+#    # delocate package is only needed for building wheels for Windows systems.
+#    from delocate import wheeltools
+#    from zipfile import ZipFile
+#    
+#    def my_zip2dir(zip_fname, out_dir):
+#        """ Removes need for 'unzip' binary in PATH during `wheeltools.zip2dir`
+#        """
+#        with open(zip_fname, 'rb') as fobj:
+#            zip = ZipFile(fobj)
+#            zip.extractall(path=out_dir)
+#
+#    # Monkeypatch wheeltools
+#    wheeltools.zip2dir = my_zip2dir
+#    
+#    lapack_dll = os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll')
+#    blas_dll = os.path.join('libtsvm', 'optimizer', 'blas_win64_MT.dll')
+#    
+#    wheel_fnames = glob(os.path.join(dist_path, '*.whl'))
+#    
+#    print(wheel_fnames)
+#    
+#    for fname in wheel_fnames:
+#        print('Processing', fname)
+#        with wheeltools.InWheel(fname, fname):
+#            print(os.path.abspath())
+#            
+#            copy2(lapack_dll, os.path.join('libtsvm', 'optimizer'))
+#            copy2(blas_dll, os.path.join('libtsvm', 'optimizer'))
+#            
+#    print("Added LAPACK and BLAS DLLs to the wheel.")
     
 ##############################################################################
     
@@ -342,6 +392,10 @@ def setup_package():
     metadata['configuration'] = configuration
     
     setup(**metadata)
+    
+#    if sys.platform == 'win32' and WIN_BUILD_WHEEL:
+#        
+#        add_dll_wheel()
     
 if __name__ == '__main__':
     setup_package()
