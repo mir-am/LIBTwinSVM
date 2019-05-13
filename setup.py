@@ -13,7 +13,7 @@ LIBTwinSVM Program - A Library for Twin Support Vector Machines
 
 from libtsvm import __version__
 from pkg_resources import parse_version
-from shutil import copy, copy2
+from shutil import copy
 #from setuptools import find_packages, setup, Command
 import io
 import os
@@ -36,9 +36,6 @@ PKG_DATA = {}
 
 NUMPY_MIN_VERSION = '1.14.0'
 CYTHON_MIN_VERSION = '0.28'
-
-WIN_BUILD_WHEEL = False
-
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -123,9 +120,9 @@ if SETUPTOOLS_COMMANDS.intersection(sys.argv):
         
     if 'bdist_wheel' in sys.argv:
         
-        WIN_BUILD_WHEEL = True
         data_files = [(os.path.join('libtsvm', 'optimizer'),
-        [os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll')])]
+        [os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll'),
+         os.path.join('libtsvm', 'optimizer', 'blas_win64_MT.dll')])]
     
         print("Added LAPACK and BLAS DLLs to the wheel.")
 
@@ -165,7 +162,7 @@ def cp_libs_win():
     copy(src_1, dst)
     copy(src_2, dst)
     
-    print("Copied the BLAS libraries...")
+    print("Copied the LAPACK and BLAS libraries to source distribution...")
 
     
 def get_numpy_status():
@@ -393,9 +390,6 @@ def setup_package():
     
     setup(**metadata)
     
-#    if sys.platform == 'win32' and WIN_BUILD_WHEEL:
-#        
-#        add_dll_wheel()
     
 if __name__ == '__main__':
     setup_package()
