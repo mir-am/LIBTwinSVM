@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# LIBTwinSVM: A Library for Twin Support Vector Machines
 # Developers: Mir, A. and Mahdi Rahbar
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
@@ -9,21 +10,18 @@
 This test module tests the functionalities of estimators.py module
 """
 
-# A temprory workaround to import LIBTwinSVM for running tests
-import sys
-sys.path.append('./')
-
 from libtsvm.estimators import TSVM, LSTSVM
-from libtsvm.preprocess import read_data
+from libtsvm.preprocess import DataReader
 from sklearn.utils.testing import assert_greater
 import unittest
 import numpy as np
 
 # Load the dataset for testing
-X, y, file_name = read_data('./dataset/hepatitis.csv')
+data = DataReader('./dataset/hepatitis.csv', ',', True)
+data.load_data(False, False)
+X, y, file_name = data.get_data()
 
 class TestLSTSVM(unittest.TestCase):
-    
     """
     It tests the functionalities of the LSTSVM estimator
     """
@@ -33,7 +31,6 @@ class TestLSTSVM(unittest.TestCase):
         super().__init__(*args, **kwargs)
         
     def test_lstsvm_set_get_params_linear(self):
-        
         """
         It checks that set_params and get_params works correctly for linear 
         LSTSVM
@@ -49,7 +46,6 @@ class TestLSTSVM(unittest.TestCase):
                          'set_params and get_params output don\'t match')
         
     def test_lstsvm_set_get_params_rbf(self):
-        
         """
         It checks that set_params and get_params works correctly for non-linear
         LSTSVM
@@ -65,7 +61,6 @@ class TestLSTSVM(unittest.TestCase):
                          'set_params and get_params output don\'t match')
         
     def test_linear_lstsvm_hepatitis(self):
-        
         """
         It tests linear LSTSVM on hepatits dataset
         """
@@ -77,7 +72,6 @@ class TestLSTSVM(unittest.TestCase):
         assert_greater(np.mean(y == pred), 0.85)
         
     def test_rbf_lstsvm_hepatitis(self):
-        
         """
         It tests non-linear LSTSVM on hepatitis dataset
         """
@@ -89,7 +83,6 @@ class TestLSTSVM(unittest.TestCase):
         assert_greater(np.mean(y == pred), 0.95)
         
     def test_rectangular_lstsvm_hepatitis(self):
-        
         """
         It tests LSTSVM with rectangular on hepatitis dataset
         """
@@ -102,7 +95,6 @@ class TestLSTSVM(unittest.TestCase):
         
 
 class TestTSVM(unittest.TestCase):
-    
     """
     It tests the functionalities of the TSVM estimator
     """
@@ -112,7 +104,6 @@ class TestTSVM(unittest.TestCase):
         super().__init__(*args, **kwargs)
         
     def test_linear_tsvm_set_get_params(self):
-        
         """
         It checks that set_params and get_params works correctly for linear 
         TSVM estimator
@@ -128,7 +119,6 @@ class TestTSVM(unittest.TestCase):
                          'set_params and get_params output don\'t match')
         
     def test_rbf_tsvm_set_get_params(self):
-        
         """
         It checks that set_params and get_params works correctly for non-linear
         TSVM estimator
@@ -144,7 +134,6 @@ class TestTSVM(unittest.TestCase):
                          'set_params and get_params output don\'t match')
         
     def test_linear_tsvm_hepatitis(self):
-        
         """
         It tests linear TSVM estimator on hepatits dataset
         """
@@ -156,7 +145,6 @@ class TestTSVM(unittest.TestCase):
         assert_greater(np.mean(y == pred), 0.78)
         
     def test_rbf_tsvm_hepatitis(self):
-        
         """
         It tests non-linear TSVM estimator on hepatitis dataset
         """
@@ -168,7 +156,6 @@ class TestTSVM(unittest.TestCase):
         assert_greater(np.mean(y == pred), 0.95)
 
     def test_rectangular_tsvm_hepatitis(self):
-        
         """
         It tests TSVM with rectangular on hepatitis dataset
         """

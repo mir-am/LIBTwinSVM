@@ -374,6 +374,7 @@ def setup_package():
         #     'console_scripts': ['mycli=mymodule:cli'],
         # },
         install_requires=REQ_PACKAGES,
+        test_suite='tests',
         license='GNU General Public License v3.0',
         classifiers=[
             # Trove classifiers

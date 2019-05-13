@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# LIBTwinSVM: A Library for Twin Support Vector Machines
 # Developers: Mir, A.
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
@@ -7,10 +8,6 @@
 """
 This test module tests the functionalities of mc_scheme.py module
 """
-
-# A temprory workaround to import LIBTwinSVM for running tests
-import sys
-sys.path.append('./')
 
 from libtsvm.estimators import LSTSVM, TSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
@@ -61,7 +58,7 @@ class TestUserInput(unittest.TestCase):
         user_in.test_method_tuple = ('CV', 5)
         output.append(user_in._get_eval_method())
         
-        user_in.test_method_tuple = ('t_t_split', 70)
+        user_in.test_method_tuple = ('t_t_split', 0.3)
         output.append(user_in._get_eval_method())
         
         self.assertEqual(output, expected_output)

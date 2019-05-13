@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# LIBTwinSVM: A Library for Twin Support Vector Machines
 # Developers: Mir, A.
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
@@ -8,19 +9,17 @@
 This test module tests the functionalities of mc_scheme.py module
 """
 
-# A temprory workaround to import LIBTwinSVM for running tests
-import sys
-sys.path.append('./')
-
 from libtsvm.estimators import LSTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
-from libtsvm.preprocess import read_data
+from libtsvm.preprocess import DataReader
 from sklearn.utils.testing import assert_greater
 import unittest
 import numpy as np
 
 # Load the dataset for testing
-X, y, file_name = read_data('./dataset/iris.csv')
+data = DataReader('./dataset/iris.csv', ',', True)
+data.load_data(False, False)
+X, y, file_name = data.get_data()
 
 class TestOVA(unittest.TestCase):
     """
