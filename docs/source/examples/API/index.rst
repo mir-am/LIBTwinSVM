@@ -6,3 +6,4 @@ API's examples
 
    bin_clf
    mc_clf
+   me_cv
