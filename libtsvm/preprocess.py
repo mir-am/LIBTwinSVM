@@ -72,7 +72,7 @@ class DataReader():
         if f_ext == '.csv':
         
             df = pd.read_csv(self.file_path, sep=self.sep)
-            self.hdr_names = list(df.columns.values) if self.header else []
+            self.hdr_names = list(df.columns.values)[1:] if self.header else []
         
         elif f_ext == '.libsvm':
             
