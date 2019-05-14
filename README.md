@@ -85,3 +85,15 @@ pip3 install .
 ```python
 pip install .
 ```
+
+## Quick start
+
+After LIBTwinSVM was installed, for running the GUI application, open the terminal and enter the following code:
+* Linux & Mac OS:
+```python
+python3 -m libtsvm
+```
+* Windows:
+```python
+python -m libtsvm
+```
