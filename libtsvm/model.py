@@ -279,6 +279,8 @@ class UserInput:
         
         if self.input_complete:
             
+            y_n = lambda x: 'Yes' if x else 'No'
+            
             u_param = " | u: 2^%d to 2^%d" % (self.u_range[0], self.u_range[-1]) \
             if self.kernel_type == 'RBF' else ''
             clf = "Standard TwinSVM" if self.clf_type == 'tsvm' else "LeastSquares TwinSVM"
@@ -287,12 +289,15 @@ class UserInput:
             "Multi-class scheme: %s\nEvaluation method: %s\n"
             "Range of parameters for grid search: (step:%.2f)\nC1: 2^%d to 2^%d |"
             "C2: 2^%d to 2^%d%s\n"
-            "Results' path:%s\nLog File: %s"
+            "---------------------------------------------------------------\n"
+            "Results' path: %s\nSave Classification Results: %s\n"
+            "Save Best Model: %s\nSave Log File: %s"
             ) % (self.data_filename, clf, self._get_kernel_selection(),
                 self._get_mc_scheme(), self._get_eval_method(), self.step_size,
                 self.C1_range[0], self.C1_range[1], self.C2_range[0],
-                self.C2_range[1], u_param, self.result_path, 'Yes' \
-                if self.log_file else 'No')
+                self.C2_range[1], u_param, self.result_path,
+                y_n(self.save_clf_results), y_n(self.save_best_model),
+                y_n(self.log_file))
             
         else:
             
