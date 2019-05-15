@@ -18,7 +18,7 @@ LIBTwinSVM is an easy-to-use implementation of Twin Support Vector Machine.  It 
 - The classification results can be logged during the grid search process to not lose results in case of power failure.
 - A **feature-rich visualization tool** to show decision boundaries and geometrical interpretation of TwinSVMs.
 - The best-fitted classifier can be saved on the disk after the grid search process.
-
+- The pre-trained models can be loaded and evaluated on the test samples.
 
 
 ## Installation Guide
@@ -35,7 +35,7 @@ LIBTwinSVM depends on the following packages.
 | [Scikit-learn](https://scikit-learn.org/)      | For TwinSVM-based models evaluation and selection.             | BSD 3-Clause |
 | [Pandas](https://pandas.pydata.org/)           | For reading and processing datasets.                           | BSD 3-Clause |
 | [XlsxWriter](https://xlsxwriter.readthedocs.io/) | For saving classification results in an Excel file.          | BSD 3-Clause |
-| [Joblib](https://xlsxwriter.readthedocs.io/)   | For saving and loading TwinSVM-based models.                   | BSD 3-Clause |
+| [Joblib](https://joblib.readthedocs.io)   | For saving and loading TwinSVM-based models.                   | BSD 3-Clause |
 | [numpydoc](https://numpydoc.readthedocs.io/en/latest/) | API code documentation.                                | BSD License  |
 
 ### Installation from the source
