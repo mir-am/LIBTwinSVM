@@ -9,7 +9,10 @@
 This test module tests the functionalities of model_selection.py module
 """
 
-from libtsvm.model_selection import eval_metrics, search_space, get_results_filename
+from libtsvm.estimators import TSVM
+from libtsvm.mc_scheme import OneVsAllClassifier
+from libtsvm.model_selection import eval_metrics, search_space, get_results_filename, Validator
+from libtsvm.preprocess import DataReader
 import unittest
 import numpy as np
 
@@ -110,4 +113,111 @@ class TestFunctions(unittest.TestCase):
         # TODO: test should be implemented with a reliable assertion
         pass
         
+
+class TestValidator(unittest.TestCase):
+    """
+    It tests the functionalities of Validator class.
+    """
     
+    def __init__(self, *args, **kwargs):
+        
+        super().__init__(*args, **kwargs)
+        
+        self.bin_clf = TSVM()
+        self.mc_clf = OneVsAllClassifier(self.bin_clf)
+        
+        # Binary dataset
+        bin_dataset = DataReader('./dataset/2d-synthetic.csv', ',', True)
+        bin_dataset.load_data(False, False)
+        self.bin_X, self.bin_y, _ = bin_dataset.get_data()
+        
+        # Multi-class data
+        mc_dataset = DataReader('./dataset/mc-data.csv', ',', True)
+        mc_dataset.load_data(False, False)
+        self.mc_X, self.mc_y, _ = mc_dataset.get_data()
+        
+    def test_cv_validator(self):    
+        """
+        It tests cross-validation for a binary TSVM-based estimator.
+        """
+        
+        expected_output = [100, 0.0]
+        
+        eval_m = Validator(self.bin_X, self.bin_y, ('CV', 5), self.bin_clf)
+        eval_func = eval_m.choose_validator()
+        acc, std, _ = eval_func({'C1': 1, 'C2': 1})
+        
+        self.assertEqual([acc, std], expected_output)
+    
+    def test_tt_validator(self):
+        """
+        It tests train/test split for a binary TSVM-based estimator.
+        """
+        
+        expected_output = [100, 0.0]
+        
+        eval_m = Validator(self.bin_X, self.bin_y, ('t_t_split', 0.3),
+                           self.bin_clf)
+        eval_func = eval_m.choose_validator()
+        acc, std, _ = eval_func({'C1': 1, 'C2': 1})
+        
+        self.assertEqual([acc, std], expected_output)
+    
+    def test_cv_validator_mc(self):
+        """
+        It tests cross-validation for a multi-class TSVM-based estimator.
+        """
+        
+        expected_output = [100, 0.0]
+        
+        eval_m = Validator(self.mc_X, self.mc_y, ('CV', 5), self.mc_clf)  
+        eval_func = eval_m.choose_validator()
+        acc, std, _ = eval_func({'C1': 1, 'C2': 1})
+        
+        self.assertEqual([acc, std], expected_output)
+    
+    def test_tt_validator_mc(self):
+        """
+        It tests train/test split for a multi-class TSVM-based estimator.
+        """
+        
+        expected_output = [100, 0.0]
+        
+        eval_m = Validator(self.mc_X, self.mc_y, ('t_t_split', 0.3),
+                           self.mc_clf)
+        eval_func = eval_m.choose_validator()
+        acc, std, _ = eval_func({'C1': 1, 'C2': 1})
+        
+        self.assertEqual([acc, std], expected_output)
+        
+    def test_choose_validator(self):
+        """
+        It tests whether the right validator is returned.
+        """
+        
+        output = []
+        
+        eval_m = Validator(self.bin_X, self.bin_y, ('CV', 5), self.bin_clf)
+        
+        output.append(eval_m.choose_validator().__name__ \
+                      == Validator.cv_validator.__name__)
+        
+        eval_m = Validator(self.bin_X, self.bin_y, ('t_t_split', 0.3),
+                           self.bin_clf)
+        
+        output.append(eval_m.choose_validator().__name__ \
+                      == Validator.tt_validator.__name__)
+        
+        eval_m = Validator(self.mc_X, self.mc_y, ('CV', 5), self.mc_clf)
+        
+        output.append(eval_m.choose_validator().__name__ \
+                      == Validator.cv_validator_mc.__name__)
+        
+        eval_m = Validator(self.mc_X, self.mc_y, ('t_t_split', 0.3),
+                           self.mc_clf)
+        
+        output.append(eval_m.choose_validator().__name__ \
+                      == Validator.tt_validator_mc.__name__)
+        
+        self.assertEqual(True, all(output))
+        

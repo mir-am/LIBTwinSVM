@@ -121,38 +121,61 @@ def performance_eval(tp, tn, fp, fn):
     positives = tp + fp
     negatives = tn + fn
     
-    # Initialize
-    accuracy = 0
-    # Positive class
-    recall_p = 1.0
-    precision_p = 1.0
-    f1_p = 1.0
-    # Negative class
-    recall_n = 1.0
-    precision_n = 1.0
-    f1_n = 1.0
+    # Metric functions
+    rec_p = lambda tp, fn: 0.0 if tp + fn == 0 else tp / (tp + fn)
+    prec_p = lambda tp, fp: 0.0 if tp + fp == 0 else tp / (tp + fp)
+    f1_p = lambda r_p, p_p: 0.0 if r_p == 0.0 or p_p == 0.0 else (2 * r_p *
+                                                                  p_p) / (p_p + r_p)
     
-    print('P-N:', positives, negatives)
-    try:
+    rec_n = lambda tn, fp: 0.0 if tn + fp == 0 else tn / (tn + fp)
+    prec_n = lambda tn, fn: 0.0 if tn + fn == 0 else tn / (tn + fn)
+    f1_n = lambda r_n, p_n: 0.0 if r_n == 0.0 or p_n == 0.0 else (2 * r_n *
+                                                                  p_n) / (p_n + r_n)
+    
+    
+    accuracy = (tp + tn) / (positives + negatives)
+    # Positive class
+    recall_p = rec_p(tp, fn)
+    precision_p = prec_p(tp, fp)
+    f1m_p = f1_p(recall_p, precision_p)
 
-        accuracy = (tp + tn) / (positives + negatives)
-        # Positive class
-        recall_p = tp / (tp + fn)
-        print("R:", recall_p)
-        precision_p = tp / (tp + fp)
-        f1_p = (2 * recall_p * precision_p) / (precision_p + recall_p)
-
-        # Negative class
-        recall_n = tn / (tn + fp)
-        precision_n = tn / (tn + fn)
-        f1_n = (2 * recall_n * precision_n) / (precision_n + recall_n)
-
-    except ZeroDivisionError:
-
-        pass  # Continue if division by zero occured
+    # Negative class
+    recall_n = rec_n(tn, fp)
+    precision_n = prec_n(tp, fn)
+    f1m_n = f1_n(recall_n, precision_n)
+    
+    
+#    # Initialize
+#    accuracy = 0
+#    # Positive class
+#    recall_p = 1.0
+#    precision_p = 1.0
+#    f1_p = 1.0
+#    # Negative class
+#    recall_n = 1.0
+#    precision_n = 1.0
+#    f1_n = 1.0
+#    
+#    try:
+#
+#        accuracy = (tp + tn) / (positives + negatives)
+#        # Positive class
+#        recall_p = tp / (tp + fn)
+#        print("R:", recall_p)
+#        precision_p = tp / (tp + fp)
+#        f1_p = (2 * recall_p * precision_p) / (precision_p + recall_p)
+#
+#        # Negative class
+#        recall_n = tn / (tn + fp)
+#        precision_n = tn / (tn + fn)
+#        f1_n = (2 * recall_n * precision_n) / (precision_n + recall_n)
+#
+#    except ZeroDivisionError:
+#
+#        pass  # Continue if division by zero occured
         
-    return accuracy * 100, recall_p * 100, precision_p * 100, f1_p * 100, \
-           recall_n * 100, precision_n * 100, f1_n * 100
+    return accuracy * 100, recall_p * 100, precision_p * 100, f1m_p * 100, \
+           recall_n * 100, precision_n * 100, f1m_n * 100
     
 
 def eval_metrics(y_true, y_pred):
@@ -350,50 +373,24 @@ class Validator:
             self.estimator.fit(X_train, y_train)
 
             output = self.estimator.predict(X_test)
-            
-            tp_i, tn_i, fp_i, fn_i = cm_element(y_test, output)
-            
-            # Count
-            tp = tp + tp_i
-            tn = tn + tn_i
-            fp = fp + fp_i
-            fn = fn + fn_i
-            
-            accuracy, recall_p, precision_p, f1_p, recall_n, precision_n, \
-            f1_n = performance_eval(tp, tn, fp, fn)
-            
-            mean_accuracy.append(accuracy)
-            # Positive cass
-            mean_recall_p.append(recall_p)
-            mean_precision_p.append(precision_p)
-            mean_f1_p.append(f1_p)
-            # Negative class    
-            mean_recall_n.append(recall_n)
-            mean_precision_n.append(precision_n)
-            mean_f1_n.append(f1_n)
 
-#            accuracy_test = eval_metrics(y_test, output)
-#
-#            mean_accuracy.append(accuracy_test[4])
-#            # Positive cass
-#            mean_recall_p.append(accuracy_test[5])
-#            mean_precision_p.append(accuracy_test[6])
-#            mean_f1_p.append(accuracy_test[7])
-#            # Negative class    
-#            mean_recall_n.append(accuracy_test[8])
-#            mean_precision_n.append(accuracy_test[9])
-#            mean_f1_n.append(accuracy_test[10])
-#
-#            # Count
-#            tp = tp + accuracy_test[0]
-#            tn = tn + accuracy_test[1]
-#            fp = fp + accuracy_test[2]
-#            fn = fn + accuracy_test[3]
-        
-        
-        
-        print(np.mean(mean_recall_p), len(mean_recall_p))
-        print(tp, tn, fp, fn)
+            accuracy_test = eval_metrics(y_test, output)
+
+            mean_accuracy.append(accuracy_test[4])
+            # Positive class
+            mean_recall_p.append(accuracy_test[5])
+            mean_precision_p.append(accuracy_test[6])
+            mean_f1_p.append(accuracy_test[7])
+            # Negative class    
+            mean_recall_n.append(accuracy_test[8])
+            mean_precision_n.append(accuracy_test[9])
+            mean_f1_n.append(accuracy_test[10])
+
+            # Count
+            tp = tp + accuracy_test[0]
+            tn = tn + accuracy_test[1]
+            fp = fp + accuracy_test[2]
+            fn = fn + accuracy_test[3]
         
         return np.mean(mean_accuracy), np.std(mean_accuracy), {**{'accuracy': np.mean(mean_accuracy),
                       'acc_std': np.std(mean_accuracy),'recall_p': np.mean(mean_recall_p),
