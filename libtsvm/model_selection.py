@@ -18,6 +18,143 @@ import numpy as np
 import pandas as pd
 
 
+def cm_element(y_true, y_pred):
+    """
+    It computes the elements of a confusion matrix.
+    
+    Parameters
+    ----------
+    y_true : array-like
+        Target values of samples.
+
+    y_pred : array-like
+        Predicted class lables.
+        
+    Returns
+    -------
+    tp : int
+        True positive.
+
+    tn : int
+        True negative.
+
+    fp : int
+        False positive.
+
+    fn : int
+        False negative.
+    """
+    
+    # Elements of confusion matrix
+    tp, tn, fp, fn = 0, 0, 0, 0
+
+    for i in range(y_true.shape[0]):
+
+        # True positive
+        if y_true[i] == 1 and y_pred[i] == 1:
+
+            tp = tp + 1
+
+        # True negative
+        elif y_true[i] == -1 and y_pred[i] == -1:
+
+            tn = tn + 1
+
+        # False positive
+        elif y_true[i] == -1 and y_pred[i] == 1:
+
+            fp = fp + 1
+
+        # False negative
+        elif y_true[i] == 1 and y_pred[i] == -1:
+
+            fn = fn + 1
+            
+    return tp, tn, fp, fn
+    
+
+def performance_eval(tp, tn, fp, fn):
+    """
+    It computes common evaluation metrics based on the elements of
+    a confusion matrix.
+    
+    Parameters
+    ----------
+    tp : int
+        True positive.
+
+    tn : int
+        True negative.
+
+    fp : int
+        False positive.
+
+    fn : int
+        False negative.
+        
+    Returns
+    -------
+    accuracy : float
+        Overall accuracy of the model.
+
+    recall_p : float
+        Recall of positive class.
+
+    precision_p : float
+        Precision of positive class.
+
+    f1_p : float
+        F1-measure of positive class.
+
+    recall_n : float
+        Recall of negative class.
+
+    precision_n : float
+        Precision of negative class.
+
+    f1_n : float
+        F1-measure of negative class.
+    """
+    
+    # TODO: This method should be reviewed!
+    # Compute total positives and negatives
+    positives = tp + fp
+    negatives = tn + fn
+    
+    # Initialize
+    accuracy = 0
+    # Positive class
+    recall_p = 1.0
+    precision_p = 1.0
+    f1_p = 1.0
+    # Negative class
+    recall_n = 1.0
+    precision_n = 1.0
+    f1_n = 1.0
+    
+    print('P-N:', positives, negatives)
+    try:
+
+        accuracy = (tp + tn) / (positives + negatives)
+        # Positive class
+        recall_p = tp / (tp + fn)
+        print("R:", recall_p)
+        precision_p = tp / (tp + fp)
+        f1_p = (2 * recall_p * precision_p) / (precision_p + recall_p)
+
+        # Negative class
+        recall_n = tn / (tn + fp)
+        precision_n = tn / (tn + fn)
+        f1_n = (2 * recall_n * precision_n) / (precision_n + recall_n)
+
+    except ZeroDivisionError:
+
+        pass  # Continue if division by zero occured
+        
+    return accuracy * 100, recall_p * 100, precision_p * 100, f1_p * 100, \
+           recall_n * 100, precision_n * 100, f1_n * 100
+    
+
 def eval_metrics(y_true, y_pred):
     """
     It computes common evaluation metrics such as Accuracy, Recall, Precision,
@@ -67,65 +204,73 @@ def eval_metrics(y_true, y_pred):
         F1-measure of negative class.
     """
 
-    # Elements of confusion matrix
-    tp, tn, fp, fn = 0, 0, 0, 0
+#    # Elements of confusion matrix
+#    tp, tn, fp, fn = 0, 0, 0, 0
+#
+#    for i in range(y_true.shape[0]):
+#
+#        # True positive
+#        if y_true[i] == 1 and y_pred[i] == 1:
+#
+#            tp = tp + 1
+#
+#        # True negative
+#        elif y_true[i] == -1 and y_pred[i] == -1:
+#
+#            tn = tn + 1
+#
+#        # False positive
+#        elif y_true[i] == -1 and y_pred[i] == 1:
+#
+#            fp = fp + 1
+#
+#        # False negative
+#        elif y_true[i] == 1 and y_pred[i] == -1:
+#
+#            fn = fn + 1
+    
+    tp, tn, fp, fn = cm_element(y_true, y_pred)
+    accuracy, recall_p, precision_p, f1_p, recall_n, precision_n, \
+    f1_n = performance_eval(tp, tn, fp, fn)
 
-    for i in range(y_true.shape[0]):
-
-        # True positive
-        if y_true[i] == 1 and y_pred[i] == 1:
-
-            tp = tp + 1
-
-        # True negative
-        elif y_true[i] == -1 and y_pred[i] == -1:
-
-            tn = tn + 1
-
-        # False positive
-        elif y_true[i] == -1 and y_pred[i] == 1:
-
-            fp = fp + 1
-
-        # False negative
-        elif y_true[i] == 1 and y_pred[i] == -1:
-
-            fn = fn + 1
-
-    # Compute total positives and negatives
-    positives = tp + fp
-    negatives = tn + fn
-
-    # Initialize
-    accuracy = 0
-    # Positive class
-    recall_p = 0
-    precision_p = 0
-    f1_p = 0
-    # Negative class
-    recall_n = 0
-    precision_n = 0
-    f1_n = 0
-
-    try:
-
-        accuracy = (tp + tn) / (positives + negatives)
-        # Positive class
-        recall_p = tp / (tp + fn)
-        precision_p = tp / (tp + fp)
-        f1_p = (2 * recall_p * precision_p) / (precision_p + recall_p)
-
-        # Negative class
-        recall_n = tn / (tn + fp)
-        precision_n = tn / (tn + fn)
-        f1_n = (2 * recall_n * precision_n) / (precision_n + recall_n)
-
-    except ZeroDivisionError:
-
-        pass  # Continue if division by zero occured
-
-    return tp, tn, fp, fn, accuracy * 100, recall_p * 100, precision_p * 100, f1_p * 100, \
-        recall_n * 100, precision_n * 100, f1_n * 100
+#    # Compute total positives and negatives
+#    positives = tp + fp
+#    negatives = tn + fn
+#
+#    # Initialize
+#    accuracy = 0
+#    # Positive class
+#    recall_p = 0
+#    precision_p = 0
+#    f1_p = 0
+#    # Negative class
+#    recall_n = 0
+#    precision_n = 0
+#    f1_n = 0
+#    
+#    print('P-N:', positives, negatives)
+#    try:
+#
+#        accuracy = (tp + tn) / (positives + negatives)
+#        # Positive class
+#        recall_p = tp / (tp + fn)
+#        print("R:", recall_p)
+#        precision_p = tp / (tp + fp)
+#        f1_p = (2 * recall_p * precision_p) / (precision_p + recall_p)
+#
+#        # Negative class
+#        recall_n = tn / (tn + fp)
+#        precision_n = tn / (tn + fn)
+#        f1_n = (2 * recall_n * precision_n) / (precision_n + recall_n)
+#
+#    except ZeroDivisionError:
+#
+#        pass  # Continue if division by zero occured
+    
+    
+        
+    return tp, tn, fp, fn, accuracy, recall_p, precision_p, f1_p,recall_n, \
+           precision_n, f1_n
         
 
 class Validator:
@@ -158,7 +303,6 @@ class Validator:
         self.estimator = estimator
 
     def cv_validator(self, dict_param):
-
         """
         It evaluates a TSVM-based estimator using the cross-validation method.
         
@@ -206,25 +350,51 @@ class Validator:
             self.estimator.fit(X_train, y_train)
 
             output = self.estimator.predict(X_test)
-
-            accuracy_test = eval_metrics(y_test, output)
-
-            mean_accuracy.append(accuracy_test[4])
-            # Positive cass
-            mean_recall_p.append(accuracy_test[5])
-            mean_precision_p.append(accuracy_test[6])
-            mean_f1_p.append(accuracy_test[7])
-            # Negative class    
-            mean_recall_n.append(accuracy_test[8])
-            mean_precision_n.append(accuracy_test[9])
-            mean_f1_n.append(accuracy_test[10])
-
+            
+            tp_i, tn_i, fp_i, fn_i = cm_element(y_test, output)
+            
             # Count
-            tp = tp + accuracy_test[0]
-            tn = tn + accuracy_test[1]
-            fp = fp + accuracy_test[2]
-            fn = fn + accuracy_test[3]
+            tp = tp + tp_i
+            tn = tn + tn_i
+            fp = fp + fp_i
+            fn = fn + fn_i
+            
+            accuracy, recall_p, precision_p, f1_p, recall_n, precision_n, \
+            f1_n = performance_eval(tp, tn, fp, fn)
+            
+            mean_accuracy.append(accuracy)
+            # Positive cass
+            mean_recall_p.append(recall_p)
+            mean_precision_p.append(precision_p)
+            mean_f1_p.append(f1_p)
+            # Negative class    
+            mean_recall_n.append(recall_n)
+            mean_precision_n.append(precision_n)
+            mean_f1_n.append(f1_n)
 
+#            accuracy_test = eval_metrics(y_test, output)
+#
+#            mean_accuracy.append(accuracy_test[4])
+#            # Positive cass
+#            mean_recall_p.append(accuracy_test[5])
+#            mean_precision_p.append(accuracy_test[6])
+#            mean_f1_p.append(accuracy_test[7])
+#            # Negative class    
+#            mean_recall_n.append(accuracy_test[8])
+#            mean_precision_n.append(accuracy_test[9])
+#            mean_f1_n.append(accuracy_test[10])
+#
+#            # Count
+#            tp = tp + accuracy_test[0]
+#            tn = tn + accuracy_test[1]
+#            fp = fp + accuracy_test[2]
+#            fn = fn + accuracy_test[3]
+        
+        
+        
+        print(np.mean(mean_recall_p), len(mean_recall_p))
+        print(tp, tn, fp, fn)
+        
         return np.mean(mean_accuracy), np.std(mean_accuracy), {**{'accuracy': np.mean(mean_accuracy),
                       'acc_std': np.std(mean_accuracy),'recall_p': np.mean(mean_recall_p),
                       'r_p_std': np.std(mean_recall_p), 'precision_p': np.mean(mean_precision_p),

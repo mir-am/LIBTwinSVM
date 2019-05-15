@@ -125,7 +125,11 @@ class TestUserInput(unittest.TestCase):
             "Multi-class scheme: One-vs-One\nEvaluation method: 5-Fold cross-validation\n"
             "Range of parameters for grid search: (step:1.00)\nC1: 2^-5 to 2^5 |"
             "C2: 2^-5 to 2^5 | u: 2^-10 to 2^2\n"
-            "Results' path:/home/results/\nLog File: No")
+            "---------------------------------------------------------------\n"
+            "Results' path: /home/results/\n"
+            "Save Classification Results: Yes\n"
+            "Save Best Model: Yes\n"
+            "Save Log File: No")
         
         user_in = UserInput()
         user_in.data_filename = 'Iris'
@@ -139,6 +143,8 @@ class TestUserInput(unittest.TestCase):
         user_in.u_range = (-10, 2)
         user_in.result_path = '/home/results/'
         user_in.log_file = False
+        user_in.save_clf_results = True
+        user_in.save_best_model = True
         user_in.input_complete = True
         
         output = user_in.get_current_selection()
