@@ -95,7 +95,7 @@ def configuration(parent_package='', top_path=None):
                          sources=sources,
                          depends=depends,
                          language="c++",
-                         libraries=libs + ['clipdcd-lib'],
+                         libraries=['clipdcd-lib']+libs,
                          library_dirs=[join('armadillo-code', 'lib_win64')],
                          extra_compile_args=compile_args,
                          extra_link_args=link_args,
