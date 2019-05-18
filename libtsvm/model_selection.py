@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# LIBTwinSVM: A Library for Twin Support Vector Machines
 # Developers: Mir, A. and Mahdi Rahbar
 # Version: 0.1 - 2019-03-20
 # License: GNU General Public License v3.0
+
+"""
+This module contains functions and classes for model evaluation and selection.
+"""
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid

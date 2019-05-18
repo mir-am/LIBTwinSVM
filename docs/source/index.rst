@@ -1,4 +1,4 @@
-LIBTwinSVM: An easy-to-use and fast library for TwinSVMs on CPUs and GPUs
+LIBTwinSVM: A Library for Twin Support Vector Machines
 =========================================================================
 This is the `LIBTwinSVM <https://github.com/mir-am/LIBTwinSVM>`_ 's documentation.
 
