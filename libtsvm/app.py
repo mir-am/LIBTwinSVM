@@ -15,7 +15,7 @@ from libtsvm.preprocess import DataReader
 from libtsvm.model_selection import ThreadGS
 from libtsvm.model_eval import load_model, ModelThread
 from libtsvm.visualize import VisualThread
-from libtsvm.misc import validate_step_size, validate_path
+from libtsvm.misc import validate_path
 from datetime import datetime
 import numpy as np
 import sys
@@ -97,7 +97,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
     def get_data_path(self):
         """
-        gets the dataset path from a user.
+        Gets the dataset path from a user.
         """
         
         data_filename, _ = QFileDialog.getOpenFileName(self, "Import dataset",
@@ -301,9 +301,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         
         total_valid = []
         
-        if validate_step_size(self.user_in.kernel_type, self.user_in.C1_range,
-                              self.user_in.C2_range, self.user_in.u_range,
-                              self.user_in.step_size):
+        if self.user_in.validate_step_size():
             total_valid.append(True)
         else:
             total_valid.append(False)
