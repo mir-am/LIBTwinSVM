@@ -738,7 +738,6 @@ class Ui_MainWindow(object):
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
         self.menuHelp.addAction(self.actionDocumentation)
-        self.menuHelp.addAction(self.actionView_License)
         self.menuHelp.addSeparator()
         self.menuHelp.addAction(self.actionAbout)
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -871,7 +870,6 @@ class Ui_MainWindow(object):
         self.actionDocumentation.setText(_translate("MainWindow", "Documentation"))
         self.actionView_License.setText(_translate("MainWindow", "View License "))
         self.actionAbout.setText(_translate("MainWindow", "About"))
-
 
 if __name__ == "__main__":
     import sys
