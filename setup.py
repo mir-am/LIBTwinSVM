@@ -330,6 +330,8 @@ def configuration(parent_package='', top_path=None):
 
 def setup_package():
     
+    global PKG_DATA
+    
     # Check dependencies and requirements ####################################
     help_instr = ("Please check out the installation guide of the LIBTwinSVM:\n"
                   "https://libtwinsvm.readthedocs.io/en/latest/")

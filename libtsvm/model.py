@@ -366,5 +366,24 @@ class UserInput:
                                         self.data_filename,
                                         datetime.now().strftime('%Y-%m-%d %H-%M'))
         
+    def validate_step_size(self):
+        """
+        Checks whether step size for generating search elements are valid or 
+        not.
+        
+        Returns
+        -------
+        boolean
+            Whether step size is valid or not.
+        """
+        
+        return (self.step_size < abs(self.C1_range[1] - self.C1_range[0]) \
+                and self.step_size < abs(self.C2_range[1] - self.C2_range[0]))\
+                and (self.step_size < abs(self.u_range[1] - self.u_range[0])\
+                if self.kernel_type == 'RBF' else True)
+        
+        
+        
+        
         
         

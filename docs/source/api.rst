@@ -11,3 +11,4 @@ This page contains the list of the project's modules
 	model
 	model_selection
 	preprocess
+	model_eval
