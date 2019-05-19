@@ -33,5 +33,6 @@ addons:
   
 install:
 - python --version && pip --version
+- pip install numpy cython
 - git clone --recursive https://github.com/mir-am/LIBTwinSVM
 - pip install .
