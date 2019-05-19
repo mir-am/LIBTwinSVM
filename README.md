@@ -7,7 +7,8 @@
 1. [Core Features](#core-features)
 2. [Installation Guide](#installation-guide)
 3. [Quick Start](#quick-start)
-4. [License](#license)
+4. [Documentation](#documentation) 
+5. [License](#license)
 
 ## Core Features
 LIBTwinSVM is an easy-to-use implementation of Twin Support Vector Machine.  It is licensed under the terms of GNU GPL v3. This application comes with a user interface which makes using the algorithm so handy for Data Scientists, Machine Learning Researchers and whoever else that is interested in Machine Learning.
@@ -106,6 +107,10 @@ python3 -m libtsvm
 ```python
 python -m libtsvm
 ```
+
+## Documentation
+Usage examples and API reference can be found on the project's [Read the Docs page](https://libtwinsvm.readthedocs.io/en/latest/). 
+
 
 ## License
 LIBTwinSVM library is licensed under the terms of GNU General Public License v3. This library can be used for both academic and commercial purposes. For more information, check out the [LICENSE](https://github.com/mir-am/LIBTwinSVM/blob/master/LICENSE.txt) file.
