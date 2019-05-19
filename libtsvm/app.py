@@ -190,7 +190,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.ova_rbtn.setEnabled(enable_mc)
         self.ovo_rbtn.setEnabled(enable_mc)
         
-        # Enable gird search buttonsl
+        # Enable gird search buttons
         self.run_btn.setEnabled(True)
         
     def enable_visualize(self):
@@ -383,6 +383,10 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         """
         Runs grid search based on user choices.
         """
+        
+        # TODO: stop button
+        self.run_btn.setEnabled(False)
+        self.stop_btn.setEnabled(True)
         
         t = QThread()
         gs_t = ThreadGS(self.user_in)
