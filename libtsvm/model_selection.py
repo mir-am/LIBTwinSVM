@@ -743,12 +743,14 @@ class ThreadGS(QObject):
     # Signals
     sig_pbar_set = pyqtSignal(int)
     sig_gs_info_set = pyqtSignal(int, str, str, str)
+    sig_finished = pyqtSignal(bool)
     
     def __init__(self, usr_input):
         
         super(ThreadGS, self).__init__()
         
         self.usr_input = usr_input
+        self._isRunning = True
         # Logging
         self.log_file = None
         ######################################################################
@@ -820,6 +822,10 @@ class ThreadGS(QObject):
                                           time_fmt(elapsed_time.seconds))
                 
                 run = run + 1
+                
+                if not self._isRunning:
+                    
+                    break
     
             # Some parameters cause errors such as Singular matrix        
             except np.linalg.LinAlgError:
@@ -908,4 +914,16 @@ class ThreadGS(QObject):
         if self.usr_input.log_file:
             self.log_file.close()
         ######################################################################
+        
+        if self._isRunning:
+            
+            # Enables Start button
+            self.sig_finished.emit(True)
+    
+    def stop(self):
+        """
+        Stops the thread of the grid search.
+        """
+        
+        self._isRunning = False
     

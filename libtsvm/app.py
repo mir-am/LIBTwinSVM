@@ -52,6 +52,7 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.model_path_btn.clicked.connect(self.get_model_path)
         self.model_load_btn.clicked.connect(self.load_model_info)
         self.model_eval_btn.clicked.connect(self.eval_model_test)
+        self.stop_btn.clicked.connect(self.stop_gs_thread)
         
         # Checkbox
         self.log_file_chk.clicked.connect(self.log_file_info)
@@ -346,16 +347,9 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         """
         Shows a message box to confirm exiting the program.
         """
-        
-        close_win = QMessageBox()
-        close_win.setIcon(QMessageBox.Warning)
-        
-        close_win.setWindowTitle("Exit")
-        close_win.setText("Are you sure you want to quit the program?")
-        close_win.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        quit_state = close_win.exec_()
-        
-        if quit_state == QMessageBox.Yes:
+                
+        if yes_no_dialog("Exit", "Are you sure you want"
+                         "to quit the program?") == QMessageBox.Yes:
             
             event.accept()
             
@@ -386,18 +380,19 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.run_btn.setEnabled(False)
         self.stop_btn.setEnabled(True)
         
-        t = QThread()
-        gs_t = ThreadGS(self.user_in)
-        self.__threads.append((t, gs_t))
+        self.t = QThread()
+        self.gs_t = ThreadGS(self.user_in)
+        self.__threads.append((self.t, self.gs_t))
         
-        gs_t.moveToThread(t)
-        t.started.connect(gs_t.initialize)
+        self.gs_t.moveToThread(self.t)
+        self.t.started.connect(self.gs_t.initialize)
         
         # Connect signals
-        gs_t.sig_pbar_set.connect(self.set_pbar_range)
-        gs_t.sig_gs_info_set.connect(self.update_gs_info)
+        self.gs_t.sig_pbar_set.connect(self.set_pbar_range)
+        self.gs_t.sig_gs_info_set.connect(self.update_gs_info)
+        self.gs_t.sig_finished.connect(self.stop_gs_thread)
         
-        t.start()
+        self.t.start()
      
     @pyqtSlot(int)
     def set_pbar_range(self, pbar_rng):
@@ -430,6 +425,23 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
         self.acc.setText(curr_acc)
         self.best_acc.setText(best_acc)
         self.elapsed_time.setText(elapsed_t)
+    
+    @pyqtSlot(bool)
+    def stop_gs_thread(self, finished=False):
+        """
+        It stops the grid search's thread.
+        """
+        
+        if not finished:
+        
+            if yes_no_dialog("Stop grid search", "Are you sure you want "
+                             "to stop the grid search?") == QMessageBox.Yes:
+            
+                self.gs_t.stop()
+                
+        self.stop_btn.setEnabled(False)
+        self.run_btn.setEnabled(True)
+        
         
     def plot_figure(self):
         """
@@ -644,6 +656,34 @@ def show_dialog(title, msg_txt, diag_type):
     msg.setStandardButtons(QMessageBox.Ok)
     msg.exec_()
     
+    
+def yes_no_dialog(title, msg_txt):
+    """
+    Asks users for confirmation of an event.
+    
+    Parameters
+    ----------
+    title : str
+        Title of the message box.
+        
+    msg_txt : str
+        Message that shows information to users.
+        
+    Returns
+    -------
+        object
+           The yes or no answer. 
+    """    
+    
+    close_win = QMessageBox()
+    close_win.setIcon(QMessageBox.Warning)
+    
+    close_win.setWindowTitle(title)
+    close_win.setText(msg_txt)
+    close_win.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+
+    return close_win.exec_()
+
       
 class ConfrimDialog(confirm_diag.Ui_confirm_diag, QDialog):
     """
