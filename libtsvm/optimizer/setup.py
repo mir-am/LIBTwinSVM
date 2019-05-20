@@ -84,7 +84,7 @@ def configuration(parent_package='', top_path=None):
                                 join("src", "clippdcd_opt.h")],
                         include_dirs=[np.get_include(), join('armadillo-code',
                                        'include')],
-                        extra_compile_args=compile_args,
+                        extra_compiler_args=compile_args,
                      )
             
     
