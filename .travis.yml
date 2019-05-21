@@ -32,9 +32,9 @@ addons:
   
 install:
 - python --version && pip --version
-- pip install numpy cython
+- pip install numpy cython pytest
 - git clone --recursive https://github.com/mir-am/LIBTwinSVM
-- pip install . -vv
+- pip install . -v
 
 script:
-- python -m unittest discover -s tests
+- pytest tests
