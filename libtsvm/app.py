@@ -439,9 +439,19 @@ class LIBTwinSVMApp(view.Ui_MainWindow, QMainWindow):
             
                 self.gs_t.stop()
                 
+        else:
+            
+            show_path = ''
+            if any([self.user_in.save_clf_results, self.user_in.save_best_model,
+                    self.user_in.log_file]):
+                    show_path = ("If selected, the results, model, and log file"
+                                " are saved at:\n%s\n" % self.user_in.result_path)
+            
+            show_dialog("Done!", "The grid search is finished!\n%s" % (show_path),
+                        QMessageBox.Information)
+                
         self.stop_btn.setEnabled(False)
         self.run_btn.setEnabled(True)
-        
         
     def plot_figure(self):
         """
