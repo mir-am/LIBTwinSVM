@@ -150,7 +150,6 @@ else:
 
     
 ### Utility functinos for installation #######################################    
-    
 def cp_libs_win():
     """
     Copies external libraries for installing package on Windows.
@@ -273,6 +272,14 @@ def check_arma_submodule():
     
     print("Found Armadillo submodule.")
     
+    
+def detect_anaconda_dist():
+    """
+    It detects Anaconda distribution.
+    """
+    
+    return True if 'anaconda' in sys.version.lower() else False
+        
 # This code is borrowed from Matthew Brett's windows-wheel-builder
 #def add_dll_wheel(dist_path='dist'):
 #    """
@@ -356,6 +363,12 @@ def setup_package():
         cp_libs_win()
         
         PKG_DATA = {'libtsvm': [os.path.join('libtsvm', 'optimizer', '*.dll')]}
+        
+    # Remove PyQT5 from dependencies for Anaconda distribution
+    if detect_anaconda_dist():
+        # TODO: Check whether PyQT is installed.
+        print("Detected Anaconda distribution...")
+        REQ_PACKAGES.remove("pyQt5")
 
     metadata = dict(
         name=NAME,
@@ -376,7 +389,6 @@ def setup_package():
         #     'console_scripts': ['mycli=mymodule:cli'],
         # },
         install_requires=REQ_PACKAGES,
-        test_suite='tests',
         license='GNU General Public License v3.0',
         classifiers=[
             # Trove classifiers
