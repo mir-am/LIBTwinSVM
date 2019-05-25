@@ -106,6 +106,19 @@ python3 -m libtsvm
 * Windows:
 ```python
 python -m libtsvm
+
+
+## Uninstall LIBTwinSVM
+
+For uninstalling LIBTwinSVM enter the following command in the terminal:
+
+* Linux & Mac OS:
+```python
+pip3 uninstall libtsvm
+```
+* Windows:
+```python
+pip uninstall libtsvm
 ```
 
 ## Documentation
