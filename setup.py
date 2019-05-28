@@ -382,7 +382,7 @@ def setup_package():
         classifiers=[
             # Trove classifiers
             # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
-            'License :: OSI Approved :: GNU General Public License v3.0',
+            'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
             'Programming Language :: C++',
             'Programming Language :: Python',
             'Programming Language :: Python :: 3.5',
