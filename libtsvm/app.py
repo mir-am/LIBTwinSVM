@@ -2,7 +2,6 @@
 
 # LIBTwinSVM: A Library for Twin Support Vector Machines
 # Developers: Mir, A. and Mahdi Rahbar
-# Version: 0.1.0 - 2019-03-20
 # License: GNU General Public License v3.0
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, QGridLayout, QTableWidgetItem, QDialog, QWidget, QActionGroup

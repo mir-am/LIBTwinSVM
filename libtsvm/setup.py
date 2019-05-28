@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 # LIBTwinSVM: A Library for Twin Support Vector Machines
-# Developers: Mir, A
-# Version: 0.1 - 2019-03-20
+# Developers: Mir, A. and Mahdi Rahbar
 # License: GNU General Public License v3.0
 
 """
-This module is a setup file for libtsvm subpackage.
+This module is a setup file for the libtsvm subpackage.
 """
 
 def configuration(parent_package='', top_path=None):
