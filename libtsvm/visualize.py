@@ -156,7 +156,7 @@ class VisualThread(QObject):
         It plots the figure based on the user's input.
         """
         
-        print("Plotting....")
+        #print("Plotting....")
         
         self.clf_obj = self.usr_input.get_selected_clf()
         
@@ -265,7 +265,7 @@ class VisualThread(QObject):
                        ax.plot(xx, yy_2, 'k-')
         else:
 
-            print("Linear decision boundary...")
+            #print("Linear decision boundary...")
             
             xx, yy = make_mesh(self.usr_input.X_train[:, 0],
                                self.usr_input.X_train[:, 1])

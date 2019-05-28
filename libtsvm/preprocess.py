@@ -101,7 +101,7 @@ class DataReader():
         
         self.X_train = df.values # Feature values
         self.filename = splitext(split(f_name)[-1])[0]
-        print(self.filename)
+        #print(self.filename)
         
     def get_data(self):
         """
