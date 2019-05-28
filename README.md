@@ -49,6 +49,20 @@ LIBTwinSVM depends on the following packages.
 | [Joblib](https://joblib.readthedocs.io)   | For saving and loading TwinSVM-based models.                   | BSD 3-Clause |
 | [numpydoc](https://numpydoc.readthedocs.io/en/latest/) | API code documentation.                                | BSD License  |
 
+
+### Quick Installation
+
+For Installing LIBTwinSVM you can choose one of the following commands based on your Operating System and your Python version. Please note that for installing the latest bugfixes and features, we recommend you to install the library from the source. 
+
+* Linux & Mac OS:
+```python
+pip3 install libtwinsvm
+```
+* Windows:
+```python
+pip install libtwinsvm
+```
+
 ### Installation from the source
 
 **1.  Downloading LIBTWinSVM**
@@ -97,19 +111,6 @@ pip3 install .
 pip install .
 ```
 
-### Uninstall LIBTwinSVM
-
-For uninstalling LIBTwinSVM enter the following command in the terminal:
-
-* Linux & Mac OS:
-```
-pip3 uninstall libtsvm
-```
-* Windows:
-```
-pip uninstall libtsvm
-```
-
 ## Quick start
 
 After LIBTwinSVM was installed, for running the GUI application, open the terminal and enter the following code:
@@ -120,6 +121,19 @@ python3 -m libtsvm
 * Windows:
 ```python
 python -m libtsvm
+
+
+## Uninstall LIBTwinSVM
+
+For uninstalling LIBTwinSVM enter the following command in the terminal:
+
+* Linux & Mac OS:
+```python
+pip3 uninstall libtsvm
+```
+* Windows:
+```python
+pip uninstall libtsvm
 ```
 
 ## Documentation
