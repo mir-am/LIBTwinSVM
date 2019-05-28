@@ -803,7 +803,7 @@ class ThreadGS(QObject):
                     max_acc = acc
                     max_acc_std = acc_std  
                     optimal_params = element
-                    print(optimal_params)
+                    # print(optimal_params)
                     
                     #########################################################
                     # To minmize I/O operations, only best accuray will be
@@ -905,7 +905,7 @@ class ThreadGS(QObject):
             
         if self.usr_input.save_best_model:
             
-            print("Saving best model on disk.")
+            # print("Saving best model on disk.")
             save_model(eval_method, opt_params,
                        os.path.join(self.usr_input.result_path,
                                     'model_'+results_fn+'.joblib'))
