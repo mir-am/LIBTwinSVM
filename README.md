@@ -1,5 +1,6 @@
 # LIBTwinSVM
 <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License"></a>
+<a href="https://travis-ci.org/mir-am/LIBTwinSVM"><img src="https://api.travis-ci.org/mir-am/LIBTwinSVM.svg?branch=master" alt="Travis-CI"></a>
 [![Documentation Status](https://readthedocs.org/projects/libtwinsvm/badge/?version=latest)](https://libtwinsvm.readthedocs.io/en/latest/?badge=latest)
 
 
@@ -96,6 +97,19 @@ pip3 install .
 pip install .
 ```
 
+### Uninstall LIBTwinSVM
+
+For uninstalling LIBTwinSVM enter the following command in the terminal:
+
+* Linux & Mac OS:
+```
+pip3 uninstall libtsvm
+```
+* Windows:
+```
+pip uninstall libtsvm
+```
+
 ## Quick start
 
 After LIBTwinSVM was installed, for running the GUI application, open the terminal and enter the following code:
@@ -106,19 +120,6 @@ python3 -m libtsvm
 * Windows:
 ```python
 python -m libtsvm
-
-
-## Uninstall LIBTwinSVM
-
-For uninstalling LIBTwinSVM enter the following command in the terminal:
-
-* Linux & Mac OS:
-```python
-pip3 uninstall libtsvm
-```
-* Windows:
-```python
-pip uninstall libtsvm
 ```
 
 ## Documentation
