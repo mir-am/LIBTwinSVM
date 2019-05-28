@@ -23,7 +23,7 @@ import traceback
 NAME = "LIBTwinSVM"
 DESCRIPTION = "LIBTwinSVM: A Library for Twin Support Vector Machines."
 URL = 'https://github.com/mir-am/LIBTwinSVM'
-EMAIL = "mir-am@hotmail.com | MahdiRahbar@Gmail.com"
+EMAIL = "mir-am@hotmail.com, mahdirahbar@gmail.com"
 AUTHOR = "Mir, A. and Mahdi Rahbar"
 REQUIRES_PYTHON = '>=3.5'
 VERSION = '%s' % __version__
