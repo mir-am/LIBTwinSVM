@@ -55,9 +55,10 @@ LIBTwinSVM depends on the following packages.
 For Installing LIBTwinSVM you can choose one of the following commands based on your Operating System and your Python version. Please note that for installing the latest bugfixes and features, we recommend you to install the library from the source. 
 
 * Linux & Mac OS:
-```python
+```
 pip3 install libtwinsvm
 ```
+
 * Windows:
 ```python
 pip install libtwinsvm
@@ -78,11 +79,12 @@ git clone --recursive https://github.com/mir-am/LIBTwinSVM
 Before installing any packages, we recommend you to upgrade pip:
 
 * Linux & Mac OS:
-```python
+```
 pip3 install -U pip
 ```
+
 * Windows:
-```python
+```
 pip install -U pip
 ```
 
@@ -111,6 +113,19 @@ pip3 install .
 pip install .
 ```
 
+### Uninstall LIBTwinSVM
+
+For uninstalling LIBTwinSVM, enter the following command in the terminal:
+
+* Linux & Mac OS:
+```python
+pip3 uninstall libtsvm
+```
+* Windows:
+```python
+pip uninstall libtsvm
+```
+
 ## Quick start
 
 After LIBTwinSVM was installed, for running the GUI application, open the terminal and enter the following code:
@@ -121,19 +136,6 @@ python3 -m libtsvm
 * Windows:
 ```python
 python -m libtsvm
-
-
-## Uninstall LIBTwinSVM
-
-For uninstalling LIBTwinSVM enter the following command in the terminal:
-
-* Linux & Mac OS:
-```python
-pip3 uninstall libtsvm
-```
-* Windows:
-```python
-pip uninstall libtsvm
 ```
 
 ## Documentation
