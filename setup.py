@@ -36,8 +36,9 @@ CYTHON_MIN_VERSION = '0.28'
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'README.md')) as f:
-    LONG_DESCRIPTION = '\n' + f.read()
+LONG_DESCRIPTION = ("Please check out the project's `GitHub page "
+                    "<https://github.com/mir-am/LIBTwinSVM>`_ for installation"
+                    " guide and documentation.")
 
 # Load the package's __version__.py module as a dictionary.
 #about = {}
