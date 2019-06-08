@@ -30,6 +30,7 @@ VERSION = '%s' % __version__
 REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "sklearn","pandas",
             "xlsxwriter", "joblib","numpydoc==0.7.0"]
 PKG_DATA = {}
+DATA_FILES = []
 
 NUMPY_MIN_VERSION = '1.14.0'
 CYTHON_MIN_VERSION = '0.28'
@@ -112,21 +113,17 @@ if SETUPTOOLS_COMMANDS.intersection(sys.argv):
         
         if sys.platform == 'win32':
         
-            data_files = [(os.path.join('libtsvm', 'optimizer'),
+            DATA_FILES = [(os.path.join('libtsvm', 'optimizer'),
             [os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll'),
              os.path.join('libtsvm', 'optimizer', 'blas_win64_MT.dll')])]
         
-            print("Added LAPACK and BLAS DLLs to the wheel.")
-
-    else:
-        
-        data_files = []
+            print("Added LAPACK and BLAS DLLs to the wheel for Windows platform.")
 
     extra_setuptools_args = dict(
         zip_safe=False,  # the package can run out of an .egg file
         include_package_data=True,
         distclass=BinaryDistribution,
-        data_files=data_files,
+        data_files=DATA_FILES,
         extras_require={
             'alldeps': (
                 'numpy >= {0}'.format(NUMPY_MIN_VERSION),
