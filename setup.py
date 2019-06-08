@@ -96,7 +96,7 @@ LONG_DESCRIPTION = ("Please check out the project's `GitHub page "
     
 # using setuptool features
 SETUPTOOLS_COMMANDS = set([
-    'develop', 'release', 'bdist_egg', 'bdist_rpm',
+    'develop', 'release', 'install', 'bdist_egg', 'bdist_rpm',
     'bdist_wininst', 'install_egg_info', 'build_sphinx',
     'egg_info', 'easy_install', 'upload', 'bdist_wheel',
     '--single-version-externally-managed',
@@ -108,13 +108,15 @@ if SETUPTOOLS_COMMANDS.intersection(sys.argv):
         def has_ext_modules(foo):
             return True
         
-    if 'bdist_wheel' in sys.argv:
+    if 'bdist_wheel' in sys.argv or 'install' in sys.argv:
         
-        data_files = [(os.path.join('libtsvm', 'optimizer'),
-        [os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll'),
-         os.path.join('libtsvm', 'optimizer', 'blas_win64_MT.dll')])]
-    
-        print("Added LAPACK and BLAS DLLs to the wheel.")
+        if sys.platform == 'win32':
+        
+            data_files = [(os.path.join('libtsvm', 'optimizer'),
+            [os.path.join('libtsvm', 'optimizer', 'lapack_win64_MT.dll'),
+             os.path.join('libtsvm', 'optimizer', 'blas_win64_MT.dll')])]
+        
+            print("Added LAPACK and BLAS DLLs to the wheel.")
 
     else:
         
