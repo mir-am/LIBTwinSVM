@@ -6,6 +6,7 @@ User Interface
 
    classify
    visual
+   model
 
 --------------------------------------
  A one-minute example of the GUI usage
