@@ -13,8 +13,8 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from libtsvm.estimators import BaseTSVM, TSVM, LSTSVM
-from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier, mc_clf_no_params
-from libtsvm.misc import time_fmt
+from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
+from libtsvm.misc import time_fmt, progress_bar_gs
 from libtsvm.model_eval import save_model
 from datetime import datetime
 import os
@@ -727,6 +727,94 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     excel_file.save()
 
     return os.path.abspath(output_file)  
+
+
+def grid_search(func_eval, params_range, log_file=None):
+    """
+    It does grid search for a TSVM-based estimator. Note that this function is
+    defined for API usage.
+    
+    Parameters
+    ----------
+    func_eval : object
+        An evaluation method for assesing a TSVM-based estimator's performance.
+        
+    params_range : dict
+        Range of each hyper-parameter.
+        
+    log_file : object (default=None)
+        An opened file for logging best classification accuracy.
+            
+    Returns
+    -------
+    max_acc
+        Best accuracy obtained after the grid search.
+        
+    max_acc_std
+        Standard deviation of the best accuracy.
+        
+    dict
+        Optimal hyper-parameters.
+        
+    list
+        Classification results for every hyper-parameters.
+    """
+    
+    result_list = []
+    # Max accuracy
+    max_acc, max_acc_std = 0, 0
+    optimal_params = None
+    
+    search_elem = search_space('RBF' if params_range['gamma'] is not None else 'linear',
+                 'full', params_range['C1'], params_range['C2'],
+                 params_range['gamma'])
+    search_total = len(search_elem)
+
+    progress_bar_gs(0, search_total, '0:00:00', (0.0, 0.0), (0.0, 0.0),
+                    prefix='', suffix='')
+
+    start_time = datetime.now()
+
+    run = 1   
+
+    # Exhaustive Grid search for finding optimal parameters
+    for element in search_elem:
+
+        try:
+            
+            acc, acc_std, result = func_eval(element)
+            
+            # For debugging purpose
+            #print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
+
+            result_list.append(result)
+
+            # Save best accuracy
+            if acc > max_acc:
+                
+                max_acc = acc
+                max_acc_std = acc_std
+                optimal_params = element
+                
+                if log_file is not None:
+                    log_file.write("%s | Best Acc: %.2f+-%.2f | params: %s\n" % \
+                                  (datetime.now().strftime('%Y/%m/%d %I:%M:%S %p'), \
+                                  max_acc, max_acc_std, str(element)))
+            
+            elapsed_time = datetime.now() - start_time
+            progress_bar_gs(run, search_total, time_fmt(elapsed_time.seconds), \
+                           (acc, acc_std), (max_acc, max_acc_std), prefix='',
+                            suffix='') 
+
+            run = run + 1
+
+        # Some parameters cause errors such as Singular matrix        
+        except np.linalg.LinAlgError:
+        
+            run = run + 1
+
+
+    return max_acc, max_acc_std, optimal_params, result_list
 
 
 class ThreadGS(QObject):
