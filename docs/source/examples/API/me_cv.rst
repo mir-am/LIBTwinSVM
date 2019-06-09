@@ -1,4 +1,4 @@
-An example of model evaluation with cross validation
+An example of model evaluation with cross-validation
 =====================================================
 
 This user guide is provided to help you evaluate the model with cross validation.
