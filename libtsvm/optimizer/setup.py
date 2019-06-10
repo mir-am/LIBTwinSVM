@@ -55,7 +55,7 @@ elif platform == 'linux':
 elif platform == 'darwin':
     # TODO: Add libs for OSX.
     
-    link_args = ['-framework Accelerate']
+    #link_args = ['-framework Accelerate']
     compile_args = compile_args + ['-stdlib=libc++', '-mmacosx-version-min=10.9']
 
 
