@@ -137,6 +137,18 @@ python3 -m libtsvm
 ```python
 python -m libtsvm
 ```
+## Dataset Format 
+
+LIBTwinSVM supports data files with the following formats:
+- **CSV** files with '*.csv*' extention.
+- **LIBSVM** files with '*.libsvm*' extention.
+
+Note that for importing data as a CSV file, the dataset has to comply the following terms: 
+1. The first column has to be the dataset labels. Moreover, labels of positive and negative samples should be 1 and -1, respectively.
+2. The first row can be dataset's headernames. (Optional)
+3. All the values in dataset except headernames should be numerical. Nominal values are not allowed. <br/>
+
+To help you prepare your dataset and test the program, three datasets are included [here](https://github.com/mir-am/LIBTwinSVM/tree/master/dataset).
 
 ## Documentation
 Usage examples and API reference can be found on the project's [Read the Docs page](https://libtwinsvm.readthedocs.io/en/latest/). 
