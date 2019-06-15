@@ -120,6 +120,8 @@ To analyze the computational efficieny of the LIBTwinSVM library, we conducted e
 	|          |                |            |           |
 	+----------+----------------+------------+-----------+
 
+For the experiment with NDC datasets, we set the hyper-parameters of the estimator to default values (i.e. :raw-latex:`\(C=1\)`). Moreover, we used linear kernel. Table below shows the comparison of LIBTwinSVM with other implementations in terms learning and prediction speed. 
+	
 
 .. table :: The comparison of LIBTwinSVM with other implementations in terms learning and prediction speed.
 
@@ -136,15 +138,24 @@ To analyze the computational efficieny of the LIBTwinSVM library, we conducted e
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+
 	| NDC-50K  | 7.87       | 0.0025    | 56.39      | 0.087     | 63.85      | 0.062     | 0.021      | 0.0022    |
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+
-	| NDC-1l   | 19.01      | 0.0059    |            |           |            |           | 0.038      | 0.0047    |
+	| NDC-1l   | 19.01      | 0.0059    |   [a]_     |    [a]_   |    [a]_    |    [a]_   | 0.038      | 0.0047    |
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+
-	| NDC-5l   | 132.93     |  0.013    |            |           |            |           | 0.20       | 0.041     |
+	| NDC-5l   | 132.93     |  0.013    |   [a]_     |    [a]_   |    [a]_    |    [a]_   | 0.20       | 0.041     |
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+
-	| NDC-1m   | 289.36     |  0.018    |            |           |            |           | 0.38       | 0.074     |
+	| NDC-1m   | 289.36     |  0.018    |   [a]_     |    [a]_   |    [a]_    |    [a]_   | 0.38       | 0.074     |
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+
 	|          |            |           |            |           |            |           |            |           |
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+
 	|          |            |           |            |           |            |           |            |           |
 	+----------+------------+-----------+------------+-----------+------------+-----------+------------+-----------+	
 	
+From the above table, we draw the following conclusions:
+
+* The prediction speed of the LIBTwinSVM is significantly faster than that of LightTwinSVM. Because we improved the prediction procedure of the LIBTwinSVM by evaluating the decision function in parallel.
+* Thanks to the Least Sqaures extension of TSVM classifier, the LIBTwinSVM library can handle large-scale datasets with 1 million samples.
+* The LIBTwinSVM library with LSTSVM classifier is much faster than LIBLINEAR, which is a state-of-the-art implementation of linear SVM.
+	
+.. rubric:: Notes
+	
+.. [a] The experiments ran out of memory.
 	
