@@ -314,6 +314,9 @@ class LSTSVM(BaseTSVM):
         # Vectors of ones
         mat_e1 = np.ones((mat_A.shape[0], 1))
         mat_e2 = np.ones((mat_B.shape[0], 1))
+        
+        # Regularization term used for ill-possible condition
+        reg_term = 2 ** float(-7)
 
         if self.kernel == 'linear':
 
@@ -322,17 +325,19 @@ class LSTSVM(BaseTSVM):
 
             mat_H_t = np.transpose(mat_H)
             mat_G_t = np.transpose(mat_G)
+            
+            stabilizer = reg_term * np.identity(mat_H.shape[1])
 
             # Determine parameters of two non-parallel hyperplanes
-            hyper_p_1 = -1 * np.dot(np.linalg.inv(np.dot(mat_G_t, mat_G) +
-                                                  (1 / self.C1) * np.dot(mat_H_t, mat_H)), np.dot(mat_G_t,
-                                                                                                  mat_e2))
+            hyper_p_1 = -1 * np.dot(np.linalg.inv((np.dot(mat_G_t, mat_G) +
+                        (1 / self.C1) * np.dot(mat_H_t,mat_H)) + stabilizer),
+                        np.dot(mat_G_t, mat_e2))
 
             self.w1 = hyper_p_1[:hyper_p_1.shape[0] - 1, :]
             self.b1 = hyper_p_1[-1, :]
 
-            hyper_p_2 = np.dot(np.linalg.inv(np.dot(mat_H_t, mat_H) + (1 / self.C2)
-                                             * np.dot(mat_G_t, mat_G)), np.dot(mat_H_t, mat_e1))
+            hyper_p_2 = np.dot(np.linalg.inv((np.dot(mat_H_t, mat_H) + (1 / self.C2)
+                        * np.dot(mat_G_t, mat_G)) + stabilizer), np.dot(mat_H_t, mat_e1))
 
             self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
             self.b2 = hyper_p_2[-1, :]
@@ -358,10 +363,6 @@ class LSTSVM(BaseTSVM):
             
             mat_I = np.identity(mat_G.shape[1]) # (n x n)
 
-            # Regulariztion term used for ill-possible condition
-            reg_term = 2 ** float(-7)
-
-            # TODO: There are redundant computation below, which needs to be fixed
             # Determine parameters of hypersurfaces # Using SMW formula
             if mat_A.shape[0] < mat_B.shape[0]:
                 
