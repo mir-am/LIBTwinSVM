@@ -15,6 +15,7 @@ from libtsvm.model_selection import ThreadGS
 from libtsvm.model_eval import load_model, ModelThread
 from libtsvm.visualize import VisualThread
 from libtsvm.misc import validate_path
+from libtsvm import __version__
 from datetime import datetime
 import numpy as np
 import sys
@@ -727,6 +728,7 @@ class AboutDialog(about_diag.Ui_license_diag, QDialog):
         super(AboutDialog, self).__init__()
 
         self.setupUi(self)
+        self.ld_libtsvm_ver.setText("(v%s)" % __version__)
         self.show()
         self.exec_()        
 
