@@ -8,6 +8,4 @@ This is the `LIBTwinSVM <https://github.com/mir-am/LIBTwinSVM>`_ 's documentatio
 
    examples/index
    api
-   bench
-
 
