@@ -10,7 +10,7 @@
 2. [Installation Guide](#installation-guide)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
-5. [Development]() 
+5. [Development](#development) 
 6. [License](#license)
 
 ## Core Features
