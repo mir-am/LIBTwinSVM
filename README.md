@@ -2,14 +2,16 @@
 <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License"></a>
 <a href="https://travis-ci.org/mir-am/LIBTwinSVM"><img src="https://api.travis-ci.org/mir-am/LIBTwinSVM.svg?branch=master" alt="Travis-CI"></a>
 [![Documentation Status](https://readthedocs.org/projects/libtwinsvm/badge/?version=latest)](https://libtwinsvm.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/LIBTwinSVM.svg)](https://badge.fury.io/py/LIBTwinSVM)
 
 
 # Contents
 1. [Core Features](#core-features)
 2. [Installation Guide](#installation-guide)
 3. [Quick Start](#quick-start)
-4. [Documentation](#documentation) 
-5. [License](#license)
+4. [Documentation](#documentation)
+5. [Development]() 
+6. [License](#license)
 
 ## Core Features
 LIBTwinSVM is an easy-to-use implementation of Twin Support Vector Machine.  It is licensed under the terms of GNU GPL v3. This application comes with a user interface which makes using the algorithm so handy for Data Scientists, Machine Learning Researchers and whoever else that is interested in Machine Learning.
@@ -153,6 +155,19 @@ To help you prepare your dataset and test the program, three datasets are includ
 ## Documentation
 Usage examples and API reference can be found on the project's [Read the Docs page](https://libtwinsvm.readthedocs.io/en/latest/). 
 
+## Development
+### Tests
+After installing the library, you can run unit tests to ensure that your installation is valid. To do so, you need to install pytest package with the following command:
+
+```
+pip install pytest
+```
+
+Next, execute the following command in the root of the project directory:
+
+```
+pytest tests
+```
 
 ## License
 LIBTwinSVM library is licensed under the terms of GNU General Public License v3. This library can be used for both academic and commercial purposes. For more information, check out the [LICENSE](https://github.com/mir-am/LIBTwinSVM/blob/master/LICENSE.txt) file.
