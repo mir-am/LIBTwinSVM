@@ -68,6 +68,18 @@ class BaseTSVM(BaseEstimator):
         # Two hyperplanes attributes
         self.w1, self.b1, self.w2, self.b2 = None, None, None, None
         
+        self.check_clf_params()
+        
+    def check_clf_params(self):
+        """
+        Checks whether the estimator's input parameters are valid.
+        """
+        
+        if not(self.kernel in ['linear', 'RBF']):
+            
+            raise ValueError("\"%s\" is an invalid kernel. \"linear\" and \"RBF\""
+                             " values are valid." % self.kernel)
+        
     def get_params_names(self):
         """
         For retrieving the names of hyper-parameters of the TSVM-based estimator.
