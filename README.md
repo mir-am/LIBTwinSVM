@@ -68,7 +68,7 @@ pip install libtwinsvm
 
 ### Installation from the source
 
-**1.  Downloading LIBTWinSVM**
+**1.  Downloading LIBTwinSVM**
 
 First, make sure that [Git](https://git-scm.com/) is installed as it is required for getting the source code. Then open Git in any arbitrary path and enter the following command:
 
@@ -96,6 +96,19 @@ For LIBTwinSVM installation, *Numpy* and *Cython* must be installed. You can ins
 ```
 pip3 install numpy cython
 ```
+
+**Note for Linux users:** You should also install the following packages for your distribution:
+
+Debian-based Linux distro:
+```
+sudo apt-get install python3-tk liblapack-dev libblas-dev
+```
+
+RPM-based Linux distro:
+```
+sudo yum install python3-tkinter lapack-devel blas-devel
+```
+
 
 * Windows: for installing the requirements on windows, you should enter the following command in the command prompt. 
 ```
