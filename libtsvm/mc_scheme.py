@@ -53,9 +53,9 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
         y_ = column_or_1d(y, warn=True)
         check_classification_targets(y)
         self.classes_, y = np.unique(y_, return_inverse=True)
-        
+
         if len(self.classes_) < 2:
-            
+
             raise ValueError(
                 "The number of classes has to be greater than one; got %d"
                 " class" % len(self.classes_))
@@ -112,7 +112,7 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
             for j in range(i + 1, self.classes_.size):
 
-                #print("%d, %d" % (i, j))
+                # print("%d, %d" % (i, j))
 
                 # Break multi-class problem into a binary problem
                 sub_prob_X_i_j = X[(y == i) | (y == j)]
@@ -162,7 +162,8 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
                 for j in range(i + 1, self.classes_.size):
 
-                    y_pred = self.bin_clf_[p].predict(X[k, :].reshape(1, X.shape[1]))
+                    y_pred = self.bin_clf_[p].predict(X[k, :].reshape(1,
+                                                      X.shape[1]))
 
                     if y_pred == 1:
 
@@ -174,36 +175,35 @@ class OneVsOneClassifier(BaseEstimator, ClassifierMixin):
 
                     p = p + 1
 
-         # Labels of test samples based max-win strategy
+        # Labels of test samples based max-win strategy
         max_votes = np.argmax(votes, axis=1)
 
         return self.classes_.take(np.asarray(max_votes, dtype=np.int))
-    
+
 
 class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
-    
     """
     Multi-class classification using One-vs-One scheme
-    
+
     Parameters
     ----------
     estimator : estimator object
         An estimator object implementing `fit` and `predict`.
-        
+
     Attributes
     ----------
     clf_name : str
         Name of the classifier.
-        
+
     bin_clf_ : list
         Stores intances of each binary :class:`TSVM` classifier.
     """
-    
+
     def __init__(self, estimator):
-        
+
         self.estimator = estimator
         self.clf_name = 'OVA-' + estimator.clf_name
-        
+
     def _validate_targets(self, y):
         """
         Validates labels for training and testing classifier
@@ -211,15 +211,15 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         y_ = column_or_1d(y, warn=True)
         check_classification_targets(y)
         self.classes_, y = np.unique(y_, return_inverse=True)
-        
+
         if len(self.classes_) < 2:
-            
+
             raise ValueError(
                 "The number of classes has to be greater than one; got %d"
                 " class" % len(self.classes_))
 
         return np.asarray(y, dtype=np.int)
-    
+
     def _validate_for_predict(self, X):
         """
         Checks that the classifier is already trained and also test samples are
@@ -238,7 +238,7 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
                              (n_features, self.shape_fit_[1]))
 
         return X
-        
+
     def fit(self, X, y):
         """
         Parameters
@@ -254,29 +254,30 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         -------
         self : object
         """
-        
+
         X, y = check_X_y(X, y, dtype=np.float64)
         y = self._validate_targets(y)
-        
+
         # Allocate n binary classifiers
-        # Note that an estimator should be cloned for training a multi-class method
+        # Note that an estimator should be cloned for training a multi-class
+        # method
         self.bin_clf_ =  [clone(self.estimator) for i in range(self.classes_.size)]
-        
+
         for i in range(self.classes_.size):
-            
+
             # labels of samples of i-th class and other classes
             mat_y_i = y[(y == i) | (y != i)]
-                    
+
             # For binary classification, labels must be {-1, +1}
             # i-th class -> +1 and other class -> -1
             mat_y_i[y == i] = 1
             mat_y_i[y != i] = -1
-            
+
             self.bin_clf_[i].fit(X, mat_y_i)
-            
+
         self.shape_fit_ = X.shape
         return self
-    
+
     def predict(self, X):
         """
         Performs classification on samples in X using the OVO-classifier model.
@@ -291,36 +292,36 @@ class OneVsAllClassifier(BaseEstimator, ClassifierMixin):
         test_labels : array, shape (n_samples,)
             Predicted class lables of test data.
         """
-        
+
         X = self._validate_for_predict(X)
-        
+
         pred = np.zeros((X.shape[0], self.classes_.size), dtype=np.float64)
-        
+
         for i in range(X.shape[0]):
-            
+
             for j in range(self.classes_.size):
-                
+
                 pred[i, j] = self.bin_clf_[j].decision_function(X[i, :].reshape(1,
                     X.shape[1]))[0, 1]
-                #pred[i, j] = self.bin_clf_[j].predict(X[i, :].reshape(1, X.shape[1]))
-        
-        test_lables = np.argmin(pred, axis=1)  
+                # pred[i, j] = self.bin_clf_[j].predict(X[i, :].reshape(1, X.shape[1]))
+
+        test_lables = np.argmin(pred, axis=1)
         return self.classes_.take(np.asarray(test_lables, dtype=np.int))
 
 
 def mc_clf_no_params(bin_clfs):
     """
     It calculates number of parameters for a multi-class model.
-    
+
     Parameters
     ----------
     bin_clfs : list
         Instances of binary TSVM-based estimators.
-        
+
     Returns
     -------
     int
         Number of parameters of a multi-class model.
     """
-    
+
     return sum([clf.w1.shape[0] + clf.w2.shape[0] + 2 for clf in bin_clfs])
