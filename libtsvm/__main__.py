@@ -13,6 +13,5 @@ The execution of the GUI application starts from here.
 
 
 if __name__ == '__main__':
-    
+
     main()
-    
