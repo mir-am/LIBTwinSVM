@@ -11,8 +11,9 @@ This module contains functions and classes for model evaluation and selection.
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from sklearn.model_selection import train_test_split, KFold, ParameterGrid
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
-from libtsvm.estimators import BaseTSVM, TSVM, LSTSVM
+from sklearn.metrics import (accuracy_score, recall_score, precision_score,
+                             f1_score)
+from libtsvm.estimators import BaseTSVM
 from libtsvm.mc_scheme import OneVsAllClassifier, OneVsOneClassifier
 from libtsvm.misc import time_fmt, progress_bar_gs
 from libtsvm.model_eval import save_model
@@ -25,7 +26,7 @@ import pandas as pd
 def cm_element(y_true, y_pred):
     """
     It computes the elements of a confusion matrix.
-    
+
     Parameters
     ----------
     y_true : array-like
@@ -33,7 +34,7 @@ def cm_element(y_true, y_pred):
 
     y_pred : array-like
         Predicted class lables.
-        
+
     Returns
     -------
     tp : int
@@ -48,7 +49,7 @@ def cm_element(y_true, y_pred):
     fn : int
         False negative.
     """
-    
+
     # Elements of confusion matrix
     tp, tn, fp, fn = 0, 0, 0, 0
 
@@ -73,15 +74,15 @@ def cm_element(y_true, y_pred):
         elif y_true[i] == 1 and y_pred[i] == -1:
 
             fn = fn + 1
-            
+
     return tp, tn, fp, fn
-    
+
 
 def performance_eval(tp, tn, fp, fn):
     """
     It computes common evaluation metrics based on the elements of
     a confusion matrix.
-    
+
     Parameters
     ----------
     tp : int
@@ -95,7 +96,7 @@ def performance_eval(tp, tn, fp, fn):
 
     fn : int
         False negative.
-        
+
     Returns
     -------
     accuracy : float
@@ -119,24 +120,23 @@ def performance_eval(tp, tn, fp, fn):
     f1_n : float
         F1-measure of negative class.
     """
-    
+
     # TODO: This method should be reviewed!
     # Compute total positives and negatives
     positives = tp + fp
     negatives = tn + fn
-    
+
     # Metric functions
     rec_p = lambda tp, fn: 0.0 if tp + fn == 0 else tp / (tp + fn)
     prec_p = lambda tp, fp: 0.0 if tp + fp == 0 else tp / (tp + fp)
     f1_p = lambda r_p, p_p: 0.0 if r_p == 0.0 or p_p == 0.0 else (2 * r_p *
                                                                   p_p) / (p_p + r_p)
-    
+
     rec_n = lambda tn, fp: 0.0 if tn + fp == 0 else tn / (tn + fp)
     prec_n = lambda tn, fn: 0.0 if tn + fn == 0 else tn / (tn + fn)
     f1_n = lambda r_n, p_n: 0.0 if r_n == 0.0 or p_n == 0.0 else (2 * r_n *
                                                                   p_n) / (p_n + r_n)
-    
-    
+
     accuracy = (tp + tn) / (positives + negatives)
     # Positive class
     recall_p = rec_p(tp, fn)
@@ -147,8 +147,8 @@ def performance_eval(tp, tn, fp, fn):
     recall_n = rec_n(tn, fp)
     precision_n = prec_n(tp, fn)
     f1m_n = f1_n(recall_n, precision_n)
-    
-    
+
+
 #    # Initialize
 #    accuracy = 0
 #    # Positive class
@@ -159,7 +159,7 @@ def performance_eval(tp, tn, fp, fn):
 #    recall_n = 1.0
 #    precision_n = 1.0
 #    f1_n = 1.0
-#    
+#
 #    try:
 #
 #        accuracy = (tp + tn) / (positives + negatives)
@@ -177,10 +177,10 @@ def performance_eval(tp, tn, fp, fn):
 #    except ZeroDivisionError:
 #
 #        pass  # Continue if division by zero occured
-        
+
     return accuracy * 100, recall_p * 100, precision_p * 100, f1m_p * 100, \
            recall_n * 100, precision_n * 100, f1m_n * 100
-    
+
 
 def eval_metrics(y_true, y_pred):
     """
@@ -255,7 +255,7 @@ def eval_metrics(y_true, y_pred):
 #        elif y_true[i] == 1 and y_pred[i] == -1:
 #
 #            fn = fn + 1
-    
+
     tp, tn, fp, fn = cm_element(y_true, y_pred)
     accuracy, recall_p, precision_p, f1_p, recall_n, precision_n, \
     f1_n = performance_eval(tp, tn, fp, fn)
@@ -274,7 +274,7 @@ def eval_metrics(y_true, y_pred):
 #    recall_n = 0
 #    precision_n = 0
 #    f1_n = 0
-#    
+#
 #    print('P-N:', positives, negatives)
 #    try:
 #
@@ -293,31 +293,30 @@ def eval_metrics(y_true, y_pred):
 #    except ZeroDivisionError:
 #
 #        pass  # Continue if division by zero occured
-    
-    
-        
-    return tp, tn, fp, fn, accuracy, recall_p, precision_p, f1_p,recall_n, \
+
+    return tp, tn, fp, fn, accuracy, recall_p, precision_p, f1_p, recall_n, \
            precision_n, f1_n
-        
+
 
 class Validator:
     """
-    It evaluates a TSVM-based estimator based on the specified evaluation method.
-    
+    It evaluates a TSVM-based estimator based on the specified evaluation
+    method.
+
     Parameters
     ----------
     X_train : array-like, shape (n_samples, n_features)
         Training feature vectors, where n_samples is the number of samples
         and n_features is the number of features.
-        
+
     y_train : array-like, shape (n_samples,)
         Target values or class labels.
-                
+
     validator_type : tuple
         A two-element tuple which contains type of evaluation method and its
         parameter. Example: ('CV', 5) -> 5-fold cross-validation,
         ('t_t_split', 30) -> 30% of samples for test set.
-        
+
     estimator : estimator object
         A TSVM-based estimator which inherits from the :class:`BaseTSVM`.
     """
@@ -332,28 +331,28 @@ class Validator:
     def cv_validator(self, dict_param):
         """
         It evaluates a TSVM-based estimator using the cross-validation method.
-        
+
         Parameters
         ----------
-        dict_param : dict 
+        dict_param : dict
             Values of hyper-parameters for a TSVM-based estimator
-            
+
         Returns
         -------
         float
             Mean accuracy of the model.
-            
+
         float
             Standard deviation of accuracy.
-            
+
         dict
-            Evaluation metrics such as Recall, Percision and F1-measure for both
-            classes as well as elements of the confusion matrix.
+            Evaluation metrics such as Recall, Percision and F1-measure for
+            both classes as well as elements of the confusion matrix.
         """
-        
+
         self.estimator.set_params(**dict_param)
-        
-        k_fold = KFold(self.validator[1])    
+
+        k_fold = KFold(self.validator[1])
 
         # Store result after each run
         mean_accuracy = []
@@ -361,14 +360,14 @@ class Validator:
         mean_recall_p, mean_precision_p, mean_f1_p = [], [], []
         # Negative class
         mean_recall_n, mean_precision_n, mean_f1_n = [], [], []
-        
+
         # Count elements of confusion matrix
         tp, tn, fp, fn = 0, 0, 0, 0
-        
+
         for train_index, test_index in k_fold.split(self.train_data):
 
             # Extract data based on index created by k_fold
-            X_train = np.take(self.train_data, train_index, axis=0) 
+            X_train = np.take(self.train_data, train_index, axis=0)
             X_test = np.take(self.train_data, test_index, axis=0)
 
             y_train = np.take(self.labels_data, train_index, axis=0)
@@ -385,7 +384,7 @@ class Validator:
             mean_recall_p.append(accuracy_test[5])
             mean_precision_p.append(accuracy_test[6])
             mean_f1_p.append(accuracy_test[7])
-            # Negative class    
+            # Negative class
             mean_recall_n.append(accuracy_test[8])
             mean_precision_n.append(accuracy_test[9])
             mean_f1_n.append(accuracy_test[10])
@@ -395,7 +394,7 @@ class Validator:
             tn = tn + accuracy_test[1]
             fp = fp + accuracy_test[2]
             fn = fn + accuracy_test[3]
-        
+
         return np.mean(mean_accuracy), np.std(mean_accuracy), {**{'accuracy': np.mean(mean_accuracy),
                       'acc_std': np.std(mean_accuracy),'recall_p': np.mean(mean_recall_p),
                       'r_p_std': np.std(mean_recall_p), 'precision_p': np.mean(mean_precision_p),
@@ -407,26 +406,25 @@ class Validator:
                       'fn': fn}, **dict_param}
 
     def tt_validator(self, dict_param):
-        
         """
         It evaluates a TSVM-based estimator using the train/test split method.
-        
+
         Parameters
         ----------
         dict_param : dict
             Values of hyper-parameters for a TSVM-based estimator
-            
+
         Returns
         -------
         float
             Accuracy of the model.
-            
+
         float
             Zero standard deviation.
-            
+
         dict
-            Evaluation metrics such as Recall, Percision and F1-measure for both
-            classes as well as elements of the confusion matrix.
+            Evaluation metrics such as Recall, Percision and F1-measure for
+            both classes as well as elements of the confusion matrix.
         """
 
         self.estimator.set_params(**dict_param)
@@ -440,11 +438,11 @@ class Validator:
 
         output = self.estimator.predict(X_test)
 
-        tp, tn, fp, fn, accuracy, recall_p, precision_p, f1_p, recall_n, precision_n, \
-        f1_n = eval_metrics(y_test, output)
+        tp, tn, fp, fn, accuracy, recall_p, precision_p, f1_p, recall_n, \
+        precision_n, f1_n = eval_metrics(y_test, output)
 
-       # m_a=0, m_r_p=1, m_p_p=2, m_f1_p=3, k=4, c1=5, c2=6, gamma=7,
-       # m_r_n=8, m_p_n=9, m_f1_n=10, tp=11, tn=12, fp=13, fn=14,
+        # m_a=0, m_r_p=1, m_p_p=2, m_f1_p=3, k=4, c1=5, c2=6, gamma=7,
+        # m_r_n=8, m_p_n=9, m_f1_n=10, tp=11, tn=12, fp=13, fn=14,
         return accuracy, 0.0, {**{'accuracy': accuracy, 'recall_p': recall_p,
                'precision_p': precision_p, 'f1_p': f1_p, 'recall_n': recall_n,
                'precision_n': precision_n, 'f1_n': f1_n, 'tp': tp, 'tn': tn,
@@ -452,40 +450,42 @@ class Validator:
 
     def cv_validator_mc(self, dict_param):
         """
-        It evaluates a multi-class TSVM-based estimator using the cross-validation.
-        
+        It evaluates a multi-class TSVM-based estimator using the
+        cross-validation.
+
         Parameters
         ----------
-        dict_param : dict 
+        dict_param : dict
             Values of hyper-parameters for a multi-class TSVM-based estimator.
-            
+
         Returns
         -------
         float
             Accuracy of the model.
-            
+
         float
             Zero standard deviation.
-            
+
         dict
             Evaluation metrics such as Recall, Percision and F1-measure.
         """
-        
-        # Set parameters of the underlying estimator in the multiclass classifier
+
+        # Set parameters of the underlying estimator in the multiclass
+        # classifier
         self.estimator.estimator.set_params(**dict_param)
 
-        k_fold = KFold(self.validator[1])    
+        k_fold = KFold(self.validator[1])
 
         # Store result after each run
         mean_accuracy = []
-        
+
         # Evaluation metrics
         mean_recall, mean_precision, mean_f1 = [], [], []
-        
+
         for train_index, test_index in k_fold.split(self.train_data):
 
             # Extract data based on index created by k_fold
-            X_train = np.take(self.train_data, train_index, axis=0) 
+            X_train = np.take(self.train_data, train_index, axis=0)
             X_test = np.take(self.train_data, test_index, axis=0)
 
             y_train = np.take(self.labels_data, train_index, axis=0)
@@ -496,8 +496,10 @@ class Validator:
             output = self.estimator.predict(X_test)
 
             mean_accuracy.append(accuracy_score(y_test, output) * 100)
-            mean_recall.append(recall_score(y_test, output, average='micro') * 100)
-            mean_precision.append(precision_score(y_test, output, average='micro') * 100)
+            mean_recall.append(recall_score(y_test, output, average='micro')
+                               * 100)
+            mean_precision.append(precision_score(y_test, output,
+                                                  average='micro') * 100)
             mean_f1.append(f1_score(y_test, output, average='micro') * 100)
 
         return np.mean(mean_accuracy), np.std(mean_accuracy), {**{'accuracy':
@@ -506,40 +508,40 @@ class Validator:
                'micro_precision': np.mean(mean_precision), 'm_prec_std':
                np.std(mean_precision), 'mirco_f1': np.mean(mean_f1), 'm_f1_std':
                np.std(mean_f1)}, **dict_param}
-            
+
     def tt_validator_mc(self, dict_param):
         """
-        It evaluates a multi-class TSVM-based estimator using the train/test 
+        It evaluates a multi-class TSVM-based estimator using the train/test
         split method.
-        
+
         Parameters
         ----------
         dict_param : dict
             Values of hyper-parameters for a TSVM-based estimator
-            
+
         Returns
         -------
         float
             Accuracy of the model.
-            
+
         float
             Zero standard deviation.
-            
+
         dict
             Evaluation metrics such as Recall, Percision and F1-measure.
         """
-        
+
         self.estimator.estimator.set_params(**dict_param)
 
         X_train, X_test, y_train, y_test = train_test_split(self.train_data, \
                                            self.labels_data, test_size=self.validator[1], \
                                            random_state=42)
-        
+
         self.estimator.fit(X_train, y_train)
         output = self.estimator.predict(X_test)
-        
+
         acc = accuracy_score(y_test, output) * 100
-        
+
         return acc, 0.0, {**{'accuracy': acc, 'acc_std': 0.0,
                'micro_recall': recall_score(y_test, output, average='micro') * 100,
                'm_rec_std': 0.0, 'micro_precision': precision_score(y_test,
@@ -548,15 +550,15 @@ class Validator:
                **dict_param}
 
     def choose_validator(self):
-
         """
         It selects an appropriate evaluation method based on the input
         paramters.
-        
+
         Returns
         -------
         object
-            An evaluation method for assesing a TSVM-based estimator's performance.
+            An evaluation method for assesing a TSVM-based estimator's
+            performance.
         """
 
         if isinstance(self.estimator, BaseTSVM):
@@ -575,64 +577,63 @@ class Validator:
             if self.validator[0] == 'CV':
 
                 return self.cv_validator_mc
-            
+
             elif self.validator[0] == 't_t_split':
-                
+
                 return self.tt_validator_mc
 
 
 def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
                  step=1):
-
     """
-    It generates all combination of search elements based on the given range of 
+    It generates all combination of search elements based on the given range of
     hyperparameters.
-    
+
     Parameters
     ----------
     kernel_type : str, {'linear', 'RBF'}
         Type of the kernel function which is either 'linear' or 'RBF'.
-        
+
     search_type : str, {'full', 'partial'}
         Type of search space
-    
+
     C1_range : tuple
         Lower and upper bound for C1 penalty parameter.
-    
+
     C2_range : tuple
         Lower and upper bound for C2 penalty parameter.
-        
+
     u_range : tuple
         Lower and upper bound for gamma parameter.
-          
+
     step : int, optinal (default=1)
-        Step size to increase power of 2. 
-    
+        Step size to increase power of 2.
+
     Returns
     -------
     list
         Search elements.
-        
+
     Examples
     --------
     """
 
     c1_range = [2**i for i in np.arange(C1_range[0], C1_range[1]+1, step,
-                                         dtype=np.float)]
+                                        dtype=np.float)]
     c2_range = [2**i for i in np.arange(C2_range[0], C2_range[1]+1, step,
-                                         dtype=np.float)]
-    
+                                        dtype=np.float)]
+
     gamma_range = [2**i for i in np.arange(u_range[0], u_range[1]+1, step,
                    dtype=np.float)] if kernel_type == 'RBF' else [1]
-    
+
     # In full search, C1 and C2 is not same.
     if search_type == 'full':
-        
+
         param_grid = ParameterGrid({'C1': c1_range, 'C2': c2_range,
                                     'gamma': gamma_range})
 
     elif search_type == 'partial':
-        
+
         # TODO: It will be implemeneted later!
         pass
 
@@ -642,37 +643,37 @@ def search_space(kernel_type, search_type, C1_range, C2_range, u_range, \
 def get_results_filename(file_name, clf_name, kernel_name, test_method):
     """
     It returns the filename of the results based on user's input.
-    
+
     Parameters
     ----------
     file_name : str
         Name of the dataset file.
-        
+
     clf_name : str
         Name of the classifier.
-        
+
     kernel_name : str
         Name of kernel function.
-        
+
     test_method : tuple
          A two-element tuple which contains type of evaluation method and its
         parameter.
-            
+
     Returns
     -------
     output : str
         Filename of the results.
     """
-    
+
     # (Name of validator, validator's attribute) - ('CV', 5-folds)
     validator_type, validator_attr = test_method
-                                                  
+
     eval_type = "%d-F-CV" % validator_attr if validator_type == 'CV' else 'Tr%d-Te%d' % \
                 ((1.0 - validator_attr) * 100, validator_attr * 100)
 
     output_file = "%s_%s_%s_%s_%s" % (clf_name, kernel_name, eval_type, file_name,
                                       datetime.now().strftime('%Y-%m-%d %H-%M'))
-    
+
     return output_file
 
 
@@ -681,18 +682,18 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     It saves the detailed classification results in a spreadsheet file (Excel).
 
     Parameters
-    ----------    
+    ----------
     problem_type : str, {'binary', 'multiclass'}
         Type of the classification problem.
-        
+
     validator_obj : object
         The evaluation method that was used for the assesment of the TwinSVM
         classifier.
-    
-    gs_result : list 
+
+    gs_result : list
         Classification results of the TwinSVM classifier using different set of
         hyperparameters.
-              
+
     output_file : str
         The full path and filename of the classification results.
         ex. C:\\Users\\Mir\\file.xlsx
@@ -702,7 +703,7 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
     str
         Path to the saved spreadsheet (Excel) file.
     """
-    
+
     mc_cols = ['accuracy', 'acc_std', 'micro_recall', 'm_rec_std',
                'micro_precision', 'm_prec_std', 'mirco_f1', 'm_f1_std']
 
@@ -714,10 +715,10 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
                     'multiclass':{'CV': mc_cols, 't_t_split': mc_cols}}
 
     excel_file = pd.ExcelWriter(output_file + ".xlsx", engine='xlsxwriter')
-    
+
     param_names = validator_obj.estimator.get_params_names() if problem_type \
                   == 'binary' else validator_obj.estimator.estimator.get_params_names()
-    
+
     result_frame = pd.DataFrame(gs_result,
                    columns=column_names[problem_type][validator_obj.validator[0]] + \
                    param_names) 
@@ -726,45 +727,45 @@ def save_result(validator_obj, problem_type, gs_result, output_file):
 
     excel_file.save()
 
-    return os.path.abspath(output_file)  
+    return os.path.abspath(output_file)
 
 
 def grid_search(func_eval, params_range, log_file=None):
     """
     It does grid search for a TSVM-based estimator. Note that this function is
     defined for API usage.
-    
+
     Parameters
     ----------
     func_eval : object
         An evaluation method for assesing a TSVM-based estimator's performance.
-        
+
     params_range : dict
         Range of each hyper-parameter.
-        
+
     log_file : object (default=None)
         An opened file for logging best classification accuracy.
-            
+
     Returns
     -------
     max_acc
         Best accuracy obtained after the grid search.
-        
+
     max_acc_std
         Standard deviation of the best accuracy.
-        
+
     dict
         Optimal hyper-parameters.
-        
+
     list
         Classification results for every hyper-parameters.
     """
-    
+
     result_list = []
     # Max accuracy
     max_acc, max_acc_std = 0, 0
     optimal_params = None
-    
+
     search_elem = search_space('RBF' if params_range['gamma'] is not None else 'linear',
                  'full', params_range['C1'], params_range['C2'],
                  params_range['gamma'])
@@ -775,32 +776,33 @@ def grid_search(func_eval, params_range, log_file=None):
 
     start_time = datetime.now()
 
-    run = 1   
+    run = 1
 
     # Exhaustive Grid search for finding optimal parameters
     for element in search_elem:
 
         try:
-            
+
             acc, acc_std, result = func_eval(element)
-            
+
             # For debugging purpose
-            #print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
+            # print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std,
+            # str(result)))
 
             result_list.append(result)
 
             # Save best accuracy
             if acc > max_acc:
-                
+
                 max_acc = acc
                 max_acc_std = acc_std
                 optimal_params = element
-                
+
                 if log_file is not None:
                     log_file.write("%s | Best Acc: %.2f+-%.2f | params: %s\n" % \
                                   (datetime.now().strftime('%Y/%m/%d %I:%M:%S %p'), \
                                   max_acc, max_acc_std, str(element)))
-            
+
             elapsed_time = datetime.now() - start_time
             progress_bar_gs(run, search_total, time_fmt(elapsed_time.seconds), \
                            (acc, acc_std), (max_acc, max_acc_std), prefix='',
@@ -808,11 +810,10 @@ def grid_search(func_eval, params_range, log_file=None):
 
             run = run + 1
 
-        # Some parameters cause errors such as Singular matrix        
+        # Some parameters cause errors such as Singular matrix
         except np.linalg.LinAlgError:
-        
-            run = run + 1
 
+            run = run + 1
 
     return max_acc, max_acc_std, optimal_params, result_list
 
@@ -820,78 +821,80 @@ def grid_search(func_eval, params_range, log_file=None):
 class ThreadGS(QObject):
     """
     It runs the Grid Search in a separate thread.
-    
+
     Parameters
     ----------
     usr_input : object
         An instance of :class:`UserInput` class which holds the user input.
     """
-    
+
     # Signals
     sig_pbar_set = pyqtSignal(int)
     sig_gs_info_set = pyqtSignal(int, str, str, str)
     sig_finished = pyqtSignal(bool)
-    
+
     def __init__(self, usr_input):
-        
+
         super(ThreadGS, self).__init__()
-        
+
         self.usr_input = usr_input
         self._isRunning = True
         # Logging
         self.log_file = None
         ######################################################################
-        
+
     @pyqtSlot(object, list)
     def run_gs(self, func_eval, search_space):
         """
-        Runs grid search for the selected classifier on specified hyper-parameters.
-        
+        Runs grid search for the selected classifier on specified
+        hyper-parameters.
+
         Parameters
         ----------
         func_eval : object
-            An evaluation method for assesing a TSVM-based estimator's performance.
-            
+            An evaluation method for assesing a TSVM-based estimator's
+            performance.
+
         search_space : list
             Search elements.
-            
+
         Returns
         -------
         list
             Classification results for every hyper-parameters.
         """
-        
+
         result_list = []
         max_acc, max_acc_std = 0, 0
         optimal_params = None
-    
+
         search_total = len(search_space)
-        self.sig_pbar_set.emit(search_total) # Set range of the progress bar
+        self.sig_pbar_set.emit(search_total)  # Set range of the progress bar
 
         start_time = datetime.now()
-    
+
         run = 1
-    
+
         # Ehaustive Grid search for finding optimal parameters
         for element in search_space:
-    
+
             try:
-    
+
                 acc, acc_std, result = func_eval(element)
-    
+
                 # For debugging purpose
-                #print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
-    
+                # print('Acc: %.2f+-%.2f | params: %s' % (acc, acc_std, str(result)))
+
                 result_list.append(result)
-    
+
                 # Save best accuracy
                 if acc > max_acc:
-                    
+
                     max_acc = acc
-                    max_acc_std = acc_std  
+                    max_acc_std = acc_std
                     optimal_params = element
                     # print(optimal_params)
-                    
+
                     #########################################################
                     # To minmize I/O operations, only best accuray will be
                     # saved in the log file.
@@ -900,52 +903,54 @@ class ThreadGS(QObject):
                                      (datetime.now().strftime('%Y/%m/%d %I:%M:%S %p'), \
                                       max_acc, max_acc_std, str(element)))
                     #########################################################
-                
+
                 elapsed_time = datetime.now() - start_time
-                
+
                 # Update info on screen
                 self.sig_gs_info_set.emit(run, "%.2f+-%.2f" % (acc, acc_std),
                                           "%.2f+-%.2f" % (max_acc, max_acc_std),
                                           time_fmt(elapsed_time.seconds))
-                
+
                 run = run + 1
-                
+
                 if not self._isRunning:
-                    
+
                     break
-    
-            # Some parameters cause errors such as Singular matrix        
+
+            # Some parameters cause errors such as Singular matrix
             except np.linalg.LinAlgError:
-            
+
                 run = run + 1
-                
+
         return result_list, optimal_params
-    
-    @pyqtSlot()            
-    def initialize(self): 
+
+    @pyqtSlot()
+    def initialize(self):
         # TODO: Revise docs of this method
         """
         It passes a user's input to the functions and classes for solving a
-        classification task. The steps that this function performs can be summarized
-        as follows:
-            
+        classification task. The steps that this function performs can be
+        summarized as follows:
+
         #. Specifies a TwinSVM classifier based on the user's input.
         #. Chooses an evaluation method for assessment of the classifier.
         #. Computes all the combination of search elements.
-        #. Computes the evaluation metrics for all the search element using grid search.
-        #. Saves the detailed classification results in a spreadsheet file (Excel).
-            
+        #. Computes the evaluation metrics for all the search element using
+        grid search.
+        #. Saves the detailed classification results in a spreadsheet
+        file (Excel).
+
         Returns
         -------
         object
             The evalution method.
-        
+
         dict
             Grids of search elements.
         """
-        
+
         clf_obj = self.usr_input.get_selected_clf()
-    
+
 #        if self.usr_input.clf_type == 'tsvm':
 #            
 #            clf_obj = TSVM(self.usr_input.kernel_type, self.usr_input.rect_kernel)
@@ -963,10 +968,10 @@ class ThreadGS(QObject):
 #            elif self.usr_input.mc_scheme == 'ovo':
 #                
 #                clf_obj = OneVsOneClassifier(clf_obj)
-                
+
         eval_method = Validator(self.usr_input.X_train, self.usr_input.y_train,
                                 self.usr_input.test_method_tuple, clf_obj)
-    
+
         search_elem = search_space(self.usr_input.kernel_type, 'full',
                                    self.usr_input.C1_range, self.usr_input.C2_range,
                                    self.usr_input.u_range, self.usr_input.step_size)
@@ -975,42 +980,41 @@ class ThreadGS(QObject):
                                           self.usr_input._get_clf_name(),
                                           self.usr_input.kernel_type,
                                           self.usr_input.test_method_tuple)
-        
+
         # Logging section ####################################################
         if self.usr_input.log_file:
             self.log_file = open(os.path.join(self.usr_input.result_path,
                                 'log_'+results_fn+'.txt'), 'w', 1)
         ######################################################################
-        
+
         clf_results, opt_params = self.run_gs(eval_method.choose_validator(),
                                               search_elem)
-        
+
         if self.usr_input.save_clf_results:
-        
+
             save_result(eval_method, self.usr_input.class_type, clf_results,
                         os.path.join(self.usr_input.result_path, results_fn))
-            
+
         if self.usr_input.save_best_model:
-            
+
             # print("Saving best model on disk.")
             save_model(eval_method, opt_params,
                        os.path.join(self.usr_input.result_path,
                                     'model_'+results_fn+'.joblib'))
-        
+
         # Close logging file #################################################
         if self.usr_input.log_file:
             self.log_file.close()
         ######################################################################
-        
+
         if self._isRunning:
-            
+
             # Enables Start button
             self.sig_finished.emit(True)
-    
+
     def stop(self):
         """
         Stops the thread of the grid search.
         """
-        
+
         self._isRunning = False
-    
