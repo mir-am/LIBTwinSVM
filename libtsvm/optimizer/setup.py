@@ -83,7 +83,8 @@ def configuration(parent_package='', top_path=None):
     config.add_library('clipdcd-lib',
                        language='c++',
                        sources=[join("src", "clippdcd_opt.cpp"),
-                                join("src", "clippdcd_opt.h")],
+                                join("src", "clippdcd_opt.h"),
+                                join("src", "arma_util.hpp")],
                         include_dirs=[np.get_include(), join('armadillo-code',
                                        'include')],
                         extra_compiler_args=compile_args,
@@ -91,7 +92,8 @@ def configuration(parent_package='', top_path=None):
             
 
     sources = [join("src", "clipdcd.pyx")]
-    depends = [join("src", "clippdcd_opt.cpp"), join("src", "clippdcd_opt.h")]
+    depends = [join("src", "clippdcd_opt.cpp"), join("src", "clippdcd_opt.h"),
+               join("src", "arma_util.hpp")]
 
     config.add_extension('clipdcd',
                          sources=sources,

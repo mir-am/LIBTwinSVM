@@ -29,11 +29,13 @@ May 4, 2018: A trick for improving dot product computation. It improves speed by
 #include "clippdcd_opt.h"
 #include <iostream>
 #include <numeric>
-#include <armadillo>
 
 #define MAX_ITER 15000
 
-using namespace arma;
+void printAllElem(Mat<double>* x)
+{
+    cout << "no.rows: " << x->n_rows << " no_cols: " << x->n_cols << endl;
+}
 
 std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const double c)
 {

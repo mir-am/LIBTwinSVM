@@ -26,5 +26,10 @@ May 4, 2018: A trick for improving dot product computation. It imporves speed by
 */
 
 #include <vector>
+#include <armadillo>
+
+using namespace arma;
+
+void printAllElem(Mat<double>* x);
 
 std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const double c);
