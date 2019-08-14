@@ -187,7 +187,7 @@ def optimize(numpy.ndarray[double, ndim=2] mat_dual, const double c):
         Lagrange multipliers
     """
     
-    cdef Mat[double]* mat_dual_arma = numpy_to_mat_d(mat_dual, 1)
+    cdef Mat[double]* mat_dual_arma = numpy_to_mat_d(mat_dual, 0)
 
     return optimizer(mat_dual_arma, c)
 	
