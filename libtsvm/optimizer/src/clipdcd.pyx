@@ -157,16 +157,18 @@ cdef Mat[double]* numpy_to_mat_d(numpy.ndarray[numpy.double_t, ndim=2] X, \
 ############################## ClipDCD optimizer #############################
 cdef extern from "clippdcd_opt.h":
     
-    vector[double] optimizer(vector[vector[double]] &dual, const double c)
+    vector[double] optimizer(Mat[double]* dual, const double c)
     void printAllElem(Mat[double]* X)
-
 
 def np_arma(numpy.ndarray[double, ndim=2] mat):
     
+    import time
+    
     cdef Mat[double]* y = numpy_to_mat_d(mat, 1)
     printAllElem(y)
-
-
+    print("Moved matrix to Armadillo structure.")
+    #time.sleep(7)
+    
 def optimize(numpy.ndarray[double, ndim=2] mat_dual, const double c):
     """
     It solves a dual optimization problem using clipDCD algorithm
@@ -184,7 +186,9 @@ def optimize(numpy.ndarray[double, ndim=2] mat_dual, const double c):
     list
         Lagrange multipliers
     """
+    
+    cdef Mat[double]* mat_dual_arma = numpy_to_mat_d(mat_dual, 1)
 
-    return optimizer(mat_dual, c)
+    return optimizer(mat_dual_arma, c)
 	
 ##############################################################################

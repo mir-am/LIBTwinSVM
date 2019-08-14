@@ -35,21 +35,23 @@ May 4, 2018: A trick for improving dot product computation. It improves speed by
 void printAllElem(Mat<double>* x)
 {
     cout << "no.rows: " << x->n_rows << " no_cols: " << x->n_cols << endl;
+    cout << "First element: " << x->at(0, 0) << endl;
 }
 
-std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const double c)
+
+std::vector<double> optimizer(Mat<double>* dualMatrix, const double c)
 {
-    // Type conversion - STD vector -> arma mat
-    mat dualMatrix = zeros<mat>(dual.size(), dual.size());
-
-    for(unsigned int i = 0; i < dualMatrix.n_rows; i++)
-    {
-        dualMatrix.row(i) = conv_to<rowvec>::from(dual[i]);
-
-    }
+//    // Type conversion - STD vector -> arma mat
+//    mat dualMatrix = zeros<mat>(dual.size(), dual.size());
+//
+//    for(unsigned int i = 0; i < dualMatrix.n_rows; i++)
+//    {
+//        dualMatrix.row(i) = conv_to<rowvec>::from(dual[i]);
+//
+//    }
 
     // Step 1: Initial Lagrange multiplies
-    vec alpha = zeros<vec>(dualMatrix.n_rows);
+    vec alpha = zeros<vec>(dualMatrix->n_rows);
 
     // Number of iterations
     unsigned int iter = 0;
@@ -61,26 +63,26 @@ std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const dou
     const unsigned int maxIter = MAX_ITER;
 
     // Index set
-    std::vector<unsigned int> indexList(dualMatrix.n_rows);
+    std::vector<unsigned int> indexList(dualMatrix->n_rows);
 
     // Initialize index set
     std::iota(std::begin(indexList), std::end(indexList), 0);
 
     // Store dot product values
-    std::vector<double> dotList(dualMatrix.n_rows);
+    std::vector<double> dotList(dualMatrix->n_rows);
 
     // For storing objective function value
-    vec objList = zeros<vec>(dualMatrix.n_rows);
+    vec objList = zeros<vec>(dualMatrix->n_rows);
 
     // Create index set and computing dot products for all columns of dual mat
     for(unsigned int i = 0; i < indexList.size(); ++i)
     {
 
         // Computing dot product here, improves speed significantly
-        double temp = dot(alpha, dualMatrix.col(indexList[i]));
+        double temp = dot(alpha, dualMatrix->col(indexList[i]));
 
         //double obj = (e(*it) - dot(alpha, dualMatrix.col(*it))) / dualMatrix(*it, *it);
-        double obj = (1.0 - temp) / dualMatrix(indexList[i], indexList[i]);
+        double obj = (1.0 - temp) / dualMatrix->at(indexList[i], indexList[i]);
 
         dotList[indexList[i]] = temp;
 
@@ -93,7 +95,7 @@ std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const dou
         }
         else
         {
-            objList(indexList[i]) = pow(1.0 - temp, 2) / dualMatrix(indexList[i], indexList[i]);
+            objList(indexList[i]) = pow(1.0 - temp, 2) / dualMatrix->at(indexList[i], indexList[i]);
         }
     }
 
@@ -105,7 +107,7 @@ std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const dou
         unsigned int L_index = index_max(objList);
 
         // Compute lambda
-        double lambda = (1.0 - dot(alpha, dualMatrix.col(L_index))) / dualMatrix(L_index, L_index);
+        double lambda = (1.0 - dot(alpha, dualMatrix->col(L_index))) / dualMatrix->at(L_index, L_index);
 
         // Previous alpha value
         double preAlpha = alpha(L_index);
@@ -113,7 +115,7 @@ std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const dou
         // Step 2.2: Update multipliers
         alpha(L_index) = alpha(L_index) + std::max(0.0, std::min(lambda, c));
 
-        double objValue = pow(1.0 - dot(alpha, dualMatrix.col(L_index)), 2) / dualMatrix(L_index, L_index);
+        double objValue = pow(1.0 - dot(alpha, dualMatrix->col(L_index)), 2) / dualMatrix->at(L_index, L_index);
 
         ++iter;
 
@@ -125,16 +127,16 @@ std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const dou
         }
 
         // Zeroing!
-        objList = zeros<vec>(dualMatrix.n_rows);
+        objList = zeros<vec>(dualMatrix->n_rows);
 
         // Computing index list
         for(unsigned int i = 0; i < indexList.size(); ++i)
         {
 
             // A trick for computing dot so much faster!
-            dotList[indexList[i]] = (dotList[indexList[i]] - preAlpha * dualMatrix(indexList[i], L_index)) + (alpha(L_index) * dualMatrix(indexList[i], L_index));
+            dotList[indexList[i]] = (dotList[indexList[i]] - preAlpha * dualMatrix->at(indexList[i], L_index)) + (alpha(L_index) * dualMatrix->at(indexList[i], L_index));
 
-            double obj = (1.0 - dotList[indexList[i]]) / dualMatrix(indexList[i], indexList[i]);
+            double obj = (1.0 - dotList[indexList[i]]) / dualMatrix->at(indexList[i], indexList[i]);
 
             // Remove index when it makes condition false - Filtering out indexes
             if( !((alpha(indexList[i]) < c) & (obj > 0)) )
@@ -144,7 +146,7 @@ std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const dou
             }
             else
             {
-                objList(indexList[i]) = pow(1.0 - dotList[indexList[i]], 2) / dualMatrix(indexList[i], indexList[i]);
+                objList(indexList[i]) = pow(1.0 - dotList[indexList[i]], 2) / dualMatrix->at(indexList[i], indexList[i]);
 
             }
         }

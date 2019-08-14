@@ -32,4 +32,6 @@ using namespace arma;
 
 void printAllElem(Mat<double>* x);
 
-std::vector<double> optimizer(std::vector<std::vector<double> > &dual, const double c);
+std::vector<double> optimizer(Mat<double>* dualMatrix, const double c);
+
+
