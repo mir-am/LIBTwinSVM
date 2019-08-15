@@ -30,8 +30,8 @@ May 4, 2018: A trick for improving dot product computation. It imporves speed by
 
 using namespace arma;
 
-void printAllElem(Mat<double>* x);
+//void printAllElem(Mat<double>* x);
 
-std::vector<double> optimizer(Mat<double>* dualMatrix, const double c);
+Row<double> optimizer(Mat<double>* dualMatrix, const double c);
 
 

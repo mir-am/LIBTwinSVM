@@ -1,7 +1,6 @@
 /*
-LightTwinSVM Program - Simple and Fast
-Version: 0.2.0-alpha - 2018-05-30
-Developer: Mir, A. (mir-am@hotmail.com)
+LIBTwinSVM: A Library for Twin Support Vector Machines
+Developers: Mir, A. and Mahdi Rahbar
 License: GNU General Public License v3.0
 
 The clipDCD algorithm is implemented for solving dual optimization problems of TwinSVM.
@@ -24,6 +23,9 @@ Mar 23, 2018: execution time improved significantly by computing dot product in 
 
 May 4, 2018: A trick for improving dot product computation. It improves speed by 4-5x times.
 
+Aug 14, 2019: Moving NumPy array to Armadillo matrix without copying the memory.
+This improves the speed of the optimizer by 10x times.
+
 */
 
 #include "clippdcd_opt.h"
@@ -39,7 +41,7 @@ void printAllElem(Mat<double>* x)
 }
 
 
-std::vector<double> optimizer(Mat<double>* dualMatrix, const double c)
+Row<double> optimizer(Mat<double>* dualMatrix, const double c)
 {
 //    // Type conversion - STD vector -> arma mat
 //    mat dualMatrix = zeros<mat>(dual.size(), dual.size());
@@ -51,7 +53,7 @@ std::vector<double> optimizer(Mat<double>* dualMatrix, const double c)
 //    }
 
     // Step 1: Initial Lagrange multiplies
-    vec alpha = zeros<vec>(dualMatrix->n_rows);
+    Row<double> alpha = zeros<rowvec>(dualMatrix->n_rows);
 
     // Number of iterations
     unsigned int iter = 0;
@@ -154,8 +156,8 @@ std::vector<double> optimizer(Mat<double>* dualMatrix, const double c)
     }
 
     // Type conversion
-    std::vector<double> alphaVec = conv_to<std::vector<double> >::from(alpha);
+    // std::vector<double> alphaVec = conv_to<std::vector<double> >::from(alpha);
 
-    return alphaVec;
+    return alpha;
 
 }

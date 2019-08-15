@@ -264,10 +264,9 @@ class TSVM(BaseTSVM):
         mat_dual2 = np.dot(np.dot(mat_H, mat_G_G), mat_H_t)
 
         # Obtaining Lagrange multipliers using ClipDCD optimizer
-        alpha_d1 = np.array(clipdcd.optimize(mat_dual1,
-                                             self.C1)).reshape(mat_dual1.shape[0], 1)
-        alpha_d2 = np.array(clipdcd.optimize(mat_dual2,
-                                             self.C2)).reshape(mat_dual2.shape[0], 1)
+        alpha_d1 = clipdcd.optimize(mat_dual1, self.C1).reshape(mat_dual1.shape[0], 1)
+
+        alpha_d2 = clipdcd.optimize(mat_dual2, self.C2).reshape(mat_dual2.shape[0], 1)
 
         # Obtain hyperplanes
         hyper_p_1 = -1 * np.dot(np.dot(mat_H_H, mat_G_t), alpha_d1)

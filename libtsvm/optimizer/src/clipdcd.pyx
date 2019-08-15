@@ -152,22 +152,38 @@ cdef Mat[double]* numpy_to_mat_d(numpy.ndarray[numpy.double_t, ndim=2] X, \
 
   return m
 
+cdef numpy.ndarray[numpy.double_t, ndim=1] row_to_numpy_d(Row[double]& X) \
+    except +:
+  """
+  Convert an Armadillo row vector to a one-dimensional numpy ndarray.
+  """
+  # Extract dimensions.
+  cdef numpy.npy_intp dim = <numpy.npy_intp> X.n_elem
+  cdef numpy.ndarray[numpy.double_t, ndim=1] output = \
+      numpy.PyArray_SimpleNewFromData(1, &dim, numpy.NPY_DOUBLE, GetMemory(X))
+
+  # Transfer memory ownership, if needed.
+  if GetMemState[Row[double]](X) == 0:
+    SetMemState[Row[double]](X, 1)
+    PyArray_ENABLEFLAGS(output, numpy.NPY_OWNDATA)
+
+  return output
+
 ##############################################################################
 
 ############################## ClipDCD optimizer #############################
 cdef extern from "clippdcd_opt.h":
     
-    vector[double] optimizer(Mat[double]* dual, const double c)
-    void printAllElem(Mat[double]* X)
+    Row[double] optimizer(Mat[double]* dual, const double c)
 
-def np_arma(numpy.ndarray[double, ndim=2] mat):
-    
-    import time
-    
-    cdef Mat[double]* y = numpy_to_mat_d(mat, 1)
-    printAllElem(y)
-    print("Moved matrix to Armadillo structure.")
-    #time.sleep(7)
+#def np_arma(numpy.ndarray[double, ndim=2] mat):
+#    
+#    import time
+#    
+#    cdef Mat[double]* y = numpy_to_mat_d(mat, 1)
+#    printAllElem(y)
+#    print("Moved matrix to Armadillo structure.")
+#    #time.sleep(7)
     
 def optimize(numpy.ndarray[double, ndim=2] mat_dual, const double c):
     """
@@ -188,7 +204,8 @@ def optimize(numpy.ndarray[double, ndim=2] mat_dual, const double c):
     """
     
     cdef Mat[double]* mat_dual_arma = numpy_to_mat_d(mat_dual, 0)
-
-    return optimizer(mat_dual_arma, c)
+    cdef Row[double] lag_mults = optimizer(mat_dual_arma, c)
+    
+    return row_to_numpy_d(lag_mults)
 	
 ##############################################################################
