@@ -175,15 +175,6 @@ cdef numpy.ndarray[numpy.double_t, ndim=1] row_to_numpy_d(Row[double]& X) \
 cdef extern from "clippdcd_opt.h":
     
     Row[double] optimizer(Mat[double]* dual, const double c)
-
-#def np_arma(numpy.ndarray[double, ndim=2] mat):
-#    
-#    import time
-#    
-#    cdef Mat[double]* y = numpy_to_mat_d(mat, 1)
-#    printAllElem(y)
-#    print("Moved matrix to Armadillo structure.")
-#    #time.sleep(7)
     
 def optimize(numpy.ndarray[double, ndim=2] mat_dual, const double c):
     """

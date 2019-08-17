@@ -12,8 +12,7 @@ solving support vector machines. Knowledge-Based Systems, 71, 266-278.
 
 This C++ extension depends on the following libraries:
 - Armadillo C++ Linear Algebra Library (http://arma.sourceforge.net)
-- pybind11 for creating python bindings on Linux (https://pybind11.readthedocs.io)
-- Cython for building C++ extension module on Windows (http://cython.org/)
+- Cython for building C++ extension module (http://cython.org/)
 
 Change log:
 Mar 21, 2018: A bug related to the WLTSVM classifier was fixed. the bug caused poor accuracy.
@@ -33,13 +32,6 @@ This improves the speed of the optimizer by 10x times.
 #include <numeric>
 
 #define MAX_ITER 15000
-
-void printAllElem(Mat<double>* x)
-{
-    cout << "no.rows: " << x->n_rows << " no_cols: " << x->n_cols << endl;
-    cout << "First element: " << x->at(0, 0) << endl;
-}
-
 
 Row<double> optimizer(Mat<double>* dualMatrix, const double c)
 {

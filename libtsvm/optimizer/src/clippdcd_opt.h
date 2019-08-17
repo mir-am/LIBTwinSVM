@@ -1,7 +1,6 @@
 /*
-LightTwinSVM Program - Simple and Fast
-Version: 0.2.0-alpha - 2018-05-30
-Developer: Mir, A. (mir-am@hotmail.com)
+LIBTwinSVM: A Library for Twin Support Vector Machines
+Developers: Mir, A. and Mahdi Rahbar
 License: GNU General Public License v3.0
 
 The clipDCD algorithm is implemented for solving dual optimization problems of TwinSVM.
@@ -12,8 +11,7 @@ Peng, X., Chen, D., & Kong, L. (2014). A clipping dual coordinate descent algori
 
 This C++ extension depends on the follwing libraries:
 - Armadillo C++ Linear Agebra Library (http://arma.sourceforge.net)
-- pybind11 for creating python bindings on Linux (https://pybind11.readthedocs.io)
-- Cython for building C++ extension module on Windows (http://cython.org/)
+- Cython for building C++ extension module (http://cython.org/)
 
 Change log:
 Mar 21, 2018: A bug related to the WLTSVM classifier was fixed. the bug caused poor accuracy.
@@ -23,6 +21,9 @@ Mar 23, 2018: execution time improved significantly by computing dot product in 
 
 May 4, 2018: A trick for improving dot product computation. It imporves speed by 4-5x times.
 
+Aug 14, 2019: Moving NumPy array to Armadillo matrix without copying the memory.
+This improves the speed of the optimizer by 10x times.
+
 */
 
 #include <vector>
@@ -30,8 +31,4 @@ May 4, 2018: A trick for improving dot product computation. It imporves speed by
 
 using namespace arma;
 
-//void printAllElem(Mat<double>* x);
-
 Row<double> optimizer(Mat<double>* dualMatrix, const double c);
-
-
