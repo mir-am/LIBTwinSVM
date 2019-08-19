@@ -10,6 +10,7 @@ defined.
 """
 
 from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_X_y
 from libtsvm.optimizer import clipdcd
 import numpy as np
 
@@ -217,6 +218,8 @@ class TSVM(BaseTSVM):
 
         """
 
+        X_train, y_train = check_X_y(X_train, y_train, dtype=np.float64)
+
         # Matrix A or class 1 samples
         mat_A = X_train[y_train == 1]
 
@@ -326,6 +329,8 @@ class LSTSVM(BaseTSVM):
         y : array-like, shape(n_samples,)
             Target values or class labels.
         """
+
+        X, y = check_X_y(X, y, dtype=np.float64)
 
         # Matrix A or class 1 data
         mat_A = X[y == 1]
