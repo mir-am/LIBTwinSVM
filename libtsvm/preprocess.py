@@ -78,6 +78,16 @@ class DataReader():
 
             df = pd.DataFrame(np.hstack((y.reshape(X.shape[0], 1), X)))
             self.hdr_names = []
+            
+            # Check that the lables of binary problems are +1 and -1.
+            class_label = df.iloc[:, 0].unique()
+            
+            if class_label.size == 2:
+                
+                if not(1 in class_label and -1 in class_label):
+                    
+                    df.iloc[:, 0][df.iloc[:, 0] == class_label[0]] = 1 
+                    df.iloc[:, 0][df.iloc[:, 0] == class_label[1]] = -1 
 
         else:
 
