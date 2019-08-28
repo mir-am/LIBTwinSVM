@@ -202,7 +202,7 @@ class TSVM(BaseTSVM):
         super(TSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
         self.clf_name = 'TSVM'
-    
+    #@profile
     def fit(self, X_train, y_train):
         """
         It fits the binary TwinSVM model according to the given training data.
@@ -258,29 +258,29 @@ class TSVM(BaseTSVM):
 
         mat_H_H = np.linalg.inv(np.dot(mat_H_t, mat_H) + (reg_term *
                                 np.identity(mat_H.shape[1])))
-        mat_G_G = np.linalg.inv(np.dot(mat_G_t, mat_G) + (reg_term *
-                                np.identity(mat_G.shape[1])))
-
+        
         # Wolfe dual problem of class 1
         mat_dual1 = np.dot(np.dot(mat_G, mat_H_H), mat_G_t)
         # Obtaining Lagrange multipliers using ClipDCD optimizer
         alpha_d1 = clipdcd.optimize(mat_dual1, self.C1).reshape(mat_dual1.shape[0], 1)
         
-        # Free memory
-        del mat_dual1
+        # Obtain hyperplanes
+        hyper_p_1 = -1 * np.dot(np.dot(mat_H_H, mat_G_t), alpha_d1)
         
+        # Free memory
+        del mat_dual1, mat_H_H
+        
+        mat_G_G = np.linalg.inv(np.dot(mat_G_t, mat_G) + (reg_term *
+                                np.identity(mat_G.shape[1])))
         # Wolfe dual problem of class -1
         mat_dual2 = np.dot(np.dot(mat_H, mat_G_G), mat_H_t)
         alpha_d2 = clipdcd.optimize(mat_dual2, self.C2).reshape(mat_dual2.shape[0], 1)
 
-        # Obtain hyperplanes
-        hyper_p_1 = -1 * np.dot(np.dot(mat_H_H, mat_G_t), alpha_d1)
+        hyper_p_2 = np.dot(np.dot(mat_G_G, mat_H_t), alpha_d2)
 
         # Class 1
         self.w1 = hyper_p_1[:hyper_p_1.shape[0] - 1, :]
         self.b1 = hyper_p_1[-1, :]
-
-        hyper_p_2 = np.dot(np.dot(mat_G_G, mat_H_t), alpha_d2)
 
         # Class -1
         self.w2 = hyper_p_2[:hyper_p_2.shape[0] - 1, :]
@@ -316,7 +316,7 @@ class LSTSVM(BaseTSVM):
         super(LSTSVM, self).__init__(kernel, rect_kernel, C1, C2, gamma)
 
         self.clf_name = 'LSTSVM'
-
+#    @profile
     def fit(self, X, y):
         """
         It fits the binary Least Squares TwinSVM model according to the given
