@@ -161,11 +161,12 @@ cdef numpy.ndarray[numpy.double_t, ndim=1] row_to_numpy_d(Row[double]& X) \
   cdef numpy.npy_intp dim = <numpy.npy_intp> X.n_elem
   cdef numpy.ndarray[numpy.double_t, ndim=1] output = \
       numpy.PyArray_SimpleNewFromData(1, &dim, numpy.NPY_DOUBLE, GetMemory(X))
-
+  
+  # No need to transer memory! It causes heap corruption on Windows OS.  
   # Transfer memory ownership, if needed.
-  if GetMemState[Row[double]](X) == 0:
-    SetMemState[Row[double]](X, 1)
-    PyArray_ENABLEFLAGS(output, numpy.NPY_OWNDATA)
+#  if GetMemState[Row[double]](X) == 0:
+#    SetMemState[Row[double]](X, 1)
+#    PyArray_ENABLEFLAGS(output, numpy.NPY_OWNDATA)
 
   return output
 
