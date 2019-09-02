@@ -37,7 +37,7 @@ class TestLSTSVM(unittest.TestCase):
         """
         
         expected_output = {'gamma': 1, 'C1': 0.1, 'rect_kernel': 1, 'C2': 0.25,
-                           'kernel': 'linear'}
+                           'kernel': 'linear', 'mem_optimize': False}
         
         lstsvm_cls = LSTSVM('linear')
         lstsvm_cls.set_params(**{'C1': 0.1, 'C2':0.25})
@@ -52,7 +52,7 @@ class TestLSTSVM(unittest.TestCase):
         """
         
         expected_output = {'C2': 0.625, 'C1': 0.05, 'rect_kernel': 1,
-                           'gamma': 0.5, 'kernel': 'RBF'}
+                           'gamma': 0.5, 'kernel': 'RBF', 'mem_optimize': False}
         
         lstsvm_cls = LSTSVM('RBF')
         lstsvm_cls.set_params(**{'C1': 0.05, 'C2': 0.625, 'gamma': 0.5})
@@ -76,7 +76,7 @@ class TestLSTSVM(unittest.TestCase):
         It tests non-linear LSTSVM on hepatitis dataset
         """
         
-        clf = LSTSVM('RBF', 1, 0.5, 0.5, 0.1)
+        clf = LSTSVM('RBF', 1, 0.5, 0.5, 0.5)
         clf.fit(X, y)
         pred = clf.predict(X)
         
