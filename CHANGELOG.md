@@ -3,7 +3,19 @@ All notable changes to LIBTwinSVM library will be documented in this file. The f
 
 ## [Unreleased]
 
+## [0.3.0] - 2019-09-13
+
+### Added
+- Checking whether the kernel names are valid.
+- The order of computations are optimized in TSVM and LSTSVM estimators to reduce their memory consumption.
+- The `fit()` method of the TSVM-based estimators now accepts a Python list as well as NumPy arrays.
+
+### Fixed
+- The optimizer component avoids memory copies. It substanially improved the training speed and memory usage of the TSVM estimator.
+- Fixed the heap corruption of the optimizer component for Windows platforms.
+
 ## [0.2.0] - 2019-06-17
+
 ### Added
 - Added two benchmark scripts to the repository.
 - Added Grid Search method to the Library's API.
