@@ -143,7 +143,8 @@ class TestTSVM(unittest.TestCase):
         pred = clf.predict(X)
         
         assert_greater(np.mean(y == pred), 0.78)
-        
+    
+    @unittest.skip
     def test_rbf_tsvm_hepatitis(self):
         """
         It tests non-linear TSVM estimator on hepatitis dataset
