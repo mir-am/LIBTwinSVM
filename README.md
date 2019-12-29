@@ -3,7 +3,7 @@
 <a href="https://travis-ci.org/mir-am/LIBTwinSVM"><img src="https://api.travis-ci.org/mir-am/LIBTwinSVM.svg?branch=master" alt="Travis-CI"></a>
 [![Documentation Status](https://readthedocs.org/projects/libtwinsvm/badge/?version=latest)](https://libtwinsvm.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/LIBTwinSVM.svg)](https://badge.fury.io/py/LIBTwinSVM)
-
+<a href='http://paypal.me/mir33'><img src='https://img.shields.io/badge/Donate-PayPal-green.svg' alt='donation' /></a>
 
 # Contents
 1. [Core Features](#core-features)
@@ -11,7 +11,8 @@
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
 5. [Development](#development) 
-6. [License](#license)
+6. [Donations](#donations)
+7. [License](#license)
 
 ## Core Features
 LIBTwinSVM is an easy-to-use implementation of Twin Support Vector Machine.  It is licensed under the terms of GNU GPL v3. This application comes with a user interface which makes using the algorithm so handy for Data Scientists, Machine Learning Researchers and whoever else that is interested in Machine Learning.
@@ -181,6 +182,13 @@ Next, execute the following command in the root of the project directory:
 ```
 pytest tests
 ```
+
+## Donations
+<a href="http://paypal.me/mir33">
+  <img src="https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png" alt="Donate with PayPal" align="left" height="80" width="192" />
+</a><br />
+
+If you have used the LIBTwinSVM project and found it helpful, please consider making a donation via [PayPal](http://paypal.me/mir33) to support this work. It also motivates us to maintain the project and develop new features.
 
 ## License
 LIBTwinSVM library is licensed under the terms of GNU General Public License v3. This library can be used for both academic and commercial purposes. For more information, check out the [LICENSE](https://github.com/mir-am/LIBTwinSVM/blob/master/LICENSE.txt) file.
