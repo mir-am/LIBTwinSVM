@@ -4,6 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/libtwinsvm/badge/?version=latest)](https://libtwinsvm.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/LIBTwinSVM.svg)](https://badge.fury.io/py/LIBTwinSVM)
 <a href='http://paypal.me/mir33'><img src='https://img.shields.io/badge/Donate-PayPal-green.svg' alt='donation' /></a>
+[![Downloads](https://pepy.tech/badge/libtwinsvm)](https://pepy.tech/project/libtwinsvm)
 
 # Contents
 1. [Core Features](#core-features)
