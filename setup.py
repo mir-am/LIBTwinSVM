@@ -27,7 +27,7 @@ EMAIL = "mir-am@hotmail.com, mahdirahbar@gmail.com"
 AUTHOR = "Mir, A. and Mahdi Rahbar"
 REQUIRES_PYTHON = '>=3.5'
 VERSION = '%s' % __version__
-REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "sklearn", "pandas",
+REQ_PACKAGES = ["cython", "numpy", "matplotlib", "pyQt5", "scikit-learn", "pandas",
                 "xlsxwriter", "joblib", "numpydoc==0.7.0"]
 PKG_DATA = {}
 DATA_FILES = []

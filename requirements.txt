@@ -4,7 +4,7 @@ cython
 numpy
 matplotlib
 pyQt5
-sklearn
+scikit-learn
 pandas
 xlsxwriter
 joblib
